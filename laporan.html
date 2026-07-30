@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rekap &amp; Laporan - Sistem Presensi Edukasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden h-screen flex">
+<!-- SideNavBar -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<!-- Active Tab: Laporan -->
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-outline-variant">
+<button class="flex items-center gap-3 text-error w-full hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all" onclick="handleLogout()">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md font-bold">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-[260px] h-full flex flex-col overflow-hidden transition-all duration-300">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined text-primary">school</span>
+</button>
+<h2 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Sistem Presensi Edukasi</h2>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search on Right (Implicitly handled by gap and flex) -->
+<div class="hidden md:flex items-center bg-surface-container-high rounded-full px-4 py-2 w-64 border border-outline-variant focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-2 text-on-surface" placeholder="Cari laporan..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">help</button>
+<div class="h-10 w-10 rounded-full border-2 border-primary overflow-hidden cursor-pointer active:opacity-80">
+<img class="w-full h-full object-cover" data-alt="A high-quality studio portrait of a professional school administrator with a warm and inviting smile, dressed in business casual attire. The background is a clean, minimalist office with soft focus educational awards. The lighting is bright and airy, consistent with a professional corporate design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWK-klaOUGzi5dR5zfPkNSL_PAF7nbllGk-1dFyVTAA408nsr2YxD8zeuUOBOXZJl7IfdjmVRU2M1npBawlXbeU-ge7lombR61CEfvyd2G4uogHPhYEMka77ObN54t0bG0E-GWBqV_-JH5Jc-Q-QXgbbvjfbNVi9VxmYoZ68RfLiUw1EAYnsvgqM7NRku1hlLsVNaGI0L4AUqaK5Jj-2dAj-nUgoTDETD76_SRSKV5QJFFjffRZpwg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-gutter bg-background custom-scrollbar">
+<div class="max-w-container-max-width mx-auto flex flex-col gap-stack-lg animate-fade-in">
+<!-- Page Header -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h3 class="font-display-md text-display-md text-on-background">Rekap &amp; Laporan</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Pantau tingkat kehadiran siswa dan ekspor data administratif.</p>
+</div>
+<!-- Action Bar -->
+<div class="flex items-center gap-3">
+<button onclick="window.print()" class="flex items-center gap-2 px-6 py-3 border border-primary text-primary font-title-md rounded-lg hover:bg-primary/5 transition-all cursor-pointer">
+<span class="material-symbols-outlined">print</span>
+                            Cetak / PDF
+                        </button>
+<button onclick="exportToCSV()" class="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-title-md rounded-lg hover:shadow-lg transition-all cursor-pointer">
+<span class="material-symbols-outlined">table_view</span>
+                            Export CSV / Excel
+                        </button>
+</div>
+</section>
+<!-- Filter & Charts Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Filter Section (Level 1 Card) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">filter_alt</span>
+<h4 class="font-title-md text-title-md">Filter Laporan</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bulan</label>
+<div class="relative">
+<select id="filter-bulan" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<option value="1">Januari</option>
+<option value="2">Februari</option>
+<option value="3">Maret</option>
+<option value="4">April</option>
+<option value="5">Mei</option>
+<option value="6">Juni</option>
+<option value="7">Juli</option>
+<option value="8">Agustus</option>
+<option value="9">September</option>
+<option value="10">Oktober</option>
+<option value="11">November</option>
+<option value="12">Desember</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tahun</label>
+<div class="relative">
+<select id="filter-tahun" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<option value="2024">2024</option>
+<option value="2025">2025</option>
+<option value="2026">2026</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kelas</label>
+<div class="relative">
+<select id="filter-kelas" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<option value="">Semua Kelas</option>
+<option value="XII IPA 1">XII IPA 1</option>
+<option value="XII IPA 2">XII IPA 2</option>
+<option value="XI IPS 1">XI IPS 1</option>
+<option value="X-1">X-1</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Mini Chart Section (Level 1 Card) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+<h4 class="font-title-md text-title-md text-on-surface">Rata-rata Kehadiran Bulan Ini</h4>
+<div class="flex-1 flex items-center justify-center relative py-4">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="12"></circle>
+<circle id="pie-circle" class="text-primary transition-all duration-1000" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="36.4" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-md text-display-md text-primary" id="avg-persen-text">90%</span>
+</div>
+</div>
+<div class="ml-6 flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Hadir</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-surface-container-high"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Absen</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Siswa Terdata</span>
+<span class="font-title-md text-title-md text-primary" id="total-siswa-stat">0</span>
+</div>
+</div>
+</div>
+<!-- Main Detailed Table Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+<div class="p-6 border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h4 class="font-title-lg text-title-lg text-on-surface">Detail Rekapitulasi Kehadiran Siswa</h4>
+<span class="font-body-md text-body-md text-on-surface-variant" id="periode-text">Periode Bulan Ini</span>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Nama Siswa</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kelas</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-center">Hadir</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-center">Izin / Sakit</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-center">Alfa</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Persentase</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kategori</th>
+</tr>
+</thead>
+<tbody id="laporan-tbody" class="divide-y divide-outline-variant">
+<tr>
+<td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat rekap laporan...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant" id="laporan-count-info">Menampilkan 0 siswa</span>
+</div>
+</section>
+</div>
+</div>
+</main>
+
+<script src="js/config.js"></script>
+<script>
+    let reportData = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'guru', 'kepsek']);
+        if (!check) return;
+
+        const now = new Date();
+        document.getElementById('filter-bulan').value = String(now.getMonth() + 1);
+        document.getElementById('filter-tahun').value = String(now.getFullYear());
+
+        loadLaporanData();
+    });
+
+    async function loadLaporanData() {
+        const bulan = document.getElementById('filter-bulan').value;
+        const tahun = document.getElementById('filter-tahun').value;
+        const kelas = document.getElementById('filter-kelas').value;
+
+        const tbody = document.getElementById('laporan-tbody');
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data rekapitulasi...</td></tr>`;
+
+        try {
+            const res = await apiPost('getRekapBulanan', { token: getToken(), bulan, tahun, kelas });
+            if (res.ok && res.data) {
+                reportData = res.data;
+                renderLaporanTable(res.data);
+                if (res.ringkasan) {
+                    document.getElementById('avg-persen-text').textContent = (res.ringkasan.rata_rata || 0) + '%';
+                    document.getElementById('total-siswa-stat').textContent = res.ringkasan.total_siswa || 0;
+                    
+                    const strokeOffset = 364.4 - (364.4 * (res.ringkasan.rata_rata || 0) / 100);
+                    const circle = document.getElementById('pie-circle');
+                    if (circle) circle.setAttribute('stroke-dashoffset', strokeOffset);
+                }
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal memuat rekap: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal terhubung ke server</td></tr>`;
+        }
+    }
+
+    function renderLaporanTable(data) {
+        const tbody = document.getElementById('laporan-tbody');
+        document.getElementById('laporan-count-info').textContent = `Menampilkan ${data.length} siswa`;
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada data rekapitulasi untuk periode ini.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach(s => {
+            const initials = s.nama ? s.nama.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'SI';
+            
+            let totalHadir = 0, totalIzinSakit = 0, totalAlfa = 0;
+            if (s.per_mapel) {
+                Object.values(s.per_mapel).forEach(m => {
+                    totalHadir += m.hadir || 0;
+                    totalIzinSakit += (m.izin || 0) + (m.sakit || 0);
+                    totalAlfa += m.alfa || 0;
+                });
+            } else {
+                totalHadir = s.total_hadir || 0;
+            }
+
+            const persen = s.persen_total || 0;
+            let catBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-label-sm text-label-sm">Sangat Baik</span>`;
+            if (persen < 75) {
+                catBadge = `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-label-sm text-label-sm">Perhatian</span>`;
+            } else if (persen < 90) {
+                catBadge = `<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-label-sm text-label-sm">Cukup</span>`;
+            }
+
+            html += `
+                <tr class="hover:bg-surface-container transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">${initials}</div>
+                            <span class="font-title-md text-on-surface">${s.nama}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-body-md text-on-surface-variant">${s.kelas || '-'}</td>
+                    <td class="px-6 py-4 text-center font-body-md text-on-surface">${totalHadir}</td>
+                    <td class="px-6 py-4 text-center font-body-md text-on-surface">${totalIzinSakit}</td>
+                    <td class="px-6 py-4 text-center font-body-md text-on-surface">${totalAlfa}</td>
+                    <td class="px-6 py-4 text-right font-title-md text-primary font-bold">${persen}%</td>
+                    <td class="px-6 py-4">${catBadge}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function exportToCSV() {
+        if (!reportData || reportData.length === 0) {
+            alert('Tidak ada data rekapitulasi untuk diekspor.');
+            return;
+        }
+
+        let csv = 'Nama Siswa,Kelas,Total Hadir,Persentase Total\n';
+        reportData.forEach(s => {
+            csv += `"${s.nama}","${s.kelas}",${s.total_hadir || 0},${s.persen_total || 0}%\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `Rekap_Absensi_${document.getElementById('filter-bulan').value}_${document.getElementById('filter-tahun').value}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body></html>

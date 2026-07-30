@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sistem Presensi Edukasi - Dashboard Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            border-left-width: 4px;
+            border-color: #003d9b; /* primary */
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d8e3fb; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen">
+<!-- SideNavBar -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">school</span>
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+</div>
+<nav class="space-y-1">
+<!-- Beranda Active -->
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto px-6 py-6 border-t border-outline-variant">
+<button class="flex items-center gap-3 text-error w-full hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md font-bold">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 bg-surface dark:bg-inverse-surface shadow-sm">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined text-primary">school</span>
+</button>
+<h2 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Dashboard Overview</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary w-64 text-body-md font-body-md" placeholder="Cari data siswa..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-primary" data-icon="help">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-label-md font-bold text-on-surface">Admin Utama</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="A professional headshot of a school administrator, middle-aged with a friendly expression, wearing a formal Indonesian batik shirt. The background is a soft-focus modern office with high-key lighting, maintaining a clean and professional corporate minimalist aesthetic with a blue and white color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-gutter max-w-container-max-width mx-auto w-full space-y-gutter">
+<!-- Statistics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Total Hadir -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-3 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">person_check</span>
+</div>
+<span class="text-green-600 font-label-sm text-label-sm flex items-center bg-green-50 px-2 py-1 rounded">+2.5%</span>
+</div>
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Total Hadir</p>
+<h3 id="stat-hadir" class="text-display-md font-display-md mt-1">0</h3>
+<p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa hadir hari ini</p>
+</div>
+<!-- Sakit -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-3 bg-secondary/10 rounded-lg text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm flex items-center bg-surface-variant px-2 py-1 rounded">Normal</span>
+</div>
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Sakit</p>
+<h3 id="stat-sakit" class="text-display-md font-display-md mt-1">0</h3>
+<p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa berhalangan sakit</p>
+</div>
+<!-- Izin -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-3 bg-tertiary/10 rounded-lg text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">event_busy</span>
+</div>
+<span class="text-red-600 font-label-sm text-label-sm flex items-center bg-red-50 px-2 py-1 rounded">+4</span>
+</div>
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Izin</p>
+<h3 id="stat-izin" class="text-display-md font-display-md mt-1">0</h3>
+<p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa dengan izin resmi</p>
+</div>
+<!-- Alpa -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-3 bg-error/10 rounded-lg text-error group-hover:bg-error group-hover:text-on-error transition-colors">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">report</span>
+</div>
+<span class="text-green-600 font-label-sm text-label-sm flex items-center bg-green-50 px-2 py-1 rounded">-12%</span>
+</div>
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Alpa</p>
+<h3 id="stat-alfa" class="text-display-md font-display-md mt-1">0</h3>
+<p class="text-on-surface-variant font-body-md mt-2 text-xs">Tanpa keterangan</p>
+</div>
+</section>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Chart Section -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Grafik Tren Kehadiran</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Persentase kehadiran bulanan (Semester Ganjil)</p>
+</div>
+<select class="bg-surface-container border-none rounded-lg text-body-md font-body-md px-4 py-2 focus:ring-2 focus:ring-primary outline-none">
+<option>Tahun 2024</option>
+<option>Tahun 2023</option>
+</select>
+</div>
+<!-- Simulated Chart Container -->
+<div class="relative h-[320px] w-full flex items-end justify-between px-4 pb-8 border-b border-l border-outline-variant mt-10">
+<!-- Chart Bars -->
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative" style="height: 85%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-on-primary px-2 py-1 rounded">85%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Jan</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative" style="height: 92%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-on-primary px-2 py-1 rounded">92%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative" style="height: 78%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-on-primary px-2 py-1 rounded">78%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative" style="height: 95%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-on-primary px-2 py-1 rounded">95%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Apr</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative" style="height: 88%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-on-primary px-2 py-1 rounded">88%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Mei</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-end group">
+<div class="w-3/5 bg-primary-container hover:bg-primary transition-all rounded-t-lg relative" style="height: 97%;">
+<span class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm opacity-100 bg-primary text-on-primary px-2 py-1 rounded">97%</span>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface font-bold">Jun</span>
+</div>
+</div>
+</div>
+<!-- Alert & Quick Actions Column -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Peringatan Section -->
+<div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center gap-2 mb-4 text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-title-md text-title-md">Peringatan Absensi</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">3 kelas belum melakukan rekapitulasi hari ini:</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 bg-error-container/30 rounded-lg border-l-4 border-error">
+<div>
+<p class="font-title-md text-title-md text-on-error-container">Kelas XII IPA 1</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Wali Kelas: Bp. Mulyadi</p>
+</div>
+<span class="material-symbols-outlined text-error">notification_important</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-error-container/30 rounded-lg border-l-4 border-error">
+<div>
+<p class="font-title-md text-title-md text-on-error-container">Kelas X IPS 3</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Wali Kelas: Ibu Sarah</p>
+</div>
+<span class="material-symbols-outlined text-error">notification_important</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-error-container/30 rounded-lg border-l-4 border-error">
+<div>
+<p class="font-title-md text-title-md text-on-error-container">Kelas XI IPA 4</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Wali Kelas: Bp. Hendra</p>
+</div>
+<span class="material-symbols-outlined text-error">notification_important</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 text-primary font-title-md text-title-md hover:bg-primary/5 rounded-lg transition-colors">
+                            Kirim Pengingat Masal
+                        </button>
+</div>
+<!-- Quick Actions -->
+<div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface mb-6">Aksi Cepat</h3>
+<div class="space-y-4">
+<button class="w-full flex items-center justify-center gap-3 bg-primary text-on-primary py-3 px-6 rounded-lg font-title-md text-title-md shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">add_task</span>
+                                Input Absensi Hari Ini
+                            </button>
+<button class="w-full flex items-center justify-center gap-3 border border-primary text-primary py-3 px-6 rounded-lg font-title-md text-title-md hover:bg-primary/5 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">download</span>
+                                Download Laporan Harian
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table (Bonus context) -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-gutter py-4 bg-surface-container/50 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">Data Absensi Siswa Terbaru</h3>
+<a class="text-primary font-label-md text-label-md hover:underline" href="#">Lihat Semua</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
+<th class="px-gutter py-4">Nama Siswa</th>
+<th class="px-gutter py-4">Kelas</th>
+<th class="px-gutter py-4">Status</th>
+<th class="px-gutter py-4">Waktu</th>
+<th class="px-gutter py-4">Aksi</th>
+</tr>
+</thead>
+<tbody id="recent-absensi-tbody" class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Memuat data absensi terbaru...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Footer / Technical info -->
+<footer class="mt-auto p-gutter text-center border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Sistem Presensi Edukasi. Membangun Kedisiplinan Sejak Dini.</p>
+</footer>
+</main>
+<script src="js/config.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'guru', 'kepsek']);
+        if (!check) return;
+
+        loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const res = await apiPost('getLaporan', { token: getToken(), tanggal_mulai: today, tanggal_selesai: today });
+            
+            let hadir = 0, sakit = 0, izin = 0, alfa = 0;
+            const tbody = document.getElementById('recent-absensi-tbody');
+
+            if (res.ok && res.data && res.data.length > 0) {
+                let rowsHtml = '';
+                res.data.forEach(item => {
+                    const st = String(item.status).toLowerCase();
+                    if (st === 'hadir') hadir++;
+                    else if (st === 'sakit') sakit++;
+                    else if (st === 'izin') izin++;
+                    else if (st === 'alfa') alfa++;
+
+                    let badgeClass = 'bg-green-100 text-green-700';
+                    if (st === 'sakit') badgeClass = 'bg-blue-100 text-blue-700';
+                    else if (st === 'izin') badgeClass = 'bg-yellow-100 text-yellow-700';
+                    else if (st === 'alfa') badgeClass = 'bg-red-100 text-red-700';
+
+                    rowsHtml += `
+                        <tr class="hover:bg-surface-container-low transition-colors">
+                            <td class="px-gutter py-4 font-body-md text-on-surface">${item.nama_siswa || '-'}</td>
+                            <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.kelas || '-'}</td>
+                            <td class="px-gutter py-4">
+                                <span class="px-3 py-1 ${badgeClass} rounded-full font-label-sm text-label-sm">${item.status}</span>
+                            </td>
+                            <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.waktu || '-'} WIB</td>
+                            <td class="px-gutter py-4">
+                                <a href="input-absensi.html" class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+                if (tbody) tbody.innerHTML = rowsHtml;
+            } else if (tbody) {
+                tbody.innerHTML = `
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                        <td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Belum ada data presensi hari ini. Silakan lakukan input absen.</td>
+                    </tr>
+                `;
+            }
+
+            const statHadir = document.getElementById('stat-hadir');
+            if (statHadir) statHadir.innerText = hadir;
+            const statSakit = document.getElementById('stat-sakit');
+            if (statSakit) statSakit.innerText = sakit;
+            const statIzin = document.getElementById('stat-izin');
+            if (statIzin) statIzin.innerText = izin;
+            const statAlfa = document.getElementById('stat-alfa');
+            if (statAlfa) statAlfa.innerText = alfa;
+        } catch (err) {
+            console.error('Error loading dashboard data:', err);
+        }
+    }
+</script>
+</body></html>

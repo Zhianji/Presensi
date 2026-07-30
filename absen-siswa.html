@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Siswa - Sistem Presensi Edukasi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="js/tailwind-config.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-education-pattern {
+            background-image: linear-gradient(rgba(0, 61, 155, 0.8), rgba(0, 61, 155, 0.85)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-NYDCtrQdmjcv6iesoKgSMOlgYblPTvfBWCMioPy8CKrbA9YG3Ex0TXPl7Y-Fx-MGzSqhgSMNSJ2jczGdvQDtDkVC_f6R7BEVK67jPhYeJKTZEhtAmoPvxccbKkyiBZyKbo-JrqU3pwaXEQCEGM1Ba_39Y603Q_5kOxwNojHvXcKpkgR8n8TiCO--7o5fxH9KeJqhtu-9GMGHKTgZA4XAHl2wzhGvsgf4sHVFrF905f9rzHNDcp7Y');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-surface">
+    <!-- Navbar -->
+    <header class="bg-primary text-white py-4 px-6 shadow-md z-20">
+        <div class="container-max-width mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-3xl">school</span>
+                <h1 class="font-title-lg text-title-lg tracking-tight">Portal Siswa</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block text-right">
+                    <p class="font-title-md text-sm" id="user-name">Memuat...</p>
+                    <p class="font-label-sm text-xs opacity-80" id="user-class">Memuat...</p>
+                </div>
+                <button onclick="handleLogout()" class="p-2 hover:bg-white/10 rounded-full transition-colors" title="Keluar">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow relative overflow-hidden bg-education-pattern py-10 px-gutter">
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <div class="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="container-max-width mx-auto max-w-2xl relative z-10">
+            <!-- Check-in Card -->
+            <div class="glass-card rounded-xl shadow-2xl p-8 mb-8">
+                <div class="text-center mb-8">
+                    <p class="text-primary font-title-md mb-1" id="current-date">Senin, 10 Agustus 2024</p>
+                    <h2 class="font-display-md text-2xl text-on-surface">Silakan Lakukan Presensi</h2>
+                    <p class="text-on-surface-variant mt-2 text-sm">Pastikan Anda berada di area sekolah sebelum menekan tombol Hadir.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Mapel 1 -->
+                    <div class="border border-outline-variant rounded-lg p-5 flex flex-col items-center text-center hover:border-primary transition-colors bg-white">
+                        <span class="material-symbols-outlined text-4xl text-primary mb-3">computer</span>
+                        <h3 class="font-title-md text-lg mb-4">Teknologi Informasi (TIK)</h3>
+                        <button onclick="checkin('TIK')" class="w-full bg-primary text-white py-3 rounded-lg font-title-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md active:scale-95" id="btn-tik">
+                            Hadir TIK
+                        </button>
+                        <p class="text-xs text-secondary mt-3" id="status-tik">Belum tercatat</p>
+                    </div>
+
+                    <!-- Mapel 2 -->
+                    <div class="border border-outline-variant rounded-lg p-5 flex flex-col items-center text-center hover:border-primary transition-colors bg-white">
+                        <span class="material-symbols-outlined text-4xl text-primary mb-3">menu_book</span>
+                        <h3 class="font-title-md text-lg mb-4">KKA</h3>
+                        <button onclick="checkin('KKA')" class="w-full bg-primary text-white py-3 rounded-lg font-title-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md active:scale-95" id="btn-kka">
+                            Hadir KKA
+                        </button>
+                        <p class="text-xs text-secondary mt-3" id="status-kka">Belum tercatat</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat Singkat -->
+            <div class="bg-white rounded-xl shadow-md border border-outline-variant overflow-hidden">
+                <div class="bg-surface-container-low px-6 py-4 border-b border-outline-variant flex justify-between items-center">
+                    <h3 class="font-title-md text-on-surface">Riwayat Presensi Hari Ini</h3>
+                    <button class="text-primary text-sm font-label-md hover:underline flex items-center gap-1" onclick="refreshStatus()">
+                        <span class="material-symbols-outlined text-[18px]">refresh</span> Segarkan
+                    </button>
+                </div>
+                <div class="p-6 text-center text-on-surface-variant text-sm" id="riwayat-container">
+                    <p>Memuat riwayat...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest py-6 px-gutter border-t border-outline-variant">
+        <div class="container-max-width mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-sm">location_city</span>
+                <span class="font-label-md text-label-md text-on-surface-variant">SMA Negeri 1 Edukasi Digital</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="font-label-md text-label-md text-on-surface-variant opacity-60">Portal Siswa v2.0</span>
+                <div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+                <span class="font-label-md text-label-md text-on-surface-variant">© 2024</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Setup Date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', options);
+
+        function checkin(mapel) {
+            const btn = document.getElementById(`btn-${mapel.toLowerCase()}`);
+            const originalText = btn.innerText;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+
+            apiPost('checkin', { token: getToken(), mapel: mapel }).then(res => {
+                if (res.ok) {
+                    alert(res.message);
+                    refreshStatus();
+                } else {
+                    alert('Error: ' + res.error);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70');
+                }
+            }).catch(err => {
+                alert('Gagal terhubung ke server');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+            });
+        }
+
+        function refreshStatus() {
+            document.getElementById('riwayat-container').innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Memuat...';
+            apiPost('getAbsensiHariIni', { token: getToken() }).then(res => {
+                if (res.ok) {
+                    let html = '<div class="space-y-3 text-left">';
+                    ['TIK', 'KKA'].forEach(mapel => {
+                        const status = res.status[mapel];
+                        const btn = document.getElementById(`btn-${mapel.toLowerCase()}`);
+                        const statusText = document.getElementById(`status-${mapel.toLowerCase()}`);
+                        
+                        if (status && status !== 'Tercatat') {
+                            // Sudah absen
+                            html += `<div class="flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline-variant"><span class="font-medium">${mapel}</span> <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> ${status}</span></div>`;
+                            btn.disabled = true;
+                            btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Selesai`;
+                            btn.classList.replace('bg-primary', 'bg-green-600');
+                            btn.classList.replace('hover:bg-primary-container', 'hover:bg-green-700');
+                            statusText.textContent = `Tercatat pukul ${status}`;
+                        } else {
+                            html += `<div class="flex justify-between items-center p-3 rounded border border-dashed border-outline-variant"><span class="font-medium">${mapel}</span> <span class="text-secondary text-sm">Belum ada data</span></div>`;
+                            btn.disabled = false;
+                            btn.innerHTML = `Hadir ${mapel}`;
+                            btn.classList.replace('bg-green-600', 'bg-primary');
+                            statusText.textContent = 'Belum tercatat';
+                        }
+                    });
+                    html += '</div>';
+                    document.getElementById('riwayat-container').innerHTML = html;
+                } else {
+                    document.getElementById('riwayat-container').innerHTML = `<p class="text-error">Gagal memuat: ${res.error}</p>`;
+                }
+            });
+        }
+
+        function handleLogout() {
+            apiPost('logout', { token: getToken() });
+            clearSession();
+            window.location.href = 'index.html';
+        }
+
+        // Initialize
+        document.addEventListener("DOMContentLoaded", async () => {
+            const check = await guardPage('siswa');
+            if (check) {
+                document.getElementById('user-name').textContent = getNama();
+                document.getElementById('user-class').textContent = check.kelas || 'Siswa';
+                refreshStatus();
+            }
+        });
+    </script>
+</body>
+</html>

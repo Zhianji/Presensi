@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kelola Pengguna - Sistem Presensi Edukasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { border-left-width: 4px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface bg-background">
+<!-- Sidebar Navigation -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
+</div>
+<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant/30">
+<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+    <!-- TopNavBar -->
+    <header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface">
+        <div class="flex items-center gap-4">
+            <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+                <span class="material-symbols-outlined text-primary">school</span>
+            </button>
+            <h2 class="font-display-md text-display-md font-bold text-primary">Kelola Admin &amp; Pengguna</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="bg-primary hover:bg-primary-container text-white px-4 py-2 rounded-lg flex items-center gap-2 font-title-md transition-colors shadow-sm active:scale-95 cursor-pointer" onclick="openAdminModal()">
+                <span class="material-symbols-outlined text-[18px]">person_add</span> <span class="hidden sm:inline">Tambah Pengguna</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 p-gutter container-max-width mx-auto w-full">
+        <div class="mb-6">
+            <p class="font-body-md text-body-md text-on-surface-variant">Manajemen akun Admin, Guru, dan Kepala Sekolah.</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low border-b border-outline-variant">
+                            <th class="py-3 px-6 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Nama</th>
+                            <th class="py-3 px-6 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Username</th>
+                            <th class="py-3 px-6 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Role</th>
+                            <th class="py-3 px-6 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pengguna-table" class="divide-y divide-outline-variant">
+                        <tr class="hover:bg-surface-container-low/50 transition-colors">
+                            <td colspan="4" class="py-6 px-6 text-center text-on-surface-variant text-sm"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin -->
+    <div id="modal-admin" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
+                <h3 id="modal-admin-title" class="font-title-lg text-title-lg text-primary">Tambah Admin / Guru</h3>
+                <button onclick="closeAdminModal()" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <form id="form-admin" onsubmit="saveAdminForm(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="admin-id"/>
+                <div>
+                    <label class="block text-xs font-bold text-on-surface-variant mb-1">Username *</label>
+                    <input type="text" id="admin-username" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-on-surface-variant mb-1">Nama Lengkap *</label>
+                    <input type="text" id="admin-nama" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+                </div>
+                <div id="password-field">
+                    <label class="block text-xs font-bold text-on-surface-variant mb-1">Password *</label>
+                    <input type="password" id="admin-password" minlength="6" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                    <button type="button" onclick="closeAdminModal()" class="px-5 py-2 text-sm border border-outline-variant rounded-lg hover:bg-surface-container">Batal</button>
+                    <button type="submit" id="btn-save-admin" class="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-container">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script src="js/config.js"></script>
+<script>
+    let adminList = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'kepsek']);
+        if (!check) return;
+
+        loadAdminData();
+    });
+
+    async function loadAdminData() {
+        const tbody = document.getElementById('pengguna-table');
+        tbody.innerHTML = `<tr><td colspan="4" class="py-6 px-6 text-center text-on-surface-variant text-sm"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data...</td></tr>`;
+
+        try {
+            const res = await apiPost('getGuruList', { token: getToken() });
+            if (res.ok && res.data) {
+                adminList = res.data;
+                renderAdminTable(res.data);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 px-6 text-center text-error text-sm">Gagal memuat data: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="4" class="py-6 px-6 text-center text-error text-sm">Gagal terhubung ke server</td></tr>`;
+        }
+    }
+
+    function renderAdminTable(data) {
+        const tbody = document.getElementById('pengguna-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="py-6 px-6 text-center text-on-surface-variant text-sm">Belum ada akun admin terdaftar.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach(item => {
+            html += `
+                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                    <td class="py-4 px-6 font-title-md text-on-surface">${item.nama}</td>
+                    <td class="py-4 px-6 font-body-md text-on-surface-variant">${item.username}</td>
+                    <td class="py-4 px-6 font-body-md">
+                        <span class="px-2.5 py-1 bg-primary/10 text-primary text-xs rounded-full font-bold uppercase">${item.role ? item.role.toUpperCase() : 'ADMIN'}</span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editAdmin('${item.id}')" class="p-1.5 text-primary hover:bg-primary-container/20 rounded" title="Edit">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteAdminConfirm('${item.id}', '${item.nama}')" class="p-1.5 text-error hover:bg-error-container/20 rounded" title="Hapus">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function openAdminModal(admin = null) {
+        document.getElementById('modal-admin-title').textContent = admin ? 'Edit Admin' : 'Tambah Admin / Guru';
+        document.getElementById('admin-id').value = admin ? admin.id : '';
+        document.getElementById('admin-username').value = admin ? admin.username : '';
+        document.getElementById('admin-nama').value = admin ? admin.nama : '';
+        document.getElementById('admin-password').value = '';
+        
+        const pwdField = document.getElementById('password-field');
+        if (admin) {
+            pwdField.style.display = 'none';
+        } else {
+            pwdField.style.display = 'block';
+            document.getElementById('admin-password').required = true;
+        }
+
+        document.getElementById('modal-admin').classList.remove('hidden');
+    }
+
+    function closeAdminModal() {
+        document.getElementById('modal-admin').classList.add('hidden');
+    }
+
+    function editAdmin(id) {
+        const target = adminList.find(a => String(a.id) === String(id));
+        if (target) openAdminModal(target);
+    }
+
+    async function saveAdminForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('admin-id').value;
+        const username = document.getElementById('admin-username').value.trim();
+        const nama = document.getElementById('admin-nama').value.trim();
+        const password = document.getElementById('admin-password').value;
+
+        const action = id ? 'updateGuru' : 'createGuru';
+        const payload = id ? { token: getToken(), id, username, nama } : { token: getToken(), username, password, nama };
+
+        const btn = document.getElementById('btn-save-admin');
+        btn.disabled = true;
+
+        try {
+            const res = await apiPost(action, payload);
+            if (res.ok) {
+                showToast(id ? 'Data berhasil diperbarui' : 'Admin baru berhasil dibuat');
+                closeAdminModal();
+                loadAdminData();
+            } else {
+                alert('Error: ' + res.error);
+            }
+        } catch (err) {
+            alert('Gagal terhubung ke server');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function deleteAdminConfirm(id, nama) {
+        if (confirm(`Apakah Anda yakin ingin menghapus akun "${nama}"?`)) {
+            try {
+                const res = await apiPost('deleteGuru', { token: getToken(), id });
+                if (res.ok) {
+                    showToast('Akun berhasil dihapus');
+                    loadAdminData();
+                } else {
+                    alert('Gagal menghapus: ' + res.error);
+                }
+            } catch (e) {
+                alert('Gagal terhubung ke server');
+            }
+        }
+    }
+</script>
+</body></html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Master Data Siswa - Sistem Presensi Edukasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { border-left-width: 4px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface bg-background">
+<!-- Sidebar Navigation -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
+</div>
+<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant/30">
+<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined text-primary">school</span>
+</button>
+<h2 class="font-title-md text-title-md text-on-surface">Master Data Siswa</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container text-body-md font-body-md pl-10 pr-4 py-2 rounded-full border-none focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Cari fitur atau bantuan..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface font-bold">Admin Utama</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="A professional studio portrait of a school administrator, a middle-aged Indonesian man with a kind smile, wearing a clean batik uniform. The background is a soft-focus office setting with warm ambient lighting that conveys trustworthiness and professional reliability. The lighting is balanced and clean, typical of a modern light-mode corporate UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzWvvcKUPWSEdqGfXZDMtCkc0cyVMmILNIi-K_CjjAu1Gli4YE4cKLdBClZZcfZiw15G7YUyslx3Sp5QimgAzWDWLyuHXIMJRohFFlBiuh-qrNukTCnqoXM3P13KAjS-nSwSdPxZsjRNEaO8arHv_cmGSgKdsI8CAuy9x7dKx_wEARUd6yp_BtUEPRnwjhtrl6qm0pkJ4EKhS_dw9_Uv-n5arRCkXaNyF1ZaNYS1VgG7raHSBP5qP9"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas Area -->
+<div class="flex-1 p-gutter max-w-container-max-width mx-auto w-full">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex mb-6 text-label-md font-label-md text-on-surface-variant">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="inline-flex items-center hover:text-primary" href="#">
+<span class="material-symbols-outlined text-sm mr-2">home</span>
+                            Beranda
+                        </a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1 opacity-50">chevron_right</span>
+<span class="ml-1 md:ml-2 text-on-surface font-bold">Master Data Siswa</span>
+</div>
+</li>
+</ol>
+</nav>
+<!-- Action Bar & Filter Section -->
+<section class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm mb-stack-lg">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<!-- Search and Action Buttons -->
+<div class="flex flex-wrap items-center gap-3">
+<div class="relative w-full sm:w-80">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input id="search-siswa" oninput="filterSiswaTable()" class="w-full pl-12 pr-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="Cari Nama Siswa, NIS, atau Email..." type="text"/>
+</div>
+<button onclick="openSiswaModal()" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm active:scale-95 cursor-pointer">
+<span class="material-symbols-outlined">add</span>
+                            Tambah Siswa
+                        </button>
+<button onclick="openImportModal()" class="bg-surface-container-lowest border border-primary text-primary px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-primary-container/10 transition-all active:scale-95 cursor-pointer">
+<span class="material-symbols-outlined">upload_file</span>
+                            Import CSV
+                        </button>
+<button onclick="exportSiswaCSV()" class="bg-surface-container-lowest border border-outline-variant text-on-surface px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm active:scale-95 cursor-pointer" title="Export Data & Template CSV">
+<span class="material-symbols-outlined">download</span>
+                            Export CSV
+                        </button>
+<button id="btn-bulk-delete" onclick="deleteSelectedSiswaConfirm()" class="hidden bg-error text-white px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-red-700 transition-all shadow-sm active:scale-95 cursor-pointer">
+<span class="material-symbols-outlined">delete</span>
+                            Hapus Terpilih (<span id="selected-count">0</span>)
+                        </button>
+</div>
+<!-- Filter Dropdowns -->
+<div class="flex items-center gap-4 border-t lg:border-t-0 pt-4 lg:pt-0 border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">filter_list</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Filter:</span>
+</div>
+<select id="filter-kelas" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
+<option value="">Semua Kelas</option>
+</select>
+<select id="filter-status" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
+<option value="">Semua Status</option>
+<option value="Aktif">Aktif</option>
+<option value="Nonaktif">Nonaktif</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Data Table Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 w-12 text-center">
+    <input type="checkbox" id="checkbox-all" onchange="toggleAllCheckboxes()" class="w-4 h-4 text-primary bg-surface-container-low border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer">
+</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">NIS</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Nama Siswa</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Kelas</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Wali Murid</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Aksi</th>
+</tr>
+</thead>
+<tbody id="master-siswa-tbody" class="divide-y divide-outline-variant/30">
+<tr>
+<td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="bg-surface-container-low px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant">
+<p class="font-label-md text-label-md text-on-surface-variant" id="siswa-count-info">Menampilkan 0 Siswa</p>
+</div>
+</section>
+</div>
+
+<!-- Modal Tambah/Edit Siswa -->
+<div id="modal-siswa" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+    <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
+      <h3 id="modal-siswa-title" class="font-title-lg text-title-lg text-primary">Tambah Siswa Baru</h3>
+      <button onclick="closeSiswaModal()" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="form-siswa" onsubmit="saveSiswaForm(event)" class="mt-4 space-y-4">
+      <input type="hidden" id="siswa-id"/>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant mb-1">NIS *</label>
+        <input type="text" id="siswa-nis" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant mb-1">Nama Lengkap *</label>
+        <input type="text" id="siswa-nama" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant mb-1">Kelas *</label>
+          <input type="text" id="siswa-kelas" placeholder="Misal: XII IPA 1" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant mb-1">Status</label>
+          <select id="siswa-status" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm">
+            <option value="Aktif">Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant mb-1">Wali Murid</label>
+        <input type="text" id="siswa-wali" placeholder="Nama wali murid" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant mb-1">Email Google Sekolah</label>
+        <input type="email" id="siswa-email" placeholder="siswa@sekolah.edu" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+      </div>
+      <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+        <button type="button" onclick="closeSiswaModal()" class="px-5 py-2 text-sm border border-outline-variant rounded-lg hover:bg-surface-container">Batal</button>
+        <button type="submit" id="btn-save-siswa" class="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-container">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Import CSV -->
+<div id="modal-import" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+    <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
+      <h3 class="font-title-lg text-title-lg text-primary">Import Data Siswa Bulk</h3>
+      <button onclick="closeImportModal()" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="mt-4 space-y-4">
+      <div class="flex justify-between items-center">
+        <p class="text-xs text-on-surface-variant">Upload File CSV atau Paste Teks CSV:</p>
+        <button onclick="downloadTemplateCSV()" class="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">download</span> Unduh Template CSV
+        </button>
+      </div>
+
+      <!-- File Upload Zone -->
+      <div class="border-2 border-dashed border-outline-variant rounded-xl p-4 text-center hover:border-primary transition-all bg-surface-container-low cursor-pointer" onclick="document.getElementById('csv-file-input').click()">
+        <input type="file" id="csv-file-input" accept=".csv,.txt" class="hidden" onchange="handleFileSelect(event)"/>
+        <span class="material-symbols-outlined text-3xl text-primary mb-1">upload_file</span>
+        <p class="text-sm font-title-md text-on-surface">Pilih File CSV (.csv)</p>
+        <p class="text-xs text-on-surface-variant mt-0.5" id="file-info-label">Klik untuk unggah file dari komputer Anda</p>
+      </div>
+
+      <div class="relative">
+        <label class="block text-xs font-bold text-on-surface-variant mb-1">Pratinjau / Input Teks CSV:</label>
+        <textarea id="csv-content" rows="5" placeholder="nis,nama,kelas,wali_murid,status_aktif,email&#10;1001,Ahmad Darmawan,XII IPA 1,Bp. Mulyadi,Aktif,ahmad@sekolah.edu&#10;1002,Bunga Pertiwi,XII IPA 1,Ibu Siti,Aktif,bunga@sekolah.edu" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 text-xs font-mono"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+        <button type="button" onclick="closeImportModal()" class="px-5 py-2 text-sm border border-outline-variant rounded-lg hover:bg-surface-container">Batal</button>
+        <button type="button" onclick="submitImportCSV()" id="btn-submit-import" class="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-container">Proses Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-auto py-6 px-gutter border-t border-outline-variant text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Sistem Presensi Edukasi. Seluruh Hak Cipta Dilindungi.</p>
+</footer>
+</main>
+
+<script src="js/config.js"></script>
+<script>
+    let allSiswa = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'guru', 'kepsek']);
+        if (!check) return;
+
+        loadSiswaData();
+    });
+
+    async function loadSiswaData() {
+        const tbody = document.getElementById('master-siswa-tbody');
+        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+
+        try {
+            const res = await apiPost('getSiswaList', { token: getToken() });
+            if (res.ok && res.data) {
+                allSiswa = res.data;
+                populateKelasFilter(allSiswa);
+                filterSiswaTable();
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan pada backend Apps Script'}</td></tr>`;
+            }
+        } catch (e) {
+            console.error('Error loading siswa data:', e);
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal terhubung ke Google Apps Script: ${e.message || 'Error koneksi'}.<br/><span class="text-xs text-on-surface-variant">Pastikan URL Apps Script benar dan sudah di-deploy dengan akses 'Anyone'.</span></td></tr>`;
+        }
+    }
+
+    function populateKelasFilter(data) {
+        const kelasSelect = document.getElementById('filter-kelas');
+        const classes = [...new Set(data.map(s => s.kelas).filter(Boolean))].sort();
+        let options = `<option value="">Semua Kelas</option>`;
+        classes.forEach(c => {
+            options += `<option value="${c}">${c}</option>`;
+        });
+        kelasSelect.innerHTML = options;
+    }
+
+    function filterSiswaTable() {
+        const search = document.getElementById('search-siswa').value.toLowerCase().trim();
+        const kelas = document.getElementById('filter-kelas').value;
+        const status = document.getElementById('filter-status').value;
+
+        const filtered = allSiswa.filter(s => {
+            const matchSearch = !search || String(s.nama).toLowerCase().includes(search) || String(s.nis).toLowerCase().includes(search) || String(s.email).toLowerCase().includes(search);
+            const matchKelas = !kelas || s.kelas === kelas;
+            const matchStatus = !status || String(s.status_aktif).toLowerCase() === status.toLowerCase();
+            return matchSearch && matchKelas && matchStatus;
+        });
+
+        renderSiswaTable(filtered);
+    }
+
+    function renderSiswaTable(data) {
+        const tbody = document.getElementById('master-siswa-tbody');
+        document.getElementById('siswa-count-info').textContent = `Menampilkan ${data.length} dari ${allSiswa.length} Siswa`;
+        document.getElementById('checkbox-all').checked = false;
+        if (typeof updateCheckboxState === 'function') updateCheckboxState();
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada siswa yang cocok dengan filter.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach(s => {
+            const initials = s.nama ? s.nama.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'SI';
+            const isAktif = String(s.status_aktif).toLowerCase() === 'aktif';
+            const badge = isAktif 
+                ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Aktif</span>`
+                : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant"><span class="w-1.5 h-1.5 rounded-full bg-outline mr-1.5"></span>Nonaktif</span>`;
+            
+            const safeNama = s.nama ? s.nama.replace(/'/g, "\\'") : '';
+
+            html += `
+                <tr class="hover:bg-surface-container-high/30 transition-colors">
+                    <td class="px-6 py-4 text-center">
+                        <input type="checkbox" class="siswa-checkbox w-4 h-4 text-primary bg-background border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer" value="${s.id}" onchange="updateCheckboxState()">
+                    </td>
+                    <td class="px-6 py-4 font-body-md text-on-surface">${s.nis || '-'}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">${initials}</div>
+                            <div>
+                                <div class="font-title-md text-on-surface">${s.nama || '-'}</div>
+                                <div class="text-xs text-on-surface-variant">${s.email || ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-body-md text-on-surface">${s.kelas || '-'}</td>
+                    <td class="px-6 py-4 font-body-md text-on-surface">${s.wali_murid || '-'}</td>
+                    <td class="px-6 py-4">${badge}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center gap-2">
+                            <button onclick="editSiswa('${s.id}')" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-all" title="Edit">
+                                <span class="material-symbols-outlined text-xl">edit</span>
+                            </button>
+                            <button onclick="deleteSiswaConfirm('${s.id}', '${safeNama}')" class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-all" title="Hapus">
+                                <span class="material-symbols-outlined text-xl">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function openSiswaModal(siswa = null) {
+        document.getElementById('modal-siswa-title').textContent = siswa ? 'Edit Data Siswa' : 'Tambah Siswa Baru';
+        document.getElementById('siswa-id').value = siswa ? siswa.id : '';
+        document.getElementById('siswa-nis').value = siswa ? siswa.nis : '';
+        document.getElementById('siswa-nama').value = siswa ? siswa.nama : '';
+        document.getElementById('siswa-kelas').value = siswa ? siswa.kelas : '';
+        document.getElementById('siswa-status').value = siswa ? (siswa.status_aktif || 'Aktif') : 'Aktif';
+        document.getElementById('siswa-wali').value = siswa ? (siswa.wali_murid || '') : '';
+        document.getElementById('siswa-email').value = siswa ? (siswa.email || '') : '';
+        
+        document.getElementById('modal-siswa').classList.remove('hidden');
+    }
+
+    function closeSiswaModal() {
+        document.getElementById('modal-siswa').classList.add('hidden');
+    }
+
+    function editSiswa(id) {
+        const target = allSiswa.find(s => String(s.id) === String(id));
+        if (target) openSiswaModal(target);
+    }
+
+    async function saveSiswaForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('siswa-id').value;
+        const nis = document.getElementById('siswa-nis').value.trim();
+        const nama = document.getElementById('siswa-nama').value.trim();
+        const kelas = document.getElementById('siswa-kelas').value.trim();
+        const status_aktif = document.getElementById('siswa-status').value;
+        const wali_murid = document.getElementById('siswa-wali').value.trim();
+        const email = document.getElementById('siswa-email').value.trim();
+
+        const action = id ? 'updateSiswa' : 'createSiswa';
+        const payload = { token: getToken(), id, nis, nama, kelas, wali_murid, status_aktif, email };
+
+        const btn = document.getElementById('btn-save-siswa');
+        btn.disabled = true;
+
+        try {
+            const res = await apiPost(action, payload);
+            if (res.ok) {
+                showToast(id ? 'Data siswa berhasil diperbarui!' : 'Siswa baru berhasil ditambahkan!');
+                closeSiswaModal();
+                loadSiswaData();
+            } else {
+                alert('Error: ' + res.error);
+            }
+        } catch (err) {
+            alert('Gagal terhubung ke server');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function deleteSiswaConfirm(id, nama) {
+        if (confirm(`Apakah Anda yakin ingin menghapus siswa "${nama}"?`)) {
+            try {
+                const res = await apiPost('deleteSiswa', { token: getToken(), id });
+                if (res.ok) {
+                    showToast('Siswa berhasil dihapus');
+                    loadSiswaData();
+                } else {
+                    alert('Gagal menghapus: ' + res.error);
+                }
+            } catch (e) {
+                alert('Gagal terhubung ke server');
+            }
+        }
+    }
+
+    function toggleAllCheckboxes() {
+        const isChecked = document.getElementById('checkbox-all').checked;
+        const checkboxes = document.querySelectorAll('.siswa-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateCheckboxState();
+    }
+
+    function updateCheckboxState() {
+        const checkboxes = document.querySelectorAll('.siswa-checkbox');
+        const checkedBoxes = document.querySelectorAll('.siswa-checkbox:checked');
+        const checkboxAll = document.getElementById('checkbox-all');
+        const btnBulkDelete = document.getElementById('btn-bulk-delete');
+        const selectedCount = document.getElementById('selected-count');
+
+        if (checkboxes.length > 0) {
+            checkboxAll.checked = checkboxes.length === checkedBoxes.length;
+            checkboxAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+        } else {
+            checkboxAll.checked = false;
+            checkboxAll.indeterminate = false;
+        }
+
+        if (checkedBoxes.length > 0) {
+            btnBulkDelete.classList.remove('hidden');
+            selectedCount.textContent = checkedBoxes.length;
+        } else {
+            btnBulkDelete.classList.add('hidden');
+        }
+    }
+
+    async function deleteSelectedSiswaConfirm() {
+        const checkedBoxes = document.querySelectorAll('.siswa-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        if (confirm(`Apakah Anda yakin ingin menghapus ${checkedBoxes.length} siswa terpilih?`)) {
+            const btn = document.getElementById('btn-bulk-delete');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Menghapus...`;
+
+            try {
+                let successCount = 0;
+                let failCount = 0;
+                
+                for (let i = 0; i < checkedBoxes.length; i++) {
+                    const id = checkedBoxes[i].value;
+                    const res = await apiPost('deleteSiswa', { token: getToken(), id });
+                    if (res.ok) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                }
+
+                showToast(`Berhasil menghapus ${successCount} siswa.${failCount > 0 ? ' Gagal: ' + failCount : ''}`);
+                loadSiswaData();
+            } catch (e) {
+                alert('Gagal terhubung ke server');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined">delete</span> Hapus Terpilih (<span id="selected-count">0</span>)`;
+            }
+        }
+    }
+
+    function openImportModal() {
+        document.getElementById('csv-content').value = '';
+        document.getElementById('csv-file-input').value = '';
+        document.getElementById('file-info-label').textContent = 'Klik untuk unggah file dari komputer Anda';
+        document.getElementById('modal-import').classList.remove('hidden');
+    }
+
+    function closeImportModal() {
+        document.getElementById('modal-import').classList.add('hidden');
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('file-info-label').textContent = `File terpilih: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('csv-content').value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+
+    async function submitImportCSV() {
+        const raw = document.getElementById('csv-content').value.trim();
+        if (!raw) {
+            alert('Harap pilih file CSV atau masukkan teks CSV.');
+            return;
+        }
+
+        const lines = raw.split('\n');
+        const items = [];
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            const parts = trimmed.split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+            // Skip header line if present
+            if (parts[0].toLowerCase() === 'nis' || parts[1].toLowerCase() === 'nama') {
+                return;
+            }
+            if (parts.length >= 3) {
+                items.push({
+                    nis: parts[0],
+                    nama: parts[1],
+                    kelas: parts[2],
+                    wali_murid: parts[3] || '',
+                    status_aktif: parts[4] || 'Aktif',
+                    email: parts[5] || ''
+                });
+            }
+        });
+
+        if (items.length === 0) {
+            alert('Tidak ada data siswa yang valid ditemukan dalam CSV.');
+            return;
+        }
+
+        const btn = document.getElementById('btn-submit-import');
+        btn.disabled = true;
+
+        try {
+            const res = await apiPost('importSiswaBulk', { token: getToken(), items });
+            if (res.ok) {
+                showToast(`Berhasil mengimport ${res.success} dari ${res.total} siswa!`);
+                closeImportModal();
+                loadSiswaData();
+            } else {
+                alert('Import gagal: ' + res.error);
+            }
+        } catch (e) {
+            alert('Gagal terhubung ke server');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function exportSiswaCSV() {
+        if (!allSiswa || allSiswa.length === 0) {
+            alert('Tidak ada data siswa untuk diekspor.');
+            return;
+        }
+
+        let csv = 'nis,nama,kelas,wali_murid,status_aktif,email\n';
+        allSiswa.forEach(s => {
+            csv += `"${s.nis || ''}","${s.nama || ''}","${s.kelas || ''}","${s.wali_murid || ''}","${s.status_aktif || 'Aktif'}","${s.email || ''}"\n`;
+        });
+
+        downloadCSVFile(csv, 'Data_Siswa.csv');
+    }
+
+    function downloadTemplateCSV() {
+        const csv = 'nis,nama,kelas,wali_murid,status_aktif,email\n' +
+                    '1001,Ahmad Darmawan,XII IPA 1,Bp. Mulyadi,Aktif,ahmad@sekolah.edu\n' +
+                    '1002,Bunga Pertiwi,XII IPA 1,Ibu Siti,Aktif,bunga@sekolah.edu\n';
+
+        downloadCSVFile(csv, 'Template_Import_Siswa.csv');
+    }
+
+    function downloadCSVFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body></html>

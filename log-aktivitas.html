@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Log Aktivitas - Sistem Presensi Edukasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active { border-left-width: 4px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface bg-background">
+<!-- Sidebar Navigation -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
+</div>
+<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant/30">
+<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+    <!-- TopNavBar -->
+    <header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface">
+        <div class="flex items-center gap-4">
+            <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+                <span class="material-symbols-outlined text-primary">school</span>
+            </button>
+            <h2 class="font-display-md text-display-md font-bold text-primary">Log Aktivitas</h2>
+        </div>
+    </header>
+
+    <div class="flex-1 p-gutter container-max-width mx-auto w-full">
+        <div class="mb-6">
+            <p class="font-body-md text-body-md text-on-surface-variant">Riwayat aktivitas sistem dan pengguna.</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-outline-variant p-6">
+            <div class="space-y-4" id="log-container">
+                <p class="text-on-surface-variant text-sm text-center">Memuat log...</p>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="js/config.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'kepsek']);
+        if (!check) return;
+
+        loadLogs();
+    });
+
+    async function loadLogs() {
+        const container = document.getElementById('log-container');
+        container.innerHTML = `<p class="text-on-surface-variant text-sm text-center"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat log aktivitas...</p>`;
+
+        try {
+            const res = await apiPost('getLogAktivitas', { token: getToken() });
+            if (res.ok && res.data) {
+                renderLogs(res.data);
+            } else {
+                container.innerHTML = `<p class="text-error text-sm text-center">Gagal memuat log: ${res.error || 'Terjadi kesalahan'}</p>`;
+            }
+        } catch (e) {
+            container.innerHTML = `<p class="text-error text-sm text-center">Gagal terhubung ke server</p>`;
+        }
+    }
+
+    function renderLogs(logs) {
+        const container = document.getElementById('log-container');
+        if (!logs || logs.length === 0) {
+            container.innerHTML = `<p class="text-on-surface-variant text-sm text-center">Belum ada aktivitas tercatat.</p>`;
+            return;
+        }
+
+        let html = '';
+        logs.forEach(log => {
+            html += `
+                <div class="flex items-start gap-4 p-4 rounded-lg bg-surface-container-low border border-outline-variant/40">
+                    <div class="p-2.5 bg-primary/10 text-primary rounded-lg">
+                        <span class="material-symbols-outlined text-xl">history</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-title-md text-sm text-on-surface">${log.nama || 'System'} <span class="font-normal text-on-surface-variant">(${log.action})</span></span>
+                            <span class="text-xs text-on-surface-variant">${log.waktu || ''}</span>
+                        </div>
+                        <p class="text-xs text-on-surface-variant mt-1">${log.detail || '-'}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+</script>
+</body></html>

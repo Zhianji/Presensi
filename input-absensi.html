@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Input Absensi - Sistem Presensi Edukasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .custom-radio:checked {
+            background-color: currentColor;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- SideNavBar -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="p-gutter flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Admin Panel</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-outline-variant">
+<a class="flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined text-primary">school</span>
+</button>
+<h2 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Input Absensi</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</span>
+<input class="bg-surface-container-high border-none rounded-full py-2 pl-10 pr-4 w-64 focus:ring-2 focus:ring-primary text-body-md font-body-md outline-none" placeholder="Cari data..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in a clean office setting, soft natural lighting, high resolution, minimalist and academic aesthetic with a palette of white and primary blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE108GQgV9j16aS_ZaFMW2D4RaWhnCV87tIGupmEQE_LfntrQco2SRYBciDxc4lsqe67i13qR8PByVWchQxqlQrYvQgb79vKzwMXxfnwrIC51xzdp8oEq41JYsSYzOHx2x6s-UJ70d0j3g51qhGGKWT_RZRLUQhCtpLsz17Dfbb0egtIKsm032cQotwSVKKFpc2H2jC57jHtkG0FbNczSuXwXvytQpHRy2Kv4Jvk7Hc-5X_8NoGiVU"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-gutter flex-1 flex flex-col gap-gutter max-w-container-max-width mx-auto w-full">
+<!-- Filters & Actions Bento Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Filter Header -->
+<div class="col-span-12 lg:col-span-8 bg-white p-gutter rounded-xl shadow-sm border border-outline-variant flex flex-wrap items-end gap-gutter">
+<div class="flex-1 min-w-[200px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Kelas</label>
+<select id="select-kelas" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+<option value="">Semua Kelas</option>
+<option value="XII IPA 1">XII IPA 1</option>
+<option value="XII IPA 2">XII IPA 2</option>
+<option value="XI IPS 1">XI IPS 1</option>
+<option value="X-1">X-1</option>
+</select>
+</div><div class="flex-1 min-w-[200px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Mata Pelajaran</label>
+<select id="select-mapel" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+<option value="TIK">TIK</option>
+<option value="KKA">KKA</option>
+</select>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Tanggal</label>
+<div class="relative">
+<input id="input-tanggal" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none" type="date"/>
+</div>
+</div>
+<button id="btn-terapkan" onclick="loadStatusHarian()" class="bg-surface-variant text-primary font-title-md text-title-md px-6 py-2.5 rounded-lg hover:bg-primary-container transition-colors flex items-center gap-2 cursor-pointer">
+<span class="material-symbols-outlined">filter_list</span>
+                        Terapkan
+                    </button>
+</div>
+<!-- Action Bar -->
+<div class="col-span-12 lg:col-span-4 bg-white p-gutter rounded-xl shadow-sm border border-outline-variant flex flex-col justify-center gap-3">
+<button class="w-full bg-secondary-container text-on-secondary-container font-title-md text-title-md py-3 rounded-lg hover:bg-secondary transition-all flex items-center justify-center gap-2 border border-secondary/20 cursor-pointer" id="markAllBtn">
+<span class="material-symbols-outlined">done_all</span>
+                        Tandai Semua Hadir
+                    </button>
+<button id="btn-simpan" onclick="simpanAbsensi()" class="w-full bg-primary text-on-primary font-title-md text-title-md py-3 rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">save</span>
+                        Simpan Absensi
+                    </button>
+</div>
+</div>
+<!-- Validation Banner -->
+<div id="info-banner" class="bg-tertiary-fixed text-on-tertiary-fixed px-gutter py-stack-md rounded-lg flex items-center gap-3 border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">info</span>
+<p class="font-body-md text-body-md" id="info-text">
+<strong>Pemberitahuan:</strong> Pilih kelas dan mata pelajaran lalu klik <strong>Terapkan</strong> untuk menampilkan daftar siswa.
+</p>
+</div>
+<!-- Data Table Card -->
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden mb-20">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">No</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Nama Siswa</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase text-center">Status Kehadiran</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Keterangan / Catatan</th>
+</tr>
+</thead>
+<tbody id="input-absensi-tbody" class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td colspan="4" class="px-6 py-6 text-center text-on-surface-variant">Klik <strong>Terapkan</strong> untuk memuat data siswa...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-surface-container-low px-gutter py-4 flex justify-between items-center border-t border-outline-variant">
+<span class="font-label-md text-label-md text-on-surface-variant" id="total-siswa-text">Menampilkan 0 Siswa</span>
+</div>
+</div>
+</div>
+<!-- Sticky Footer for Actions -->
+<div class="bg-white border-t border-outline-variant p-4 sticky bottom-0 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-end gap-gutter ml-sidebar-width fixed left-0 right-0">
+<button onclick="window.location.href='dashboard.html'" class="px-8 py-2.5 font-title-md text-title-md text-secondary border border-secondary rounded-lg hover:bg-secondary-container/30 transition-all cursor-pointer">
+                Batal
+            </button>
+<button id="btn-simpan-footer" onclick="simpanAbsensi()" class="bg-primary text-on-primary font-title-md text-title-md px-12 py-2.5 rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer">
+                Simpan &amp; Kirim Laporan
+                <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</main>
+<script src="js/config.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'guru', 'kepsek']);
+        if (!check) return;
+
+        // Set default date to today
+        document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
+        
+        loadStatusHarian();
+    });
+
+    let currentSiswaList = [];
+
+    async function loadStatusHarian() {
+        const kelas = document.getElementById('select-kelas').value;
+        const mapel = document.getElementById('select-mapel').value;
+        const tanggal = document.getElementById('input-tanggal').value;
+
+        const tbody = document.getElementById('input-absensi-tbody');
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+
+        try {
+            const res = await apiPost('getStatusHarian', { token: getToken(), kelas, mapel, tanggal });
+            if (res.ok && res.data) {
+                currentSiswaList = res.data;
+                renderSiswaTable(res.data);
+                document.getElementById('total-siswa-text').textContent = `Menampilkan ${res.data.length} Siswa`;
+                document.getElementById('info-text').innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
+        }
+    }
+
+    function renderSiswaTable(data) {
+        const tbody = document.getElementById('input-absensi-tbody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant">Tidak ada data siswa ditemukan untuk kelas ini.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach((s, idx) => {
+            const rowNo = String(idx + 1).padStart(2, '0');
+            const status = s.status || '';
+
+            html += `
+                <tr class="hover:bg-surface-container-lowest transition-colors group" data-siswa-id="${s.siswa_id}">
+                    <td class="px-6 py-4 font-body-md text-on-surface-variant">${rowNo}</td>
+                    <td class="px-6 py-4 font-title-md text-on-surface">
+                        <div>${s.nama}</div>
+                        <div class="text-xs text-on-surface-variant opacity-70">${s.kelas}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center items-center gap-4">
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-5 h-5 text-green-600 border-outline-variant focus:ring-green-500"/>
+                                <span class="font-label-sm text-label-sm">Hadir</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-5 h-5 text-primary border-outline-variant focus:ring-primary"/>
+                                <span class="font-label-sm text-label-sm">Sakit</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-5 h-5 text-secondary border-outline-variant focus:ring-secondary"/>
+                                <span class="font-label-sm text-label-sm">Izin</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-5 h-5 text-error border-outline-variant focus:ring-error"/>
+                                <span class="font-label-sm text-label-sm">Alfa</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="text" id="ket-${s.siswa_id}" class="w-full bg-surface-container-low border border-outline-variant rounded px-3 py-1.5 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Tambah catatan..." value="${s.keterangan || ''}"/>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    document.getElementById('markAllBtn').addEventListener('click', function() {
+        const radioButtons = document.querySelectorAll('input[type="radio"][value="Hadir"]');
+        radioButtons.forEach(radio => {
+            radio.checked = true;
+            const row = radio.closest('tr');
+            if (row) {
+                row.classList.add('bg-green-50');
+                setTimeout(() => row.classList.remove('bg-green-50'), 600);
+            }
+        });
+    });
+
+    async function simpanAbsensi() {
+        const mapel = document.getElementById('select-mapel').value;
+        const tanggal = document.getElementById('input-tanggal').value;
+        const rows = document.querySelectorAll('#input-absensi-tbody tr[data-siswa-id]');
+
+        if (rows.length === 0) {
+            alert('Tidak ada data siswa untuk disimpan.');
+            return;
+        }
+
+        const btn = document.getElementById('btn-simpan');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Menyimpan...`;
+        btn.disabled = true;
+
+        try {
+            let count = 0;
+            for (const row of rows) {
+                const siswaId = row.getAttribute('data-siswa-id');
+                const checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
+                const ketInput = document.getElementById(`ket-${siswaId}`);
+
+                if (checkedRadio) {
+                    const status = checkedRadio.value;
+                    const keterangan = ketInput ? ketInput.value : '';
+                    await apiPost('setAbsensiStatus', {
+                        token: getToken(),
+                        siswa_id: siswaId,
+                        mapel: mapel,
+                        tanggal: tanggal,
+                        status: status,
+                        keterangan: keterangan
+                    });
+                    count++;
+                }
+            }
+            showToast(`Absensi berhasil disimpan untuk ${count} siswa!`);
+            loadStatusHarian();
+        } catch (e) {
+            alert('Gagal menyimpan absensi: ' + e.message);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+</body></html>

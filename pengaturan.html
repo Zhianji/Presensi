@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pengaturan - Sistem Presensi Edukasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8">
+<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Admin Panel</p>
+</div>
+<nav class="flex-1 px-4 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<!-- Active State: Pengaturan -->
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant">
+<button class="flex items-center gap-3 w-full text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 bg-surface shadow-sm h-16">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined text-primary">school</span>
+</button>
+<h2 class="font-display-md text-display-md font-bold text-primary">Sistem Presensi Edukasi</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-full text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Cari pengaturan..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-variant text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="ml-4 flex items-center gap-3">
+<div class="text-right hidden lg:block">
+<p class="font-label-md text-label-md text-on-surface">Admin Utama</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Superuser</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary-fixed" data-alt="A professional high-resolution headshot of a female school administrator with a friendly expression, wearing a navy blue blazer. She is set against a clean, softly blurred modern school office background with warm lighting, maintaining a clean corporate minimalism aesthetic that fits a trustworthy educational brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLwTNYp_mRso_Yfn9gjel2vWPKSkMkGbx3DKzQcVTTNBhaffT4q8nJqGAyStRIbIa0PC-v-a2hhgmo2UdARHsjoBfpuu4kGG3WjHEOzp4ph_Cshbo6HvnuJVkWRzEYW2xo3dSY9aVL6xLn0c1bo3cJy-JYBs2Lwbs1q2lQI8tiFFaaSf4lBNKZYvrWZD2iF9QKPZ4C9jCsk7biMIv6_-LcDhvbcQvZACTwwUdZ9nkZlRhvg2C5_Y6-"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-gutter max-w-container-max-width mx-auto w-full space-y-stack-lg">
+<!-- Page Header -->
+<div class="flex flex-col gap-1">
+<h3 class="font-display-md text-display-md text-on-background">Pengaturan Konfigurasi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola parameter sistem, pembatasan waktu, dan hak akses pengguna secara terpusat.</p>
+</div>
+<!-- Bento Grid Settings -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Section: Sistem -->
+<section class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Sistem</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Konfigurasi Akademik</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Tahun Ajaran Aktif</label>
+<select id="tahun-ajaran-select" class="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none">
+<option value="2023/2024">2023/2024</option>
+<option value="2024/2025">2024/2025</option>
+<option value="2025/2026">2025/2026</option>
+<option value="2026/2027" selected>2026/2027</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Semester Aktif</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="px-4 py-2 rounded-lg border-2 border-primary bg-primary-container text-on-primary-container font-label-md text-label-md">Ganjil</button>
+<button class="px-4 py-2 rounded-lg border border-outline-variant hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md">Genap</button>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-start gap-3 bg-primary/5 p-3 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="info">info</span>
+<p class="text-[12px] leading-tight text-on-surface-variant">Perubahan pada tahun ajaran akan mempengaruhi seluruh data laporan berjalan.</p>
+</div>
+</section>
+<!-- Section: Pembatasan -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Pembatasan</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Kontrol Waktu Operasional</p>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-success-container/10 text-emerald-700 rounded-full border border-emerald-100">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Aktif</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Batas Waktu Input Absensi</label>
+<div class="flex items-center gap-4">
+<input class="flex-1 bg-surface-container border border-outline-variant rounded-xl px-6 py-4 text-display-md font-bold text-primary focus:ring-4 focus:ring-primary-fixed outline-none" type="time" value="10:00"/>
+<div class="flex flex-col gap-1">
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined" data-icon="keyboard_arrow_up">keyboard_arrow_up</span></button>
+<button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined" data-icon="keyboard_arrow_down">keyboard_arrow_down</span></button>
+</div>
+</div>
+<p class="text-[12px] text-on-surface-variant italic">Guru tidak dapat melakukan input absen setelah melewati jam ini.</p>
+</div>
+</div>
+<div class="relative overflow-hidden rounded-xl bg-secondary-fixed p-6 flex flex-col justify-between">
+<!-- Background decoration -->
+<span class="absolute -right-4 -bottom-4 text-[120px] text-secondary/10 material-symbols-outlined rotate-12" data-icon="history_toggle_off">history_toggle_off</span>
+<div class="relative z-10">
+<h5 class="font-title-md text-title-md text-on-secondary-fixed">Ringkasan Aturan</h5>
+<ul class="mt-4 space-y-3">
+<li class="flex items-center gap-2 text-body-md text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+                                        Input ditutup otomatis pukul 10:00 AM
+                                    </li>
+<li class="flex items-center gap-2 text-body-md text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+                                        Notifikasi keterlambatan dikirim ke Kepsek
+                                    </li>
+</ul>
+</div>
+<button class="relative z-10 mt-6 w-full py-2 bg-on-secondary-fixed text-white rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Ubah Parameter</button>
+</div>
+</div>
+</section>
+<!-- Section: Hak Akses -->
+<section class="col-span-12 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex items-center justify-between bg-surface-bright">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="shield_person">shield_person</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Hak Akses</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Matriks Peran dan Izin</p>
+</div>
+</div>
+<button class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                            Tambah Peran Kustom
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Modul / Fitur</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant text-center uppercase tracking-wider">Admin</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant text-center uppercase tracking-wider">Guru</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant text-center uppercase tracking-wider">Kepsek</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4">
+<p class="font-title-md text-title-md text-on-surface">Input Presensi Harian</p>
+<p class="text-[11px] text-on-surface-variant">Mencatat kehadiran siswa setiap jam pelajaran</p>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4">
+<p class="font-title-md text-title-md text-on-surface">Edit Master Data Siswa</p>
+<p class="text-[11px] text-on-surface-variant">Menambah, mengubah, atau menghapus profil siswa</p>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4">
+<p class="font-title-md text-title-md text-on-surface">Ekspor Laporan Bulanan</p>
+<p class="text-[11px] text-on-surface-variant">Mengunduh rekapitulasi kehadiran dalam format PDF/Excel</p>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4">
+<p class="font-title-md text-title-md text-on-surface">Konfigurasi Sistem</p>
+<p class="text-[11px] text-on-surface-variant">Mengakses halaman pengaturan dan pembatasan waktu</p>
+</td>
+<td class="px-6 py-4 text-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Action Footer -->
+<div id="action-footer" class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/20 sticky bottom-6 shadow-lg z-30 opacity-0 translate-y-10 pointer-events-none transition-all duration-300">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
+<p id="last-updated-text" class="text-body-md font-medium text-on-surface">Terakhir diperbarui: -</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 border border-primary text-primary rounded-lg font-title-md text-title-md hover:bg-primary/5 transition-colors cursor-pointer active:scale-95" onclick="handleCancelSettings()">Batal</button>
+<button class="px-8 py-3 bg-primary text-on-primary rounded-lg font-title-md text-title-md shadow-md hover:bg-primary-container transition-all cursor-pointer active:scale-95 flex items-center gap-2" onclick="handleSaveSettings()">
+<span class="material-symbols-outlined text-[20px]" data-icon="save">save</span>
+                        Simpan Perubahan
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 opacity-0 pointer-events-none transition-all duration-300 z-[100]" id="toast">
+<span class="material-symbols-outlined text-emerald-400" data-icon="check_circle">check_circle</span>
+<p class="font-body-md text-body-md">Pengaturan berhasil disimpan dan diperbarui ke sistem.</p>
+</div>
+<script src="js/config.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const check = await guardPage(['admin', 'kepsek']);
+        if (!check) return;
+
+        loadSettings();
+        setupChangeListeners();
+    });
+
+    function showFooter() {
+        const footer = document.getElementById('action-footer');
+        if (footer) {
+            footer.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+            footer.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        }
+    }
+
+    function hideFooter() {
+        const footer = document.getElementById('action-footer');
+        if (footer) {
+            footer.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            footer.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        }
+    }
+
+    function setupChangeListeners() {
+        // Listen to changes on standard inputs
+        const inputs = document.querySelectorAll('select, input[type="time"], input[type="checkbox"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', showFooter);
+            input.addEventListener('input', showFooter);
+        });
+
+        // Semester buttons toggle logic
+        const semesterContainer = document.querySelector('.grid-cols-2.gap-2');
+        if (semesterContainer) {
+            const btns = semesterContainer.querySelectorAll('button');
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    btns.forEach(b => {
+                        b.classList.remove('border-2', 'border-primary', 'bg-primary-container', 'text-on-primary-container');
+                        b.classList.add('border', 'border-outline-variant', 'text-on-surface-variant');
+                    });
+                    e.target.classList.remove('border', 'border-outline-variant', 'text-on-surface-variant');
+                    e.target.classList.add('border-2', 'border-primary', 'bg-primary-container', 'text-on-primary-container');
+                    showFooter();
+                });
+            });
+        }
+    }
+
+    function handleCancelSettings() {
+        hideFooter();
+        loadSettings(); // revert changes
+    }
+
+    async function loadSettings() {
+        try {
+            const res = await apiPost('getPengaturan', { token: getToken() });
+            if (res.ok && res.data) {
+                if (res.data.tahun_ajaran) {
+                    const selTahun = document.getElementById('tahun-ajaran-select') || document.querySelector('select');
+                    if (selTahun) selTahun.value = res.data.tahun_ajaran;
+                }
+                if (res.data.batas_waktu_input) {
+                    const inputTime = document.querySelector('input[type="time"]');
+                    if (inputTime) inputTime.value = res.data.batas_waktu_input;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading settings:', e);
+        }
+    }
+
+    async function handleSaveSettings() {
+        const selTahun = document.getElementById('tahun-ajaran-select') || document.querySelector('select');
+        const inputTime = document.querySelector('input[type="time"]');
+
+        const settings = {
+            tahun_ajaran: selTahun ? selTahun.value : '2024/2025',
+            semester: 'Ganjil',
+            batas_waktu_input: inputTime ? inputTime.value : '10:00'
+        };
+
+        try {
+            const res = await apiPost('savePengaturan', { token: getToken(), settings });
+            if (res.ok) {
+                const now = new Date();
+                const timeString = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                const lastUpdatedEl = document.getElementById('last-updated-text');
+                if (lastUpdatedEl) lastUpdatedEl.innerText = 'Terakhir diperbarui: ' + timeString;
+                
+                showToast('Pengaturan berhasil disimpan dan diperbarui ke sistem!');
+                hideFooter();
+            } else {
+                alert('Gagal menyimpan: ' + res.error);
+            }
+        } catch (e) {
+            alert('Gagal terhubung ke server');
+        }
+    }
+</script>
+</body></html>
