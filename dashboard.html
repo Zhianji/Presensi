@@ -22,8 +22,228 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d8e3fb; border-radius: 10px; }
     </style>
+
+    <style>
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
 <body class="bg-background text-on-surface flex min-h-screen">
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden w-full pb-24">
+        
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-2">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Absen</span>
+<span class="font-display-md text-display-md font-light text-primary dark:text-primary-fixed-dim opacity-70">Online</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant rounded-full transition-colors">notifications</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a male school administrator in his 40s, wearing a clean batik shirt, with a bright and scholarly office background. The lighting is soft and professional, reflecting a trustworthy and efficient personality. The overall color palette is composed of soft blues and crisp whites to match the modern corporate minimalism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXb6qf0iDpGBhbOYgvYvtW3IKMbwonFmfNC8rCiWi0VNTFRRj268e7Xki7mfhmIuxsP6CfgzNzXfFzSEg5Sw4gQHTdPjxYhV3Qlg2kvoKlFImSFgrTJMAfYWdL6FKY6bYoagA5l06uVcvD4aOc7A1eq0xVUb0iW5JJbkjgHrhoBxNibBWuhNHgHou6bv1aflFxlIUAXQvdvAMbPB-0j5TZLilASVuAwiS_PXn0EyA3KlnGc0XV5rRC"/>
+</div>
+</div>
+</header>
+<main class="max-w-[1280px] mx-auto px-4 py-6">
+<!-- Welcome Header -->
+<section class="mb-8">
+<h1 class="font-display-md text-display-md text-primary mb-1">Halo, Admin Pusat</h1>
+<p class="font-body-md text-on-surface-variant">Senin, 14 Oktober 2024 • Semester Ganjil</p>
+</section>
+<!-- Summary Grid (2x2) -->
+<section class="bento-grid mb-8">
+<!-- Hadir -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-primary bg-primary-container p-2 rounded-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-success text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">+2%</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Hadir</p>
+<p id="stat-hadir-mobile" class="font-display-md text-display-md text-primary">0</p>
+</div>
+</div>
+<!-- Sakit -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-secondary bg-secondary-container p-2 rounded-lg" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Sakit</p>
+<p id="stat-sakit-mobile" class="font-display-md text-display-md text-on-surface">0</p>
+</div>
+</div>
+<!-- Izin -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed p-2 rounded-lg" style="font-variation-settings: 'FILL' 1;">assignment_late</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Izin</p>
+<p id="stat-izin-mobile" class="font-display-md text-display-md text-on-surface">0</p>
+</div>
+</div>
+<!-- Alpa -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-error bg-error-container p-2 rounded-lg" style="font-variation-settings: 'FILL' 1;">cancel</span>
+<span class="text-error text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">-5%</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Alpa</p>
+<p id="stat-alfa-mobile" class="font-display-md text-display-md text-error">0</p>
+</div>
+</div>
+</section>
+<!-- Attendance Trend Line Chart -->
+<section class="bg-surface-container-lowest p-5 rounded-xl shadow-sm border border-outline-variant mb-8 overflow-hidden">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-title-md text-title-md text-on-surface">Tren Kehadiran (Mingguan)</h2>
+<span class="material-symbols-outlined text-on-surface-variant">trending_up</span>
+</div>
+<div class="h-40 w-full relative flex items-end justify-between gap-1">
+<!-- Simple bar representation for line trend on mobile for better visibility -->
+<div class="flex-1 bg-primary/10 rounded-t-lg h-[60%] relative group">
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-primary text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">92%</div>
+<div class="absolute inset-0 bg-primary/20 h-full w-full rounded-t-lg"></div>
+<div class="absolute bottom-0 w-full bg-primary h-[85%] rounded-t-lg"></div>
+<p class="absolute top-full left-1/2 -translate-x-1/2 mt-2 font-label-md text-label-md text-on-surface-variant">Sen</p>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg h-[60%] relative group">
+<div class="absolute bottom-0 w-full bg-primary h-[90%] rounded-t-lg"></div>
+<p class="absolute top-full left-1/2 -translate-x-1/2 mt-2 font-label-md text-label-md text-on-surface-variant">Sel</p>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg h-[60%] relative group">
+<div class="absolute bottom-0 w-full bg-primary h-[88%] rounded-t-lg"></div>
+<p class="absolute top-full left-1/2 -translate-x-1/2 mt-2 font-label-md text-label-md text-on-surface-variant">Rab</p>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg h-[60%] relative group">
+<div class="absolute bottom-0 w-full bg-primary h-[95%] rounded-t-lg"></div>
+<p class="absolute top-full left-1/2 -translate-x-1/2 mt-2 font-label-md text-label-md text-on-surface-variant">Kam</p>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg h-[60%] relative group">
+<div class="absolute bottom-0 w-full bg-primary h-[80%] rounded-t-lg"></div>
+<p class="absolute top-full left-1/2 -translate-x-1/2 mt-2 font-label-md text-label-md text-on-surface-variant">Jum</p>
+</div>
+</div>
+<div class="mt-10 pt-4 border-t border-outline-variant flex justify-between items-center">
+<p class="font-body-md text-on-surface-variant">Rata-rata minggu ini</p>
+<p class="font-title-md text-title-md text-primary">89.4%</p>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="grid grid-cols-2 gap-4 mb-8">
+<button onclick="window.location.href='input-absensi.html'" class="flex items-center justify-center gap-3 bg-primary text-white py-4 px-4 rounded-xl shadow-md active:scale-95 transition-all font-title-md">
+<span class="material-symbols-outlined">how_to_reg</span>
+                Input Absen
+            </button>
+<button onclick="window.location.href='laporan.html'" class="flex items-center justify-center gap-3 border-2 border-primary text-primary py-4 px-4 rounded-xl active:scale-95 transition-all font-title-md">
+<span class="material-symbols-outlined">description</span>
+                Laporan
+            </button>
+</section>
+<!-- Peringatan Absensi -->
+<section class="mb-8">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-title-lg text-title-lg text-on-surface">Peringatan Absensi</h2>
+<button class="text-primary font-label-md hover:underline">Lihat Semua</button>
+</div>
+<div class="space-y-3">
+<!-- Alert Card 1 -->
+<div class="bg-error-container/30 border-l-4 border-error p-4 rounded-r-xl flex gap-4 items-center">
+<div class="bg-error text-white p-2 rounded-full">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-on-error-container">Kelas XII IPA 2</h3>
+<p class="font-body-md text-on-error-container opacity-80">Belum melakukan input data kehadiran hari ini.</p>
+</div>
+<span class="material-symbols-outlined text-on-error-container opacity-50">chevron_right</span>
+</div>
+<!-- Alert Card 2 -->
+<div class="bg-surface-container-lowest border-l-4 border-primary p-4 rounded-r-xl shadow-sm border border-outline-variant border-l-4 flex gap-4 items-center">
+<div class="bg-primary text-white p-2 rounded-full">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-primary">Kelas X IPS 1</h3>
+<p class="font-body-md text-on-surface-variant">Tingkat ketidakhadiran mencapai 15% minggu ini.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-50">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Recent Activity Mini Section -->
+<section class="mb-4">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-4">Aktivitas Terakhir</h2>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="p-4 border-b border-outline-variant flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">history</span>
+</div>
+<div>
+<p class="font-body-md font-semibold text-on-surface">Input Selesai: Kelas XI B</p>
+<p class="font-label-md text-on-surface-variant">10:15 • Oleh Guru Budi Santoso</p>
+</div>
+</div>
+<div class="p-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-[18px]">cloud_upload</span>
+</div>
+<div>
+<p class="font-body-md font-semibold text-on-surface">Laporan Mingguan Siap</p>
+<p class="font-label-md text-on-surface-variant">09:00 • Sistem Otomatis</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Active on 'Beranda') -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface shadow-[0_-1px_10px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 z-50">
+<!-- Beranda - ACTIVE -->
+<div onclick="window.location.href='dashboard.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-primary font-bold" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md text-primary font-bold">Beranda</span>
+<div class="w-1 h-1 bg-primary rounded-full"></div>
+</div>
+<!-- Input Absen -->
+<div onclick="window.location.href='input-absensi.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant">how_to_reg</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Absen</span>
+</div>
+<!-- Laporan -->
+<div onclick="window.location.href='laporan.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Laporan</span>
+</div>
+<!-- Pengaturan -->
+<div onclick="window.location.href='pengaturan.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Profil</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.bento-grid > div').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.add('scale-95');
+                setTimeout(() => card.classList.remove('scale-95'), 150);
+            });
+        });
+    </script>
+
+    </div>
+
+
+    <!-- DESKTOP VIEW -->
+    <div class="hidden md:flex w-full">
+        
 <!-- SideNavBar -->
 <aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant -translate-x-full md:translate-x-0 transition-transform duration-300">
 <div class="px-6 py-8">
@@ -121,7 +341,7 @@
 <span class="text-green-600 font-label-sm text-label-sm flex items-center bg-green-50 px-2 py-1 rounded">+2.5%</span>
 </div>
 <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Total Hadir</p>
-<h3 id="stat-hadir" class="text-display-md font-display-md mt-1">0</h3>
+<h3 id="stat-hadir-desktop" class="text-display-md font-display-md mt-1">0</h3>
 <p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa hadir hari ini</p>
 </div>
 <!-- Sakit -->
@@ -133,7 +353,7 @@
 <span class="text-on-surface-variant font-label-sm text-label-sm flex items-center bg-surface-variant px-2 py-1 rounded">Normal</span>
 </div>
 <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Sakit</p>
-<h3 id="stat-sakit" class="text-display-md font-display-md mt-1">0</h3>
+<h3 id="stat-sakit-desktop" class="text-display-md font-display-md mt-1">0</h3>
 <p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa berhalangan sakit</p>
 </div>
 <!-- Izin -->
@@ -145,7 +365,7 @@
 <span class="text-red-600 font-label-sm text-label-sm flex items-center bg-red-50 px-2 py-1 rounded">+4</span>
 </div>
 <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Izin</p>
-<h3 id="stat-izin" class="text-display-md font-display-md mt-1">0</h3>
+<h3 id="stat-izin-desktop" class="text-display-md font-display-md mt-1">0</h3>
 <p class="text-on-surface-variant font-body-md mt-2 text-xs">Siswa dengan izin resmi</p>
 </div>
 <!-- Alpa -->
@@ -157,7 +377,7 @@
 <span class="text-green-600 font-label-sm text-label-sm flex items-center bg-green-50 px-2 py-1 rounded">-12%</span>
 </div>
 <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Alpa</p>
-<h3 id="stat-alfa" class="text-display-md font-display-md mt-1">0</h3>
+<h3 id="stat-alfa-desktop" class="text-display-md font-display-md mt-1">0</h3>
 <p class="text-on-surface-variant font-body-md mt-2 text-xs">Tanpa keterangan</p>
 </div>
 </section>
@@ -299,6 +519,9 @@
 <p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Sistem Presensi Edukasi. Membangun Kedisiplinan Sejak Dini.</p>
 </footer>
 </main>
+
+    </div>
+
 <script src="js/config.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
@@ -355,17 +578,20 @@
                 `;
             }
 
-            const statHadir = document.getElementById('stat-hadir');
-            if (statHadir) statHadir.innerText = hadir;
-            const statSakit = document.getElementById('stat-sakit');
-            if (statSakit) statSakit.innerText = sakit;
-            const statIzin = document.getElementById('stat-izin');
-            if (statIzin) statIzin.innerText = izin;
-            const statAlfa = document.getElementById('stat-alfa');
-            if (statAlfa) statAlfa.innerText = alfa;
+            
+            ['desktop', 'mobile'].forEach(view => {
+                const elHadir = document.getElementById(`stat-hadir-${view}`);
+                if(elHadir) elHadir.innerText = hadir;
+                const elSakit = document.getElementById(`stat-sakit-${view}`);
+                if(elSakit) elSakit.innerText = sakit;
+                const elIzin = document.getElementById(`stat-izin-${view}`);
+                if(elIzin) elIzin.innerText = izin;
+                const elAlfa = document.getElementById(`stat-alfa-${view}`);
+                if(elAlfa) elAlfa.innerText = alfa;
+            });
+
         } catch (err) {
             console.error('Error loading dashboard data:', err);
         }
     }
-</script>
-</body></html>
+</script></body></html>

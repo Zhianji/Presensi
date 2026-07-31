@@ -18,6 +18,115 @@
     </style>
 </head>
 <body class="text-on-surface bg-background">
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden w-full pb-24 relative min-h-screen">
+        
+<!-- Top Navigation Bar (Mobile Optimized) -->
+<nav class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-2">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Absen</span>
+<span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a school administrator in a clean modern office setting. The person has a friendly but authoritative expression, representing academic leadership and trust. The lighting is soft and natural, emphasizing high-quality digital workspace vibes with a primary blue and white color scheme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr7Ddnr8zh-Xd6Q8c3dMELeVafNcUzGSD80uI113IZx8hs-l4dV4TlKio6YEAaVT5Vu47fnbm0kePS3f4nUUA9gPNRlLZfASzhS9BkhNfmymJxH_lCfg7VlipX3uDPCpw-I3NhGJhJ5RYzpzk8_qMu4edoY8u8vgXkHPPmbKrU1HnL7KiK5ducIlJyVRGMHQhlzcrp19cuOq-1Avb1uGI9McwexfpBKFUDCvER68MY4D2dH00DkRRt"/>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pb-32">
+<!-- Search & Filter Header -->
+<div class="px-gutter pt-stack-lg pb-stack-md bg-surface">
+<h1 class="font-display-md text-display-md text-primary mb-4">Master Data Siswa</h1>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-body-md placeholder:text-outline-variant" id="search-siswa-mobile" oninput="syncSearchMobile()" placeholder="Cari nama atau NISN..." type="text"/>
+</div>
+
+<div class="mt-4 px-1">
+    <select id="filter-kelas-mobile" onchange="syncFilterMobile()" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:ring-primary focus:border-primary">
+        <option value="">Semua Kelas</option>
+    </select>
+</div>
+
+</div>
+<!-- Student List -->
+<div class="px-gutter space-y-3 mt-4" id="master-siswa-mobile-list">
+</div>
+<!-- Stats Summary Sticky Bar -->
+<div class="fixed bottom-16 left-0 right-0 bg-surface-container-high px-gutter py-3 shadow-lg border-t border-outline-variant z-40">
+<div class="flex justify-between items-center max-w-container-max-width mx-auto">
+<div class="text-center">
+<p class="text-label-md text-on-surface-variant uppercase">Total</p>
+<p class="text-title-lg font-bold text-primary">1,248</p>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="text-center">
+<p class="text-label-md text-on-surface-variant uppercase">Aktif</p>
+<p class="text-title-lg font-bold text-green-600">1,202</p>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="text-center">
+<p class="text-label-md text-on-surface-variant uppercase">Nonaktif</p>
+<p class="text-title-lg font-bold text-error">46</p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface shadow-[0_-1px_10px_rgba(0,0,0,0.05)] flex items-center justify-around px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-md">Beranda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="input-absensi.html">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<span class="text-label-md">Absen</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary font-bold" href="master-data.html">
+<span class="material-symbols-outlined font-bold" data-icon="database" data-weight="fill">database</span>
+<span class="text-label-md">Master</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="laporan.html">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="text-label-md">Laporan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="pengaturan.html">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-label-md">Profil</span>
+</a>
+</nav>
+<!-- FAB for Adding New Student -->
+<button onclick="openSiswaModal()" class="fixed right-6 bottom-36 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl" data-icon="person_add">person_add</span>
+</button>
+<script>
+        // Simple micro-interaction for expandable cards
+        document.querySelectorAll('.material-symbols-outlined[data-icon="expand_more"]').forEach(btn => {
+            btn.parentElement.parentElement.addEventListener('click', function(e) {
+                // Prevent click firing on action buttons
+                if (e.target.closest('button')) return;
+                
+                const icon = this.querySelector('[data-icon="expand_more"]');
+                icon.classList.toggle('rotate-180');
+                icon.style.transition = 'transform 0.3s ease';
+            });
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            console.log('Searching for:', e.target.value);
+            // Add filtering logic here if needed
+        });
+    </script>
+
+    </div>
+
+
+    <!-- DESKTOP VIEW -->
+    <div class="hidden md:flex w-full min-h-screen flex-col">
+        
 <!-- Sidebar Navigation -->
 <aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
 <div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
@@ -123,7 +232,7 @@
 <div class="flex flex-wrap items-center gap-3">
 <div class="relative w-full sm:w-80">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input id="search-siswa" oninput="filterSiswaTable()" class="w-full pl-12 pr-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="Cari Nama Siswa, NIS, atau Email..." type="text"/>
+<input id="search-siswa-desktop" oninput="filterSiswaTable()" class="w-full pl-12 pr-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="Cari Nama Siswa, NIS, atau Email..." type="text"/>
 </div>
 <button onclick="openSiswaModal()" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm active:scale-95 cursor-pointer">
 <span class="material-symbols-outlined">add</span>
@@ -148,10 +257,10 @@
 <span class="material-symbols-outlined text-on-surface-variant text-sm">filter_list</span>
 <span class="font-label-md text-label-md text-on-surface-variant uppercase">Filter:</span>
 </div>
-<select id="filter-kelas" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
+<select id="filter-kelas-desktop" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
 <option value="">Semua Kelas</option>
 </select>
-<select id="filter-status" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
+<select id="filter-status-desktop" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
 <option value="">Semua Status</option>
 <option value="Aktif">Aktif</option>
 <option value="Nonaktif">Nonaktif</option>
@@ -278,6 +387,9 @@
 </footer>
 </main>
 
+
+    </div>
+
 <script src="js/config.js"></script>
 <script>
     let allSiswa = [];
@@ -308,20 +420,23 @@
         }
     }
 
+    
     function populateKelasFilter(data) {
-        const kelasSelect = document.getElementById('filter-kelas');
+        const kelasSelectD = document.getElementById('filter-kelas-desktop');
+        const kelasSelectM = document.getElementById('filter-kelas-mobile');
         const classes = [...new Set(data.map(s => s.kelas).filter(Boolean))].sort();
         let options = `<option value="">Semua Kelas</option>`;
         classes.forEach(c => {
             options += `<option value="${c}">${c}</option>`;
         });
-        kelasSelect.innerHTML = options;
+        if(kelasSelectD) kelasSelectD.innerHTML = options;
+        if(kelasSelectM) kelasSelectM.innerHTML = options;
     }
 
     function filterSiswaTable() {
-        const search = document.getElementById('search-siswa').value.toLowerCase().trim();
-        const kelas = document.getElementById('filter-kelas').value;
-        const status = document.getElementById('filter-status').value;
+        const search = document.getElementById('search-siswa-desktop').value.toLowerCase().trim();
+        const kelas = document.getElementById('filter-kelas-desktop').value;
+        const status = document.getElementById('filter-status-desktop').value;
 
         const filtered = allSiswa.filter(s => {
             const matchSearch = !search || String(s.nama).toLowerCase().includes(search) || String(s.nis).toLowerCase().includes(search) || String(s.email).toLowerCase().includes(search);
@@ -333,28 +448,52 @@
         renderSiswaTable(filtered);
     }
 
+    
     function renderSiswaTable(data) {
         const tbody = document.getElementById('master-siswa-tbody');
-        document.getElementById('siswa-count-info').textContent = `Menampilkan ${data.length} dari ${allSiswa.length} Siswa`;
-        document.getElementById('checkbox-all').checked = false;
+        const mobileList = document.getElementById('master-siswa-mobile-list');
+        
+        const countText = `Menampilkan ${data.length} dari ${allSiswa.length} Siswa`;
+        const c1 = document.getElementById('siswa-count-info');
+        if(c1) c1.textContent = countText;
+        
+        const cbAll = document.getElementById('checkbox-all');
+        if(cbAll) cbAll.checked = false;
         if (typeof updateCheckboxState === 'function') updateCheckboxState();
 
         if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada siswa yang cocok dengan filter.</td></tr>`;
+            if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada siswa yang cocok dengan filter.</td></tr>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Tidak ada data siswa</div>`;
+            
+            // update mobile sticky stats to 0
+            updateMobileStats(0, 0, 0);
             return;
         }
 
-        let html = '';
+        let htmlDesktop = '';
+        let htmlMobile = '';
+        let aktifCount = 0;
+        let nonaktifCount = 0;
+        
         data.forEach(s => {
             const initials = s.nama ? s.nama.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'SI';
             const isAktif = String(s.status_aktif).toLowerCase() === 'aktif';
-            const badge = isAktif 
+            if(isAktif) aktifCount++; else nonaktifCount++;
+            
+            const badgeD = isAktif 
                 ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Aktif</span>`
                 : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant"><span class="w-1.5 h-1.5 rounded-full bg-outline mr-1.5"></span>Nonaktif</span>`;
+                
+            const badgeM = isAktif
+                ? `<span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-label-sm uppercase tracking-wider">Aktif</span>`
+                : `<span class="px-2 py-1 bg-surface-variant text-on-surface-variant rounded-md text-label-sm uppercase tracking-wider">Nonaktif</span>`;
             
-            const safeNama = s.nama ? s.nama.replace(/'/g, "\\'") : '';
+            const avatarClassM = isAktif ? "bg-secondary-container text-primary" : "bg-surface-variant text-outline";
+            const nameClassM = isAktif ? "text-on-surface" : "text-on-surface opacity-70";
+            
+            const safeNama = s.nama ? s.nama.replace(/'/g, "\'") : '';
 
-            html += `
+            htmlDesktop += `
                 <tr class="hover:bg-surface-container-high/30 transition-colors">
                     <td class="px-6 py-4 text-center">
                         <input type="checkbox" class="siswa-checkbox w-4 h-4 text-primary bg-background border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer" value="${s.id}" onchange="updateCheckboxState()">
@@ -371,7 +510,7 @@
                     </td>
                     <td class="px-6 py-4 font-body-md text-on-surface">${s.kelas || '-'}</td>
                     <td class="px-6 py-4 font-body-md text-on-surface">${s.wali_murid || '-'}</td>
-                    <td class="px-6 py-4">${badge}</td>
+                    <td class="px-6 py-4">${badgeD}</td>
                     <td class="px-6 py-4">
                         <div class="flex justify-center gap-2">
                             <button onclick="editSiswa('${s.id}')" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-all" title="Edit">
@@ -384,8 +523,52 @@
                     </td>
                 </tr>
             `;
+            
+            htmlMobile += `
+                <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant transition-all">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg ${avatarClassM} flex items-center justify-center font-bold">
+                                ${initials}
+                            </div>
+                            <div>
+                                <p class="font-title-md ${nameClassM}">${s.nama || '-'}</p>
+                                <p class="font-label-md text-on-surface-variant">NISN: ${s.nis || '-'} | ${s.kelas || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="editSiswa('${s.id}')" class="p-2 text-primary hover:bg-primary-container rounded-lg transition-colors">
+                                <span class="material-symbols-outlined" data-icon="edit">edit</span>
+                            </button>
+                            <button onclick="deleteSiswaConfirm('${s.id}', '${safeNama}')" class="p-2 text-error hover:bg-error-container rounded-lg transition-colors">
+                                <span class="material-symbols-outlined" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between pt-3 border-t border-outline-variant">
+                        ${badgeM}
+                    </div>
+                </div>
+            `;
         });
-        tbody.innerHTML = html;
+        
+        if(tbody) tbody.innerHTML = htmlDesktop;
+        if(mobileList) mobileList.innerHTML = htmlMobile;
+        
+        updateMobileStats(data.length, aktifCount, nonaktifCount);
+    }
+    
+    function updateMobileStats(total, aktif, nonaktif) {
+        // Find elements inside sticky bar
+        const stickyBar = document.querySelector('.fixed.bottom-16');
+        if(stickyBar) {
+            const vals = stickyBar.querySelectorAll('.text-title-lg.font-bold');
+            if(vals.length >= 3) {
+                vals[0].textContent = total;
+                vals[1].textContent = aktif;
+                vals[2].textContent = nonaktif;
+            }
+        }
     }
 
     function openSiswaModal(siswa = null) {
@@ -635,4 +818,16 @@
         document.body.removeChild(link);
     }
 </script>
+    function syncSearchMobile() {
+        const v = document.getElementById('search-siswa-mobile').value;
+        const d = document.getElementById('search-siswa-desktop');
+        if(d) d.value = v;
+        filterSiswaTable();
+    }
+    function syncFilterMobile() {
+        const v = document.getElementById('filter-kelas-mobile').value;
+        const d = document.getElementById('filter-kelas-desktop');
+        if(d) d.value = v;
+        filterSiswaTable();
+    }
 </body></html>

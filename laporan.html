@@ -27,6 +27,162 @@
     </style>
 </head>
 <body class="bg-background text-on-background overflow-hidden h-screen flex">
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden w-full pb-24 relative min-h-screen">
+        
+<!-- Top Navigation Bar -->
+<header class="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-gutter py-stack-sm w-full">
+<h1 class="font-display-md text-display-md font-bold text-primary">Sistem Presensi Edukasi</h1>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-variant transition-colors p-2 rounded-full">notifications</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional profile headshot of a school administrator in a clean, modern educational setting. The lighting is soft and natural, reflecting a trustworthy and efficient personality. The background is a slightly blurred office with educational certificates, maintaining the Scholarly brand identity with a primary blue and white color scheme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADgGwXBWz8E35frprTbuosM7x8wgu6Ty9rp6oK4uzhTlFvXxH7HkRb_iGTxNuEfNO-GhKushsbvNY4-Yl4N2Qk3Q1bIEWiXhtyHe5QfNsG4LOnvii-uS7iX-ZB2sq5urUcUTAUWrPZhOBrSHfF8fcUSPaypWgnQkoxNa2w5I_j7SYBb2B6BmbdjvNml-NJ9WqnVCVnrDD8IilefP0jJNzLxm2F1zdj-LsoEZYOucni19sJ3kG71W5a"/>
+</div>
+</div>
+</header>
+<!-- Main Content Container (Mobile Optimized) -->
+<main class="px-4 py-6 max-w-container-max-width mx-auto">
+<!-- Page Title & Quick Action -->
+<div class="flex flex-col gap-1 mb-6">
+<h2 class="font-display-md text-display-md text-primary">Laporan Presensi</h2>
+<p class="font-body-md text-on-surface-variant">Rekapitulasi kehadiran siswa secara periodik.</p>
+</div>
+
+<!-- Filter Section: Bento Style -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span class="font-title-md text-title-md">Periode</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            <select id="filter-bulan-mobile" onchange="syncFilterMobile()" class="bg-surface border-outline-variant rounded-lg p-2 text-label-md font-label-md focus:ring-primary focus:border-primary">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7">Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+            </select>
+            <select id="filter-tahun-mobile" onchange="syncFilterMobile()" class="bg-surface border-outline-variant rounded-lg p-2 text-label-md font-label-md focus:ring-primary focus:border-primary">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+            </select>
+        </div>
+    </div>
+    <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined">school</span>
+            <span class="font-title-md text-title-md">Filter Kelas</span>
+        </div>
+        <select id="filter-kelas-mobile" onchange="syncFilterMobile()" class="w-full bg-surface border-outline-variant rounded-lg p-2 text-label-md font-label-md focus:ring-primary focus:border-primary">
+            <option value="">Semua Kelas</option>
+            <option value="XII IPA 1">XII IPA 1</option>
+            <option value="XII IPA 2">XII IPA 2</option>
+            <option value="XI IPS 1">XI IPS 1</option>
+            <option value="X-1">X-1</option>
+        </select>
+    </div>
+</section>
+
+<!-- Key Metric Card: Large Display -->
+<section class="mb-8">
+<div class="bg-primary-container text-on-primary rounded-2xl p-6 shadow-md relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">analytics</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md opacity-80 uppercase tracking-widest">Rata-rata Kehadiran</span>
+<div class="flex items-baseline gap-2">
+<span id="avg-persen-mobile" class="font-display-lg text-display-lg">0%</span>
+<span class="bg-green-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> +2.4%
+                        </span>
+</div>
+<p id="total-siswa-mobile" class="font-body-md text-body-md mt-2 opacity-90">Berdasarkan data dari 0 siswa.</p>
+</div>
+</div>
+</section>
+<!-- Export Actions: Prominent Buttons -->
+<section class="flex gap-3 mb-8">
+<button class="flex-1 bg-primary text-white font-title-md py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+                Export PDF
+            </button>
+<button onclick="exportToCSV()" class="flex-1 bg-white border-2 border-primary text-primary font-title-md py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined">table_chart</span>
+                Excel
+            </button>
+</section>
+<!-- List of Students: Modern Data List -->
+<section class="space-y-4">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-title-lg text-title-lg text-on-surface">Daftar Kehadiran Siswa</h3>
+<span class="font-label-md text-label-md text-on-surface-variant">Terurut: Persentase Tertinggi</span>
+</div>
+<div class="space-y-3">
+<div id="laporan-mobile-list" class="space-y-3"></div>
+</div>
+<button class="w-full py-3 text-primary font-title-md border border-dashed border-primary rounded-xl hover:bg-primary-container/10 transition-colors">
+                Lihat Semua Siswa (32)
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-lg flex justify-around items-center px-4 py-2 z-50 md:hidden border-t border-outline-variant">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Beranda</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="input-absensi.html">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="text-[10px] font-bold">Absen</span>
+</a>
+<!-- Active Tab: Laporan -->
+<a class="flex flex-col items-center gap-1 p-2 bg-primary-container text-on-primary-container rounded-xl px-4 scale-105 transition-all" href="laporan.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="text-[10px] font-black">Laporan</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-bold">Notif</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="pengaturan.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Seting</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                if (this.innerText.includes('Export')) {
+                    this.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Memproses...`;
+                    setTimeout(() => {
+                        this.innerHTML = `<span class="material-symbols-outlined text-green-500">check_circle</span> Selesai!`;
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                        }, 2000);
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+
+    </div>
+
+
+    <!-- DESKTOP VIEW -->
+    <div class="hidden md:flex w-full h-screen">
+        
 <!-- SideNavBar -->
 <aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant -translate-x-full md:translate-x-0 transition-transform duration-300">
 <div class="px-6 py-8 flex flex-col gap-2">
@@ -136,7 +292,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bulan</label>
 <div class="relative">
-<select id="filter-bulan" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-bulan-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="1">Januari</option>
 <option value="2">Februari</option>
 <option value="3">Maret</option>
@@ -155,7 +311,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tahun</label>
 <div class="relative">
-<select id="filter-tahun" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-tahun-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="2024">2024</option>
 <option value="2025">2025</option>
 <option value="2026">2026</option>
@@ -165,7 +321,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kelas</label>
 <div class="relative">
-<select id="filter-kelas" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-kelas-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="">Semua Kelas</option>
 <option value="XII IPA 1">XII IPA 1</option>
 <option value="XII IPA 2">XII IPA 2</option>
@@ -186,7 +342,7 @@
 <circle id="pie-circle" class="text-primary transition-all duration-1000" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="36.4" stroke-width="12"></circle>
 </svg>
 <div class="absolute inset-0 flex flex-col items-center justify-center">
-<span class="font-display-md text-display-md text-primary" id="avg-persen-text">90%</span>
+<span class="font-display-md text-display-md text-primary" id="avg-persen-desktop">90%</span>
 </div>
 </div>
 <div class="ml-6 flex flex-col gap-2">
@@ -202,7 +358,7 @@
 </div>
 <div class="bg-surface-container-low p-3 rounded-lg flex items-center justify-between">
 <span class="font-label-md text-label-md text-on-surface-variant">Total Siswa Terdata</span>
-<span class="font-title-md text-title-md text-primary" id="total-siswa-stat">0</span>
+<span class="font-title-md text-title-md text-primary" id="total-siswa-desktop">0</span>
 </div>
 </div>
 </div>
@@ -242,6 +398,9 @@
 </div>
 </main>
 
+
+    </div>
+
 <script src="js/config.js"></script>
 <script>
     let reportData = [];
@@ -251,16 +410,28 @@
         if (!check) return;
 
         const now = new Date();
-        document.getElementById('filter-bulan').value = String(now.getMonth() + 1);
-        document.getElementById('filter-tahun').value = String(now.getFullYear());
+        
+    const m = String(now.getMonth() + 1);
+    const mDesktop = document.getElementById('filter-bulan-desktop');
+    const mMobile = document.getElementById('filter-bulan-mobile');
+    if(mDesktop) mDesktop.value = m;
+    if(mMobile) mMobile.value = m;
+
+        
+    const y = String(now.getFullYear());
+    const yDesktop = document.getElementById('filter-tahun-desktop');
+    const yMobile = document.getElementById('filter-tahun-mobile');
+    if(yDesktop) yDesktop.value = y;
+    if(yMobile) yMobile.value = y;
+
 
         loadLaporanData();
     });
 
     async function loadLaporanData() {
-        const bulan = document.getElementById('filter-bulan').value;
-        const tahun = document.getElementById('filter-tahun').value;
-        const kelas = document.getElementById('filter-kelas').value;
+        const bulan = document.getElementById('filter-bulan-desktop').value;
+        const tahun = document.getElementById('filter-tahun-desktop').value;
+        const kelas = document.getElementById('filter-kelas-desktop').value;
 
         const tbody = document.getElementById('laporan-tbody');
         tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data rekapitulasi...</td></tr>`;
@@ -271,8 +442,20 @@
                 reportData = res.data;
                 renderLaporanTable(res.data);
                 if (res.ringkasan) {
-                    document.getElementById('avg-persen-text').textContent = (res.ringkasan.rata_rata || 0) + '%';
-                    document.getElementById('total-siswa-stat').textContent = res.ringkasan.total_siswa || 0;
+                    
+    const avg = (res.ringkasan.rata_rata || 0) + '%';
+    const aDesktop = document.getElementById('avg-persen-desktop');
+    const aMobile = document.getElementById('avg-persen-mobile');
+    if(aDesktop) aDesktop.textContent = avg;
+    if(aMobile) aMobile.textContent = avg;
+
+                    
+    const tot = res.ringkasan.total_siswa || 0;
+    const tDesktop = document.getElementById('total-siswa-desktop');
+    const tMobile = document.getElementById('total-siswa-mobile');
+    if(tDesktop) tDesktop.textContent = tot;
+    if(tMobile) tMobile.textContent = `Berdasarkan data dari ${tot} siswa.`;
+
                     
                     const strokeOffset = 364.4 - (364.4 * (res.ringkasan.rata_rata || 0) / 100);
                     const circle = document.getElementById('pie-circle');
@@ -286,16 +469,23 @@
         }
     }
 
+    
     function renderLaporanTable(data) {
         const tbody = document.getElementById('laporan-tbody');
-        document.getElementById('laporan-count-info').textContent = `Menampilkan ${data.length} siswa`;
+        const mobileList = document.getElementById('laporan-mobile-list');
+        const countInfo = document.getElementById('laporan-count-info');
+        
+        if(countInfo) countInfo.textContent = `Menampilkan ${data.length} siswa`;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada data rekapitulasi untuk periode ini.</td></tr>`;
+            if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada data rekapitulasi untuk periode ini.</td></tr>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Tidak ada data rekapitulasi</div>`;
             return;
         }
 
-        let html = '';
+        let htmlDesktop = '';
+        let htmlMobile = '';
+        
         data.forEach(s => {
             const initials = s.nama ? s.nama.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'SI';
             
@@ -311,14 +501,24 @@
             }
 
             const persen = s.persen_total || 0;
-            let catBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-label-sm text-label-sm">Sangat Baik</span>`;
+            let catBadgeD = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-label-sm text-label-sm">Sangat Baik</span>`;
+            let catBadgeM = `<span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 rounded">SEMPURNA</span>`;
+            
+            let nameColorM = "text-on-surface";
+            let borderM = "border-outline-variant";
+            let valColorM = "text-primary";
+            
             if (persen < 75) {
-                catBadge = `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-label-sm text-label-sm">Perhatian</span>`;
+                catBadgeD = `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-label-sm text-label-sm">Perhatian</span>`;
+                catBadgeM = `<span class="text-[10px] font-bold text-error bg-error-container px-2 rounded uppercase">Peringatan</span>`;
+                borderM = "border-error-container";
+                valColorM = "text-error";
             } else if (persen < 90) {
-                catBadge = `<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-label-sm text-label-sm">Cukup</span>`;
+                catBadgeD = `<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-label-sm text-label-sm">Cukup</span>`;
+                catBadgeM = `<span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 rounded">BAIK</span>`;
             }
 
-            html += `
+            htmlDesktop += `
                 <tr class="hover:bg-surface-container transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
@@ -331,11 +531,27 @@
                     <td class="px-6 py-4 text-center font-body-md text-on-surface">${totalIzinSakit}</td>
                     <td class="px-6 py-4 text-center font-body-md text-on-surface">${totalAlfa}</td>
                     <td class="px-6 py-4 text-right font-title-md text-primary font-bold">${persen}%</td>
-                    <td class="px-6 py-4">${catBadge}</td>
+                    <td class="px-6 py-4">${catBadgeD}</td>
                 </tr>
             `;
+            
+            htmlMobile += `
+                <div class="bg-white border ${borderM} p-4 rounded-xl flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">${initials}</div>
+                    <div class="flex-1">
+                        <h4 class="font-title-md text-title-md ${nameColorM}">${s.nama || '-'}</h4>
+                        <p class="font-label-md text-label-md text-on-surface-variant">${s.kelas || '-'}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-display-md text-display-md ${valColorM}">${persen}%</div>
+                        ${catBadgeM}
+                    </div>
+                </div>
+            `;
         });
-        tbody.innerHTML = html;
+        
+        if(tbody) tbody.innerHTML = htmlDesktop;
+        if(mobileList) mobileList.innerHTML = htmlMobile;
     }
 
     function exportToCSV() {
@@ -353,10 +569,25 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `Rekap_Absensi_${document.getElementById('filter-bulan').value}_${document.getElementById('filter-tahun').value}.csv`);
+        link.setAttribute('download', `Rekap_Absensi_${document.getElementById('filter-bulan-desktop').value}_${document.getElementById('filter-tahun-desktop').value}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 </script>
+    function syncFilterMobile() {
+        const b = document.getElementById('filter-bulan-mobile').value;
+        const t = document.getElementById('filter-tahun-mobile').value;
+        const k = document.getElementById('filter-kelas-mobile').value;
+        
+        const bD = document.getElementById('filter-bulan-desktop');
+        const tD = document.getElementById('filter-tahun-desktop');
+        const kD = document.getElementById('filter-kelas-desktop');
+        
+        if(bD) bD.value = b;
+        if(tD) tD.value = t;
+        if(kD) kD.value = k;
+        
+        loadLaporanData();
+    }
 </body></html>

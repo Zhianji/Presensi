@@ -21,8 +21,200 @@
             background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
         }
     </style>
+
+    <style>
+        .attendance-radio:checked + label {
+            background-color: #003d9b;
+            color: white;
+            border-color: #003d9b;
+        }
+    </style>
 </head>
 <body class="bg-background text-on-background min-h-screen">
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden w-full pb-24 relative min-h-screen">
+        
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-title-lg">how_to_reg</span>
+<h1 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Presensi</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a school administrator in a bright Indonesian office setting, wearing a clean batik uniform. The lighting is soft and natural from a nearby window, creating a warm, trustworthy, and scholarly atmosphere. The background is a blurred modern school hallway with clean white walls and blue accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSyehDonBLmC99pTGEPAdBbvvoMVP9G_ulWokMo5bk6UdnK-bq20_t8_7EwOszxrKOWfcZCV59se3aOydAXmX56nN5FyP9Z22D3ffALn1qZAP8KYeqPQifmi1C3ufyNmLvXEXdVK-7GKiZIa-4eqRLzgBbdzbg5PVCtrf6XoC2XFiri2FakeA0zc4bfWs0MUX_CRtjEab0nhzlgjX0E_ujDL1-o0kPXPqvnsU11GmDtMlc0O_40M5s"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max-width mx-auto px-4 py-4 space-y-6">
+<!-- Filters Section -->
+<section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant">
+<h2 class="font-title-md text-title-md text-primary mb-4">Filter Kelas &amp; Mata Pelajaran</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Class Filter -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Kelas</label>
+<select id="select-kelas-mobile" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-3 py-2 text-body-md focus:ring-primary focus:border-primary">
+<option>X - RPL 1</option>
+<option>X - RPL 2</option>
+<option>XI - TKJ 1</option>
+<option>XI - TKJ 2</option>
+</select>
+</div>
+<!-- Subject Filter -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Mata Pelajaran</label>
+<select id="select-mapel-mobile" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-3 py-2 text-body-md focus:ring-primary focus:border-primary">
+<option>TIK (Teknologi Informasi &amp; Komunikasi)</option>
+<option>KKA (Kreativitas &amp; Kewirausahaan)</option>
+<option>Matematika</option>
+</select>
+</div>
+<!-- Date Filter -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Tanggal</label>
+<input id="input-tanggal-mobile" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-3 py-2 text-body-md focus:ring-primary focus:border-primary" type="date" value="2023-10-27"/>
+</div>
+</div>
+</section>
+<!-- Student List Header -->
+<div class="flex justify-between items-center px-1">
+<div>
+<h3 class="font-title-lg text-title-lg">Daftar Siswa</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">32 Siswa Terdaftar</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-title-md hover:bg-primary-container/10 px-3 py-2 rounded-lg transition-colors" onclick="markAllPresentMobile()">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+                Set Semua Hadir
+            </button>
+</div>
+<!-- Student List -->
+<div class="space-y-3" id="student-list">
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="fixed bottom-16 md:bottom-20 left-0 right-0 px-4 py-3 z-40 bg-surface/80 backdrop-blur-md">
+<div class="max-w-container-max-width mx-auto flex items-center gap-3">
+<button class="flex-1 bg-primary text-on-primary font-title-md py-4 rounded-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2" onclick="saveAbsensi()">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+                Simpan Absensi
+            </button>
+<button class="bg-secondary-container text-on-secondary-container p-4 rounded-xl shadow-sm hover:shadow-md transition-all">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Mobile Only Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-[0_-1px_10px_rgba(0,0,0,0.05)] h-16 flex items-center justify-around z-50 px-2">
+<div class="flex flex-col items-center justify-center gap-1 cursor-pointer text-on-surface-variant group">
+<span class="material-symbols-outlined text-[24px]" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</div>
+<!-- Active Tab: Input Absen -->
+<div class="flex flex-col items-center justify-center gap-1 cursor-pointer text-primary">
+<span class="material-symbols-outlined text-[24px] font-bold" data-icon="how_to_reg">how_to_reg</span>
+<span class="font-label-md text-label-md font-bold">Input Absen</span>
+</div>
+<div class="flex flex-col items-center justify-center gap-1 cursor-pointer text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</div>
+<div class="flex flex-col items-center justify-center gap-1 cursor-pointer text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</div>
+</nav>
+<!-- Side Navigation Bar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-40 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</div>
+<div>
+<h2 class="font-title-lg text-title-lg font-black text-primary leading-tight">Absen Online</h2>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<span class="font-label-md text-label-md">Input Absen</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="database">database</span>
+<span class="font-label-md text-label-md">Master Data</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="notifications_active">notifications_active</span>
+<span class="font-label-md text-label-md">Notifikasi</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="history_edu">history_edu</span>
+<span class="font-label-md text-label-md">Log Aktivitas</span>
+</a>
+<div class="pt-10">
+<a class="flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
+</a>
+</div>
+</nav>
+</div>
+</aside>
+<script>
+        function markAllPresent() {
+            const hRadios = document.querySelectorAll('input[id^="h-"]');
+            hRadios.forEach(radio => {
+                radio.checked = true;
+            });
+            // Visual feedback
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-6 py-3 rounded-full shadow-lg z-[100] font-title-md transition-all animate-bounce';
+            toast.textContent = 'Semua siswa ditandai Hadir';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        function saveAbsensi() {
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="refresh">refresh</span> Menyimpan...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span> Tersimpan';
+                btn.classList.replace('bg-primary', 'bg-tertiary-container');
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.replace('bg-tertiary-container', 'bg-primary');
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+    </script>
+
+    </div>
+
+
+    <!-- DESKTOP VIEW -->
+    <div class="hidden md:flex w-full">
+        
 <!-- SideNavBar -->
 <aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
 <div class="p-gutter flex flex-col gap-2">
@@ -111,7 +303,7 @@
 <div class="col-span-12 lg:col-span-8 bg-white p-gutter rounded-xl shadow-sm border border-outline-variant flex flex-wrap items-end gap-gutter">
 <div class="flex-1 min-w-[200px]">
 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Kelas</label>
-<select id="select-kelas" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+<select id="select-kelas-desktop" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
 <option value="">Semua Kelas</option>
 <option value="XII IPA 1">XII IPA 1</option>
 <option value="XII IPA 2">XII IPA 2</option>
@@ -120,7 +312,7 @@
 </select>
 </div><div class="flex-1 min-w-[200px]">
 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Mata Pelajaran</label>
-<select id="select-mapel" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+<select id="select-mapel-desktop" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
 <option value="TIK">TIK</option>
 <option value="KKA">KKA</option>
 </select>
@@ -128,7 +320,7 @@
 <div class="flex-1 min-w-[200px]">
 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2 uppercase tracking-wider">Tanggal</label>
 <div class="relative">
-<input id="input-tanggal" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none" type="date"/>
+<input id="input-tanggal-desktop" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none" type="date"/>
 </div>
 </div>
 <button id="btn-terapkan" onclick="loadStatusHarian()" class="bg-surface-variant text-primary font-title-md text-title-md px-6 py-2.5 rounded-lg hover:bg-primary-container transition-colors flex items-center gap-2 cursor-pointer">
@@ -190,6 +382,9 @@
 </button>
 </div>
 </main>
+
+    </div>
+
 <script src="js/config.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
@@ -197,42 +392,136 @@
         if (!check) return;
 
         // Set default date to today
-        document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('input-tanggal-desktop').value = todayStr;
+        const mobileDate = document.getElementById('input-tanggal-mobile');
+        if(mobileDate) mobileDate.value = todayStr;
+.toISOString().split('T')[0];
         
         loadStatusHarian();
     });
 
     let currentSiswaList = [];
 
+    
     async function loadStatusHarian() {
-        const kelas = document.getElementById('select-kelas').value;
-        const mapel = document.getElementById('select-mapel').value;
-        const tanggal = document.getElementById('input-tanggal').value;
+        const kelas = document.getElementById('select-kelas-desktop').value || (document.getElementById('select-kelas-mobile') ? document.getElementById('select-kelas-mobile').value : '');
+        const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
+        const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
 
         const tbody = document.getElementById('input-absensi-tbody');
-        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+        const mobileList = document.getElementById('student-list');
+        
+        if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+        if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Memuat data...</div>`;
 
         try {
             const res = await apiPost('getStatusHarian', { token: getToken(), kelas, mapel, tanggal });
             if (res.ok && res.data) {
                 currentSiswaList = res.data;
                 renderSiswaTable(res.data);
-                document.getElementById('total-siswa-text').textContent = `Menampilkan ${res.data.length} Siswa`;
-                document.getElementById('info-text').innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                const countText = `Menampilkan ${res.data.length} Siswa`;
+                const elDesktopText = document.getElementById('total-siswa-text');
+                if(elDesktopText) elDesktopText.textContent = countText;
+                
+                const elInfo = document.getElementById('info-text');
+                if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
             } else {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
+                if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
+                if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-error">Gagal memuat data</div>`;
             }
+        } catch (e) {
+            if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-error">Gagal terhubung</div>`;
+        }
+    }
         } catch (e) {
             tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
         }
     }
 
+    
     function renderSiswaTable(data) {
         const tbody = document.getElementById('input-absensi-tbody');
+        const mobileList = document.getElementById('student-list');
+        
         if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant">Tidak ada data siswa ditemukan untuk kelas ini.</td></tr>`;
+            if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant">Tidak ada data siswa ditemukan untuk kelas ini.</td></tr>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Tidak ada data siswa</div>`;
             return;
         }
+
+        let htmlDesktop = '';
+        let htmlMobile = '';
+        
+        data.forEach((s, idx) => {
+            const rowNo = String(idx + 1).padStart(2, '0');
+            const status = s.status || '';
+            const initials = s.nama ? s.nama.substring(0, 2).toUpperCase() : 'NA';
+
+            htmlDesktop += `
+                <tr class="hover:bg-surface-container-lowest transition-colors group" data-siswa-id="${s.siswa_id}">
+                    <td class="px-6 py-4 font-body-md text-on-surface-variant">${rowNo}</td>
+                    <td class="px-6 py-4 font-title-md text-on-surface">
+                        <div>${s.nama}</div>
+                        <div class="text-xs text-on-surface-variant opacity-70">${s.kelas}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center items-center gap-4">
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-5 h-5 text-green-600 border-outline-variant focus:ring-green-500"/>
+                                <span class="font-label-sm text-label-sm">Hadir</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-5 h-5 text-primary border-outline-variant focus:ring-primary"/>
+                                <span class="font-label-sm text-label-sm">Sakit</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-5 h-5 text-secondary border-outline-variant focus:ring-secondary"/>
+                                <span class="font-label-sm text-label-sm">Izin</span>
+                            </label>
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="status-${s.siswa_id}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-5 h-5 text-error border-outline-variant focus:ring-error"/>
+                                <span class="font-label-sm text-label-sm">Alfa</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="text" id="ket-${s.siswa_id}" class="w-full bg-surface-container-low border border-outline-variant rounded px-3 py-1.5 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Tambah catatan..." value="${s.keterangan || ''}"/>
+                    </td>
+                </tr>
+            `;
+            
+            htmlMobile += `
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col gap-4 shadow-sm" data-siswa-id="${s.siswa_id}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-title-md">
+                            ${initials}
+                        </div>
+                        <div>
+                            <p class="font-title-md text-title-md text-on-surface">${s.nama}</p>
+                            <p class="font-label-md text-label-md text-on-surface-variant">${s.kelas}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex bg-surface-container-low p-1 rounded-lg gap-1 border border-outline-variant w-full justify-between">
+                            <input ${status === 'Hadir' ? 'checked' : ''} class="hidden attendance-radio" id="h-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Hadir" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="h-${s.siswa_id}">H</label>
+                            <input ${status === 'Sakit' ? 'checked' : ''} class="hidden attendance-radio" id="s-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Sakit" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="s-${s.siswa_id}">S</label>
+                            <input ${status === 'Izin' ? 'checked' : ''} class="hidden attendance-radio" id="i-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Izin" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="i-${s.siswa_id}">I</label>
+                            <input ${status === 'Alfa' ? 'checked' : ''} class="hidden attendance-radio" id="a-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Alfa" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="a-${s.siswa_id}">A</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        if(tbody) tbody.innerHTML = htmlDesktop;
+        if(mobileList) mobileList.innerHTML = htmlMobile;
+    }
 
         let html = '';
         data.forEach((s, idx) => {
@@ -287,15 +576,69 @@
         });
     });
 
+    
     async function simpanAbsensi() {
-        const mapel = document.getElementById('select-mapel').value;
-        const tanggal = document.getElementById('input-tanggal').value;
-        const rows = document.querySelectorAll('#input-absensi-tbody tr[data-siswa-id]');
+        const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
+        const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
+        
+        let rows = document.querySelectorAll('#input-absensi-tbody tr[data-siswa-id]');
+        if(rows.length === 0) {
+            rows = document.querySelectorAll('#student-list div[data-siswa-id]');
+        }
 
         if (rows.length === 0) {
             alert('Tidak ada data siswa untuk disimpan.');
             return;
         }
+
+        const btnDesktop = document.getElementById('btn-simpan');
+        const btnDesktopFooter = document.getElementById('btn-simpan-footer');
+        // Mobile version uses onclick="saveAbsensi()" which we'll map here
+        
+        try {
+            let count = 0;
+            for (const row of rows) {
+                const siswaId = row.getAttribute('data-siswa-id');
+                // check desktop radio
+                let checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
+                // if not found, check mobile radio
+                if (!checkedRadio) {
+                    checkedRadio = row.querySelector(`input[name="status-mob-${siswaId}"]:checked`);
+                }
+                
+                const ketInput = document.getElementById(`ket-${siswaId}`);
+
+                if (checkedRadio) {
+                    const status = checkedRadio.value;
+                    const keterangan = ketInput ? ketInput.value : '';
+                    await apiPost('setAbsensiStatus', {
+                        token: getToken(),
+                        siswa_id: siswaId,
+                        mapel: mapel,
+                        tanggal: tanggal,
+                        status: status,
+                        keterangan: keterangan
+                    });
+                    count++;
+                }
+            }
+            alert(`Absensi berhasil disimpan untuk ${count} siswa!`);
+            loadStatusHarian();
+        } catch (e) {
+            alert('Gagal menyimpan absensi: ' + e.message);
+        }
+    }
+    
+    function markAllPresentMobile() {
+        const hRadios = document.querySelectorAll('#student-list input[value="Hadir"]');
+        hRadios.forEach(radio => {
+            radio.checked = true;
+        });
+    }
+    
+    function saveAbsensi() {
+        simpanAbsensi();
+    }
 
         const btn = document.getElementById('btn-simpan');
         const originalText = btn.innerHTML;
@@ -333,4 +676,9 @@
         }
     }
 </script>
+    document.addEventListener('change', function(e) {
+        if(e.target.id === 'select-kelas-mobile' || e.target.id === 'select-mapel-mobile' || e.target.id === 'input-tanggal-mobile') {
+            loadStatusHarian();
+        }
+    });
 </body></html>

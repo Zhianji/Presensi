@@ -26,10 +26,86 @@
     background-size: cover;
     background-position: center
     }</style>
+
+    <style>
+        .login-gradient { background: radial-gradient(circle at top right, #cee5ff 0%, #003d9b 100%); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
 </head>
 <body class="flex flex-col min-h-screen">
 <!-- Hero Background Wrapper -->
-<main class="flex-grow flex items-center justify-center relative overflow-hidden bg-education-pattern" data-alt="A cinematic, wide-angle photograph of a modern, bright university library with high ceilings and rows of organized books. Soft sunlight filters through large windows, creating a peaceful and scholarly atmosphere. The color palette is dominated by corporate blues and clean whites, reflecting a professional Indonesian educational environment. High-quality architectural photography style with a sense of depth and tranquility.">
+
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden login-gradient relative">
+        
+<!-- Atmospheric Effect (SVG background element) -->
+<div class="fixed inset-0 pointer-events-none opacity-20">
+<svg height="100%" preserveaspectratio="none" viewbox="0 0 100 100" width="100%">
+<defs>
+<pattern height="10" id="grid" patternunits="userSpaceOnUse" width="10">
+<path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"></path>
+</pattern>
+</defs>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<main class="w-full max-w-md relative z-10 animate-fade-in">
+<!-- Logo & Branding Header -->
+<div class="flex flex-col items-center mb-stack-lg">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center shadow-lg mb-stack-md border-4 border-primary-container">
+<span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<h1 class="font-display-md text-display-md text-surface-container-lowest text-center tracking-tight">
+                Sistem Presensi Edukasi
+            </h1>
+</div>
+<!-- Login Card -->
+<div class="glass-card rounded-xl shadow-2xl p-stack-lg flex flex-col items-center">
+<div class="text-center mb-stack-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-2">Selamat Datang</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
+                    Akses dashboard administrasi dan kehadiran dalam satu langkah mudah.
+                </p>
+</div>
+<!-- Login Action -->
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container transition-all py-3.5 px-gutter rounded-lg shadow-sm active:scale-[0.98]"> onclick="openGoogleModal()"
+<img class="w-6 h-6" data-alt="Official Google G-Logo in high resolution with vibrant red, yellow, green and blue colors, presented on a clean white circular background. The logo is centered and captures a modern, professional digital identity aesthetic suitable for a high-end educational portal login page." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlzLqNDwC9QzS5eNYaTievpPI7a8fGGXPJyXBWE4IRU574JGIcBJlZievag4UvkoRXDHwhogOnkRR6KCP-cA-R3Gt7cHhkLtf1rXj-oX-_0160ClFf9Q-uxRmaiXovh_juVWG1x_mu8rvLv3PjheM0TIzqSqidvqA1ullnWJ-eKWOVYEh3LwKDjlI7O2VQjyA2JtN-j9tId2KEKJSLEPeQIfx-SgG9x4-cGyIkrDRut97pWRmbv1gL"/>
+<span class="font-title-md text-title-md text-on-surface">Masuk dengan Google</span>
+</button>
+<!-- Role Detection Info -->
+<div class="mt-stack-lg p-stack-md bg-primary-container/10 rounded-lg border border-primary/10">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl">verified_user</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary uppercase tracking-wider mb-1">Deteksi Peran Otomatis</span>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            Sistem akan otomatis mendeteksi apakah Anda masuk sebagai <b>Admin</b>, <b>Guru</b>, atau <b>Staf</b> berdasarkan akun institusi Anda.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Manual Help Link -->
+<button class="mt-stack-lg text-primary font-label-md text-label-md hover:underline cursor-pointer">
+                Butuh bantuan akses? Hubungi IT Support
+            </button>
+</div>
+<!-- Illustration Background (Subtle) -->
+<div class="mt-12 flex justify-center opacity-40 grayscale contrast-125">
+<div class="w-64 h-32" data-alt="A clean, minimalist vector illustration of a modern Indonesian school building with abstract shapes representing growth and education. The style is professional corporate minimalism using a monochrome palette of blues and whites to match a reliable, scholarly brand identity for a digital presence system." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2HNJxJmB4w3x4_1nfEjXMJoatU_qNJAG4L9yksgtiO351fDMWpAjYo0AEfMCSEkyVwbn1cxvUGAAB0rXcc7JggvfBEL8k7F0rOHlwHd72_YbhIHJK7fNEuGsx6QFgeTKn-s9OQQDbgYeGuUtnOovcssW7mNlgLjkpfyeXkEhC5nWWMaVr3LOJamtJyTYTzsRINK7JucCQBGBjcQWLEvut1ooIOIBgow0PPzLqKYDGkclAqu7LMUsV')"></div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="mt-auto py-stack-md text-center z-10">
+<p class="font-label-sm text-label-sm text-surface-container-lowest/80 uppercase tracking-widest">
+            SMK Negeri 1 Presensi Digital © 2024
+        </p>
+</footer>
+
+
+    </div>
+
+    <main class="hidden md:flex flex-grow flex items-center justify-center relative overflow-hidden bg-education-pattern" data-alt="A cinematic, wide-angle photograph of a modern, bright university library with high ceilings and rows of organized books. Soft sunlight filters through large windows, creating a peaceful and scholarly atmosphere. The color palette is dominated by corporate blues and clean whites, reflecting a professional Indonesian educational environment. High-quality architectural photography style with a sense of depth and tranquility.">
 <!-- Decorative Elements -->
 <div class="absolute inset-0 opacity-10 pointer-events-none">
 <div class="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>

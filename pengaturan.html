@@ -18,8 +18,246 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
+
+    <style>
+        .toggle-checkbox:checked { right: 0; border-color: #003d9b; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #003d9b; }
+    </style>
 </head>
 <body class="bg-background text-on-background min-h-screen flex">
+    <!-- MOBILE VIEW -->
+    <div class="block md:hidden w-full pb-24 relative min-h-screen">
+        
+<!-- Top Navigation Bar -->
+<header class="bg-surface dark:bg-inverse-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-gutter py-stack-sm w-full">
+<div class="flex items-center gap-3">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Sistem Presensi Edukasi</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">notifications</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a high school administrator in formal Indonesian batik attire, captured in a brightly lit modern office with soft bokeh background. The lighting is warm and inviting, emphasizing a trustworthy and scholarly brand identity. The photo is clean, sharp, and uses a professional corporate minimalism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn3sJ0AYr1jqHXSAObmJqT5BtgRF8pRMXxYgOJw574VT285zRWiJm1BExkvtA-SnmQXPJXtONPzZcHrCXqneZGPxeJfmjSgcWCKXv0OmaD6yOAAK33t6R9uN84ao7dJA2C56uxpDw-CSIS0dOdtYnq45eGfrOAW0SW-guM3fnBdbzFImyoJV1WV9pW30tS8WxSI49FV3qQwwb0ATla11tRc2sCchbbIOgxDM5_f-2cHkfgMJWEDocK"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max-width mx-auto px-4 pt-6 space-y-6">
+<!-- Profile Header Section -->
+<section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant flex items-center gap-4">
+<div class="w-16 h-16 rounded-full bg-secondary-fixed-dim overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A minimalist avatar icon representing a school principal, designed with clean vector lines and professional blue tones. The image is set against a soft, light-mode background, consistent with a modern Indonesian educational management application. The style is efficient and reliable, using premium brand colors from the design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzhDepo6adEg9j0w11LM87jM08L9NhqUx9dROUKaiASLzwyNBYNwvKCRtMj-LKpb3V5dSrWKOz3z2gK35Yz57V7PoLv6wAxcr2AMw_Acw5ZYEQ59x6PQBykhYayJX5xPupTSF6T9E5FIDHw-GhLY_-BxWdi8qhn5ye_jk1WKtahtINDmT7o9NITf2h80EMILeUYRsZQkOhNPSbJm3bBSkFdaVtBR87Xjz4NLvs9SlnEHYEZwn9brpp"/>
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg text-on-surface">Admin Utama</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">SMA Negeri 1 Jakarta</p>
+</div>
+</section>
+<!-- Academic Configuration -->
+<section class="space-y-3">
+<h2 class="px-2 font-label-md text-label-md text-primary uppercase tracking-widest">Konfigurasi Akademik</h2>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant divide-y divide-outline-variant">
+<!-- Academic Year -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Tahun Ajaran</p>
+
+<select id="tahun-ajaran-select-mobile" class="bg-surface-container border border-outline-variant rounded p-1 text-sm outline-none">
+    <option value="2023/2024">2023/2024</option>
+    <option value="2024/2025">2024/2025</option>
+    <option value="2025/2026">2025/2026</option>
+    <option value="2026/2027">2026/2027</option>
+</select>
+
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<!-- Semester -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">layers</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Semester</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Ganjil</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Operational Limits -->
+<section class="space-y-3">
+<h2 class="px-2 font-label-md text-label-md text-primary uppercase tracking-widest">Batasan Operasional</h2>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant divide-y divide-outline-variant">
+<!-- Time Limit -->
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Batas Waktu Absen</p>
+<input id="batas-waktu-mobile" type="time" class="bg-surface-container border border-outline-variant rounded p-1 text-sm outline-none" value="07:30">
+</div>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-outline-variant appearance-none cursor-pointer z-10 transition-all duration-300 translate-x-0 checked:translate-x-6" id="toggle-time" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-high cursor-pointer transition-colors duration-300" for="toggle-time"></label>
+</div>
+</div>
+<!-- Geofencing -->
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Radius Geofencing</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Aktif (100 Meter)</p>
+</div>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-outline-variant appearance-none cursor-pointer z-10 transition-all duration-300 translate-x-0 checked:translate-x-6" id="toggle-geo" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-high cursor-pointer transition-colors duration-300" for="toggle-geo"></label>
+</div>
+</div>
+<!-- Late Allowance -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Toleransi Keterlambatan</p>
+<p class="font-body-md text-body-md text-on-surface-variant">15 Menit</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Role Permissions -->
+<section class="space-y-3">
+<h2 class="px-2 font-label-md text-label-md text-primary uppercase tracking-widest">Izin Akses (Roles)</h2>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant divide-y divide-outline-variant">
+<!-- Teacher Role -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Akses Guru</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Input, Edit (24 Jam)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<!-- Student Role -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Akses Siswa</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Lihat Rekap, Profile</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Security & System -->
+<section class="space-y-3">
+<h2 class="px-2 font-label-md text-label-md text-primary uppercase tracking-widest">Sistem &amp; Keamanan</h2>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant divide-y divide-outline-variant">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">security</span>
+</div>
+<p class="font-title-md text-title-md text-on-surface">Ubah Kata Sandi</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-error-container/30 flex items-center justify-center text-error">
+<span class="material-symbols-outlined">delete_forever</span>
+</div>
+<p class="font-title-md text-title-md text-error">Hapus Semua Data Absen</p>
+</div>
+<span class="material-symbols-outlined text-error group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Version Footer -->
+<footer class="text-center py-8">
+<p class="font-label-md text-label-md text-outline">Versi Aplikasi 2.4.0 (Stable)</p>
+<p class="font-label-md text-label-md text-outline">© 2024 Sistem Presensi Edukasi</p>
+</footer>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<!-- Mandatory Styling: style_bg_color, style_active_navigation, style_inactive_navigation -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-4 md:hidden">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-4 py-2 transition-all" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Beranda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-4 py-2 transition-all" href="input-absensi.html">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="font-label-md text-label-md">Absen</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-4 py-2 transition-all" href="laporan.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Laporan</span>
+</a>
+<a class="flex flex-col items-center gap-1 bg-primary-container text-on-primary-container rounded-lg px-4 py-2 border-b-4 border-primary" href="pengaturan.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-md text-label-md">Pengaturan</span>
+</a>
+</nav>
+<!-- Micro-interaction for Toggles -->
+<script>
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const parent = this.closest('.flex.justify-between');
+                if (this.checked) {
+                    console.log('Setting Enabled');
+                } else {
+                    console.log('Setting Disabled');
+                }
+            });
+        });
+
+        // Simple row ripple effect
+        document.querySelectorAll('.cursor-pointer').forEach(row => {
+            row.addEventListener('click', function(e) {
+                let ripple = document.createElement('div');
+                ripple.classList.add('absolute', 'bg-primary/10', 'rounded-full', 'pointer-events-none', 'transform', '-translate-x-1/2', '-translate-y-1/2');
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.left = e.clientX + 'px';
+                ripple.style.top = e.clientY + 'px';
+                this.classList.add('relative', 'overflow-hidden');
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+
+    </div>
+
+
+    <!-- DESKTOP VIEW -->
+    <div class="hidden md:flex w-full">
+        
 <!-- SideNavBar -->
 <aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
 <div class="px-6 py-8">
@@ -119,7 +357,7 @@
 <div class="space-y-4">
 <div class="flex flex-col gap-1.5">
 <label class="font-label-md text-label-md text-on-surface-variant">Tahun Ajaran Aktif</label>
-<select id="tahun-ajaran-select" class="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none">
+<select id="tahun-ajaran-select-desktop" class="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none">
 <option value="2023/2024">2023/2024</option>
 <option value="2024/2025">2024/2025</option>
 <option value="2025/2026">2025/2026</option>
@@ -161,7 +399,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-md text-label-md text-on-surface-variant">Batas Waktu Input Absensi</label>
 <div class="flex items-center gap-4">
-<input class="flex-1 bg-surface-container border border-outline-variant rounded-xl px-6 py-4 text-display-md font-bold text-primary focus:ring-4 focus:ring-primary-fixed outline-none" type="time" value="10:00"/>
+<input id="batas-waktu-desktop" class="flex-1 bg-surface-container border border-outline-variant rounded-xl px-6 py-4 text-display-md font-bold text-primary focus:ring-4 focus:ring-primary-fixed outline-none" type="time" value="10:00"/>
 <div class="flex flex-col gap-1">
 <button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined" data-icon="keyboard_arrow_up">keyboard_arrow_up</span></button>
 <button class="p-1 hover:bg-surface-variant rounded"><span class="material-symbols-outlined" data-icon="keyboard_arrow_down">keyboard_arrow_down</span></button>
@@ -284,6 +522,12 @@
 </section>
 </div>
 <!-- Action Footer -->
+
+</div>
+</main>
+
+    </div>
+
 <div id="action-footer" class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/20 sticky bottom-6 shadow-lg z-30 opacity-0 translate-y-10 pointer-events-none transition-all duration-300">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
@@ -297,8 +541,6 @@
                     </button>
 </div>
 </div>
-</div>
-</main>
 <!-- Success Toast (Hidden by default) -->
 <div class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 opacity-0 pointer-events-none transition-all duration-300 z-[100]" id="toast">
 <span class="material-symbols-outlined text-emerald-400" data-icon="check_circle">check_circle</span>
@@ -366,12 +608,26 @@
             const res = await apiPost('getPengaturan', { token: getToken() });
             if (res.ok && res.data) {
                 if (res.data.tahun_ajaran) {
-                    const selTahun = document.getElementById('tahun-ajaran-select') || document.querySelector('select');
-                    if (selTahun) selTahun.value = res.data.tahun_ajaran;
+                    const selTahun = document.getElementById('tahun-ajaran-select-desktop') || document.getElementById('tahun-ajaran-select-mobile') || document.querySelector('select');
+                    
+if (res.data.tahun_ajaran) {
+    const sD = document.getElementById('tahun-ajaran-select-desktop');
+    const sM = document.getElementById('tahun-ajaran-select-mobile');
+    if(sD) sD.value = res.data.tahun_ajaran;
+    if(sM) sM.value = res.data.tahun_ajaran;
+}
+
                 }
                 if (res.data.batas_waktu_input) {
-                    const inputTime = document.querySelector('input[type="time"]');
-                    if (inputTime) inputTime.value = res.data.batas_waktu_input;
+                    const inputTime = document.getElementById('batas-waktu-desktop') || document.getElementById('batas-waktu-mobile') || document.querySelector('input[type="time"]');
+                    
+if (res.data.batas_waktu_input) {
+    const tD = document.getElementById('batas-waktu-desktop');
+    const tM = document.getElementById('batas-waktu-mobile');
+    if(tD) tD.value = res.data.batas_waktu_input;
+    if(tM) tM.value = res.data.batas_waktu_input;
+}
+
                 }
             }
         } catch (e) {
@@ -380,8 +636,8 @@
     }
 
     async function handleSaveSettings() {
-        const selTahun = document.getElementById('tahun-ajaran-select') || document.querySelector('select');
-        const inputTime = document.querySelector('input[type="time"]');
+        const selTahun = document.getElementById('tahun-ajaran-select-desktop') || document.getElementById('tahun-ajaran-select-mobile') || document.querySelector('select');
+        const inputTime = document.getElementById('batas-waktu-desktop') || document.getElementById('batas-waktu-mobile') || document.querySelector('input[type="time"]');
 
         const settings = {
             tahun_ajaran: selTahun ? selTahun.value : '2024/2025',
@@ -406,5 +662,4 @@
             alert('Gagal terhubung ke server');
         }
     }
-</script>
-</body></html>
+</script></body></html>
