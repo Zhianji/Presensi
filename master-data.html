@@ -74,26 +74,26 @@
 </div>
 </div>
 <!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface shadow-[0_-1px_10px_rgba(0,0,0,0.05)] flex items-center justify-around px-4 z-50">
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="dashboard.html">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="text-label-md">Beranda</span>
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-2 md:hidden shadow-lg">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Beranda</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="input-absensi.html">
-<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
-<span class="text-label-md">Absen</span>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="input-absensi.html">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="text-[10px] font-medium">Absen</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-primary font-bold" href="master-data.html">
-<span class="material-symbols-outlined font-bold" data-icon="database" data-weight="fill">database</span>
-<span class="text-label-md">Master</span>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="laporan.html">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium">Laporan</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="laporan.html">
-<span class="material-symbols-outlined" data-icon="description">description</span>
-<span class="text-label-md">Laporan</span>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="notifikasi.html">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-medium">Notif</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="pengaturan.html">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="text-label-md">Profil</span>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="pengaturan.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Seting</span>
 </a>
 </nav>
 <!-- FAB for Adding New Student -->
@@ -196,12 +196,26 @@
 <span class="material-symbols-outlined">help</span>
 </button>
 <div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3 cursor-pointer group">
-<div class="text-right">
+<div class="relative">
+<button onclick="toggleMobileDropdown('dropdown-desktop-master')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-master'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+<div class="text-right hidden md:block">
 <p class="font-label-md text-label-md text-on-surface font-bold">Admin Utama</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
 </div>
-<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="A professional studio portrait of a school administrator, a middle-aged Indonesian man with a kind smile, wearing a clean batik uniform. The background is a soft-focus office setting with warm ambient lighting that conveys trustworthiness and professional reliability. The lighting is balanced and clean, typical of a modern light-mode corporate UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzWvvcKUPWSEdqGfXZDMtCkc0cyVMmILNIi-K_CjjAu1Gli4YE4cKLdBClZZcfZiw15G7YUyslx3Sp5QimgAzWDWLyuHXIMJRohFFlBiuh-qrNukTCnqoXM3P13KAjS-nSwSdPxZsjRNEaO8arHv_cmGSgKdsI8CAuy9x7dKx_wEARUd6yp_BtUEPRnwjhtrl6qm0pkJ4EKhS_dw9_Uv-n5arRCkXaNyF1ZaNYS1VgG7raHSBP5qP9"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzWvvcKUPWSEdqGfXZDMtCkc0cyVMmILNIi-K_CjjAu1Gli4YE4cKLdBClZZcfZiw15G7YUyslx3Sp5QimgAzWDWLyuHXIMJRohFFlBiuh-qrNukTCnqoXM3P13KAjS-nSwSdPxZsjRNEaO8arHv_cmGSgKdsI8CAuy9x7dKx_wEARUd6yp_BtUEPRnwjhtrl6qm0pkJ4EKhS_dw9_Uv-n5arRCkXaNyF1ZaNYS1VgG7raHSBP5qP9"/>
+</button>
+<div id="dropdown-desktop-master" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+<div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest md:hidden">
+<p class="text-sm font-bold text-on-surface truncate" id="dropdown-desktop-master-name">Pengguna</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5" id="dropdown-desktop-master-role">Role</p>
+</div>
+<a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
+</a>
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+</button>
+</div>
 </div>
 </div>
 </div>

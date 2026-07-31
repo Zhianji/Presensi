@@ -45,8 +45,22 @@
 </div>
 <div class="flex items-center gap-4">
 <button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant rounded-full transition-colors">notifications</button>
-<div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A professional headshot of a male school administrator in his 40s, wearing a clean batik shirt, with a bright and scholarly office background. The lighting is soft and professional, reflecting a trustworthy and efficient personality. The overall color palette is composed of soft blues and crisp whites to match the modern corporate minimalism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXb6qf0iDpGBhbOYgvYvtW3IKMbwonFmfNC8rCiWi0VNTFRRj268e7Xki7mfhmIuxsP6CfgzNzXfFzSEg5Sw4gQHTdPjxYhV3Qlg2kvoKlFImSFgrTJMAfYWdL6FKY6bYoagA5l06uVcvD4aOc7A1eq0xVUb0iW5JJbkjgHrhoBxNibBWuhNHgHou6bv1aflFxlIUAXQvdvAMbPB-0j5TZLilASVuAwiS_PXn0EyA3KlnGc0XV5rRC"/>
+<div class="relative">
+<button onclick="toggleMobileDropdown('dropdown-mobile-dashboard')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-dashboard'), 200)" class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXb6qf0iDpGBhbOYgvYvtW3IKMbwonFmfNC8rCiWi0VNTFRRj268e7Xki7mfhmIuxsP6CfgzNzXfFzSEg5Sw4gQHTdPjxYhV3Qlg2kvoKlFImSFgrTJMAfYWdL6FKY6bYoagA5l06uVcvD4aOc7A1eq0xVUb0iW5JJbkjgHrhoBxNibBWuhNHgHou6bv1aflFxlIUAXQvdvAMbPB-0j5TZLilASVuAwiS_PXn0EyA3KlnGc0XV5rRC"/>
+</button>
+<div id="dropdown-mobile-dashboard" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+<div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest">
+<p class="text-sm font-bold text-on-surface truncate" id="dropdown-mobile-dashboard-name">Pengguna</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5" id="dropdown-mobile-dashboard-role">Role</p>
+</div>
+<a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
+</a>
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+</button>
+</div>
 </div>
 </div>
 </header>
@@ -182,51 +196,32 @@
 <!-- Recent Activity Mini Section -->
 <section class="mb-4">
 <h2 class="font-title-lg text-title-lg text-on-surface mb-4">Aktivitas Terakhir</h2>
-<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden">
-<div class="p-4 border-b border-outline-variant flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-on-secondary-container text-[18px]">history</span>
-</div>
-<div>
-<p class="font-body-md font-semibold text-on-surface">Input Selesai: Kelas XI B</p>
-<p class="font-label-md text-on-surface-variant">10:15 • Oleh Guru Budi Santoso</p>
-</div>
-</div>
-<div class="p-4 flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-on-primary-container text-[18px]">cloud_upload</span>
-</div>
-<div>
-<p class="font-body-md font-semibold text-on-surface">Laporan Mingguan Siap</p>
-<p class="font-label-md text-on-surface-variant">09:00 • Sistem Otomatis</p>
-</div>
-</div>
+<div id="recent-absensi-mobile" class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden divide-y divide-outline-variant">
+    <div class="p-4 text-center text-on-surface-variant text-sm">Memuat aktivitas terakhir...</div>
 </div>
 </section>
 </main>
-<!-- Bottom Navigation Bar (Active on 'Beranda') -->
-<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface shadow-[0_-1px_10px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 z-50">
-<!-- Beranda - ACTIVE -->
-<div onclick="window.location.href='dashboard.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined text-primary font-bold" style="font-variation-settings: 'FILL' 1;">dashboard</span>
-<span class="font-label-md text-label-md text-primary font-bold">Beranda</span>
-<div class="w-1 h-1 bg-primary rounded-full"></div>
-</div>
-<!-- Input Absen -->
-<div onclick="window.location.href='input-absensi.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined text-on-surface-variant">how_to_reg</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Absen</span>
-</div>
-<!-- Laporan -->
-<div onclick="window.location.href='laporan.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined text-on-surface-variant">description</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Laporan</span>
-</div>
-<!-- Pengaturan -->
-<div onclick="window.location.href='pengaturan.html'" class="flex flex-col items-center gap-1 cursor-pointer active:opacity-80">
-<span class="material-symbols-outlined text-on-surface-variant">settings</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Profil</span>
-</div>
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-2 md:hidden shadow-lg">
+<a class="flex flex-col items-center gap-1 bg-primary-container text-on-primary-container rounded-lg px-3 py-1 border-b-2 border-primary" href="dashboard.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-bold">Beranda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="input-absensi.html">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="text-[10px] font-medium">Absen</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="laporan.html">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium">Laporan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="notifikasi.html">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-medium">Notif</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="pengaturan.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Seting</span>
+</a>
 </nav>
 <script>
         // Simple micro-interaction for cards
@@ -533,21 +528,32 @@
 
     async function loadDashboardData() {
         try {
-            const today = new Date().toISOString().split('T')[0];
-            const res = await apiPost('getLaporan', { token: getToken(), tanggal_mulai: today, tanggal_selesai: today });
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            
+            const res = await apiPost('getLaporan', { token: getToken() });
             
             let hadir = 0, sakit = 0, izin = 0, alfa = 0;
             const tbody = document.getElementById('recent-absensi-tbody');
+            const mobileContainer = document.getElementById('recent-absensi-mobile');
 
             if (res.ok && res.data && res.data.length > 0) {
-                let rowsHtml = '';
+                // Calculate today's stats
                 res.data.forEach(item => {
-                    const st = String(item.status).toLowerCase();
-                    if (st === 'hadir') hadir++;
-                    else if (st === 'sakit') sakit++;
-                    else if (st === 'izin') izin++;
-                    else if (st === 'alfa') alfa++;
+                    if (item.tanggal === today) {
+                        const st = String(item.status).toLowerCase();
+                        if (st === 'hadir') hadir++;
+                        else if (st === 'sakit') sakit++;
+                        else if (st === 'izin') izin++;
+                        else if (st === 'alfa') alfa++;
+                    }
+                });
 
+                // Desktop Table HTML (top 10 recent items)
+                let rowsHtml = '';
+                const recentItems = res.data.slice(0, 10);
+                recentItems.forEach(item => {
+                    const st = String(item.status).toLowerCase();
                     let badgeClass = 'bg-green-100 text-green-700';
                     if (st === 'sakit') badgeClass = 'bg-blue-100 text-blue-700';
                     else if (st === 'izin') badgeClass = 'bg-yellow-100 text-yellow-700';
@@ -570,15 +576,50 @@
                     `;
                 });
                 if (tbody) tbody.innerHTML = rowsHtml;
-            } else if (tbody) {
-                tbody.innerHTML = `
-                    <tr class="hover:bg-surface-container-low transition-colors">
-                        <td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Belum ada data presensi hari ini. Silakan lakukan input absen.</td>
-                    </tr>
-                `;
+
+                // Mobile List HTML (top 10 recent items)
+                let mobileHtml = '';
+                recentItems.forEach(item => {
+                    const st = String(item.status).toLowerCase();
+                    let icon = 'check_circle';
+                    let iconBg = 'bg-green-100 text-green-700';
+                    if (st === 'sakit') { icon = 'medical_services'; iconBg = 'bg-blue-100 text-blue-700'; }
+                    else if (st === 'izin') { icon = 'event_note'; iconBg = 'bg-yellow-100 text-yellow-700'; }
+                    else if (st === 'alfa') { icon = 'cancel'; iconBg = 'bg-red-100 text-red-700'; }
+
+                    mobileHtml += `
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full ${iconBg} flex items-center justify-center font-bold">
+                                    <span class="material-symbols-outlined text-sm">${icon}</span>
+                                </div>
+                                <div>
+                                    <p class="font-body-md font-semibold text-on-surface">${item.nama_siswa || '-'}</p>
+                                    <p class="font-label-md text-on-surface-variant text-xs">${item.kelas || '-'} • ${item.waktu || ''} WIB</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 ${iconBg} rounded-full font-label-sm text-xs capitalize">${item.status}</span>
+                        </div>
+                    `;
+                });
+                if (mobileContainer) mobileContainer.innerHTML = mobileHtml;
+
+            } else {
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr class="hover:bg-surface-container-low transition-colors">
+                            <td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Belum ada data presensi. Silakan lakukan input absen.</td>
+                        </tr>
+                    `;
+                }
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = `
+                        <div class="p-4 text-center text-on-surface-variant text-sm">Belum ada data presensi. Silakan lakukan input absen.</div>
+                    `;
+                }
             }
 
-            
+            // Update stats counter for both views
             ['desktop', 'mobile'].forEach(view => {
                 const elHadir = document.getElementById(`stat-hadir-${view}`);
                 if(elHadir) elHadir.innerText = hadir;

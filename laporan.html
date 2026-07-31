@@ -35,8 +35,22 @@
 <h1 class="font-display-md text-display-md font-bold text-primary">Sistem Presensi Edukasi</h1>
 <div class="flex items-center gap-4">
 <span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-variant transition-colors p-2 rounded-full">notifications</span>
-<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant">
-<img class="w-full h-full object-cover" data-alt="A professional profile headshot of a school administrator in a clean, modern educational setting. The lighting is soft and natural, reflecting a trustworthy and efficient personality. The background is a slightly blurred office with educational certificates, maintaining the Scholarly brand identity with a primary blue and white color scheme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADgGwXBWz8E35frprTbuosM7x8wgu6Ty9rp6oK4uzhTlFvXxH7HkRb_iGTxNuEfNO-GhKushsbvNY4-Yl4N2Qk3Q1bIEWiXhtyHe5QfNsG4LOnvii-uS7iX-ZB2sq5urUcUTAUWrPZhOBrSHfF8fcUSPaypWgnQkoxNa2w5I_j7SYBb2B6BmbdjvNml-NJ9WqnVCVnrDD8IilefP0jJNzLxm2F1zdj-LsoEZYOucni19sJ3kG71W5a"/>
+<div class="relative">
+<button onclick="toggleMobileDropdown('dropdown-mobile-laporan')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-laporan'), 200)" class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADgGwXBWz8E35frprTbuosM7x8wgu6Ty9rp6oK4uzhTlFvXxH7HkRb_iGTxNuEfNO-GhKushsbvNY4-Yl4N2Qk3Q1bIEWiXhtyHe5QfNsG4LOnvii-uS7iX-ZB2sq5urUcUTAUWrPZhOBrSHfF8fcUSPaypWgnQkoxNa2w5I_j7SYBb2B6BmbdjvNml-NJ9WqnVCVnrDD8IilefP0jJNzLxm2F1zdj-LsoEZYOucni19sJ3kG71W5a"/>
+</button>
+<div id="dropdown-mobile-laporan" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+<div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest">
+<p class="text-sm font-bold text-on-surface truncate" id="dropdown-mobile-laporan-name">Pengguna</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5" id="dropdown-mobile-laporan-role">Role</p>
+</div>
+<a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
+</a>
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+</button>
+</div>
 </div>
 </div>
 </header>
@@ -150,7 +164,7 @@
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
 <span class="text-[10px] font-black">Laporan</span>
 </a>
-<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="#">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="notifikasi.html">
 <span class="material-symbols-outlined">notifications</span>
 <span class="text-[10px] font-bold">Notif</span>
 </a>
@@ -573,8 +587,6 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    }
-</script>
     function syncFilterMobile() {
         const b = document.getElementById('filter-bulan-mobile').value;
         const t = document.getElementById('filter-tahun-mobile').value;
@@ -590,4 +602,5 @@
         
         loadLaporanData();
     }
+</script>
 </body></html>

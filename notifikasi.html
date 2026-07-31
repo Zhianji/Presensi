@@ -65,7 +65,7 @@
 </div>
 </aside>
 <!-- Main Content Wrapper -->
-<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300 pb-20 md:pb-0">
     <!-- TopNavBar -->
     <header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface">
         <div class="flex items-center gap-4">
@@ -124,4 +124,27 @@
         container.innerHTML = html;
     }
 </script>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-2 md:hidden shadow-lg">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Beranda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="input-absensi.html">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="text-[10px] font-medium">Absen</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="laporan.html">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium">Laporan</span>
+</a>
+<a class="flex flex-col items-center gap-1 bg-primary-container text-on-primary-container rounded-lg px-3 py-1 border-b-2 border-primary" href="notifikasi.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="text-[10px] font-bold">Notif</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="pengaturan.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Seting</span>
+</a>
+</nav>
 </body></html>

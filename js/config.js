@@ -338,3 +338,35 @@ function closeSidebar() {
     overlay.classList.add('opacity-0', 'pointer-events-none');
   }
 }
+
+// ==== MOBILE PROFILE DROPDOWN HELPER ====
+function toggleMobileDropdown(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        if (el.classList.contains('opacity-0')) {
+            el.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            el.classList.add('opacity-100', 'scale-100');
+            // Try to populate user data if available in localStorage
+            const userStr = localStorage.getItem('user_session');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const nameEl = document.getElementById(id + '-name');
+                    const roleEl = document.getElementById(id + '-role');
+                    if (nameEl && user.nama) nameEl.textContent = user.nama;
+                    if (roleEl && user.role) roleEl.textContent = user.role;
+                } catch (e) {}
+            }
+        } else {
+            closeMobileDropdown(id);
+        }
+    }
+}
+
+function closeMobileDropdown(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        el.classList.remove('opacity-100', 'scale-100');
+    }
+}
