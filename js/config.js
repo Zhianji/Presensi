@@ -2,7 +2,7 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3iZkJ4ReeKdeHRixSvkLg9pR2zeUdswpdFhw7_tnY6wmVOZmWPNsGYlayeEpAP56K4A/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
-const GOOGLE_CLIENT_ID = '1043790184963-k4j7oukht03sso1c03a177odof0grll6.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
 
 const TOKEN_KEY = 'absensi_token';
 const ROLE_KEY = 'absensi_role';
