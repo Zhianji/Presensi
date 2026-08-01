@@ -31,19 +31,26 @@
     <div class="block md:hidden w-full pb-24">
         
 <!-- Top Navigation Bar -->
-<header class="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-gutter py-stack-sm w-full">
-<h1 class="font-display-md text-display-md font-bold text-primary">Sistem Presensi Edukasi</h1>
+<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-2">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Absen</span>
+<span class="font-display-md text-display-md font-light text-primary dark:text-primary-fixed-dim opacity-70">Online</span>
+</div>
 <div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-variant transition-colors p-2 rounded-full">notifications</span>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant rounded-full transition-colors" onclick="window.location.href='notifikasi.html'">notifications</button>
 <div class="relative">
-<button onclick="toggleMobileDropdown('dropdown-mobile-laporan')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-laporan'), 200)" class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
-<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADgGwXBWz8E35frprTbuosM7x8wgu6Ty9rp6oK4uzhTlFvXxH7HkRb_iGTxNuEfNO-GhKushsbvNY4-Yl4N2Qk3Q1bIEWiXhtyHe5QfNsG4LOnvii-uS7iX-ZB2sq5urUcUTAUWrPZhOBrSHfF8fcUSPaypWgnQkoxNa2w5I_j7SYBb2B6BmbdjvNml-NJ9WqnVCVnrDD8IilefP0jJNzLxm2F1zdj-LsoEZYOucni19sJ3kG71W5a"/>
+<button onclick="toggleMobileDropdown('dropdown-mobile-laporan')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-laporan'), 200)" class="flex items-center gap-2 pr-3 pl-1 py-1 rounded-full border border-outline-variant bg-surface hover:bg-surface-variant transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<img class="w-7 h-7 rounded-full object-cover shrink-0" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+<span class="font-label-md text-label-md font-bold text-on-surface user-name-display truncate max-w-[90px]">Admin Utama</span>
 </button>
 <div id="dropdown-mobile-laporan" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
 <div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest">
-<p class="text-sm font-bold text-on-surface truncate" id="dropdown-mobile-laporan-name">Pengguna</p>
-<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5" id="dropdown-mobile-laporan-role">Role</p>
+<p class="text-sm font-bold text-on-surface user-name-display truncate" id="dropdown-mobile-laporan-name">Pengguna</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5 user-role-display" id="dropdown-mobile-laporan-role">Role</p>
 </div>
+<a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">database</span> Master Data
+</a>
 <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
 </a>
@@ -126,7 +133,7 @@
 </section>
 <!-- Export Actions: Prominent Buttons -->
 <section class="flex gap-3 mb-8">
-<button class="flex-1 bg-primary text-white font-title-md py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform">
+<button onclick="window.print()" class="flex-1 bg-primary text-white font-title-md py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform">
 <span class="material-symbols-outlined">picture_as_pdf</span>
                 Export PDF
             </button>
@@ -144,33 +151,32 @@
 <div class="space-y-3">
 <div id="laporan-mobile-list" class="space-y-3"></div>
 </div>
-<button class="w-full py-3 text-primary font-title-md border border-dashed border-primary rounded-xl hover:bg-primary-container/10 transition-colors">
+<button onclick="document.getElementById('filter-kelas-mobile').value=''; syncFilterMobile(); window.scrollTo({top: 0, behavior: 'smooth'});" class="w-full py-3 text-primary font-title-md border border-dashed border-primary rounded-xl hover:bg-primary-container/10 transition-colors">
                 Lihat Semua Siswa (32)
             </button>
 </section>
 </main>
 <!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-lg flex justify-around items-center px-4 py-2 z-50 md:hidden border-t border-outline-variant">
+<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-lg flex justify-around items-center px-2 py-2 z-50 md:hidden border-t border-outline-variant">
 <a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="dashboard.html">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="text-[10px] font-bold">Beranda</span>
+<span class="text-[10px]">Beranda</span>
 </a>
 <a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="input-absensi.html">
-<span class="material-symbols-outlined">how_to_reg</span>
-<span class="text-[10px] font-bold">Absen</span>
+<span class="material-symbols-outlined" >how_to_reg</span>
+<span class="text-[10px]">Absen</span>
 </a>
-<!-- Active Tab: Laporan -->
-<a class="flex flex-col items-center gap-1 p-2 bg-primary-container text-on-primary-container rounded-xl px-4 scale-105 transition-all" href="laporan.html">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-<span class="text-[10px] font-black">Laporan</span>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="master-data.html">
+<span class="material-symbols-outlined" >database</span>
+<span class="text-[10px]">Master</span>
 </a>
-<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="notifikasi.html">
-<span class="material-symbols-outlined">notifications</span>
-<span class="text-[10px] font-bold">Notif</span>
+<a class="flex flex-col items-center gap-1 p-2 text-primary font-bold" href="laporan.html">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px]">Laporan</span>
 </a>
 <a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="pengaturan.html">
 <span class="material-symbols-outlined">settings</span>
-<span class="text-[10px] font-bold">Seting</span>
+<span class="text-[10px]">Seting</span>
 </a>
 </nav>
 <script>
@@ -211,32 +217,32 @@
 </div>
 </div>
 <nav class="flex-1 px-4 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="dashboard.html">
 <span class="material-symbols-outlined">dashboard</span>
 <span class="font-label-md text-label-md">Beranda</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="input-absensi.html">
 <span class="material-symbols-outlined">how_to_reg</span>
 <span class="font-label-md text-label-md">Input Absen</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="master-data.html">
 <span class="material-symbols-outlined">database</span>
 <span class="font-label-md text-label-md">Master Data</span>
 </a>
 <!-- Active Tab: Laporan -->
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all" href="#">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all" href="laporan.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
 <span class="font-label-md text-label-md">Laporan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="notifikasi.html">
 <span class="material-symbols-outlined">notifications_active</span>
 <span class="font-label-md text-label-md">Notifikasi</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="pengaturan.html">
 <span class="material-symbols-outlined">settings</span>
 <span class="font-label-md text-label-md">Pengaturan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="log-aktivitas.html">
 <span class="material-symbols-outlined">history_edu</span>
 <span class="font-label-md text-label-md">Log Aktivitas</span>
 </a>
@@ -268,7 +274,7 @@
 <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">notifications</button>
 <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">help</button>
 <div class="h-10 w-10 rounded-full border-2 border-primary overflow-hidden cursor-pointer active:opacity-80">
-<img class="w-full h-full object-cover" data-alt="A high-quality studio portrait of a professional school administrator with a warm and inviting smile, dressed in business casual attire. The background is a clean, minimalist office with soft focus educational awards. The lighting is bright and airy, consistent with a professional corporate design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWK-klaOUGzi5dR5zfPkNSL_PAF7nbllGk-1dFyVTAA408nsr2YxD8zeuUOBOXZJl7IfdjmVRU2M1npBawlXbeU-ge7lombR61CEfvyd2G4uogHPhYEMka77ObN54t0bG0E-GWBqV_-JH5Jc-Q-QXgbbvjfbNVi9VxmYoZ68RfLiUw1EAYnsvgqM7NRku1hlLsVNaGI0L4AUqaK5Jj-2dAj-nUgoTDETD76_SRSKV5QJFFjffRZpwg"/>
+<img class="w-full h-full object-cover" data-alt="A high-quality studio portrait of a professional school administrator with a warm and inviting smile, dressed in business casual attire. The background is a clean, minimalist office with soft focus educational awards. The lighting is bright and airy, consistent with a professional corporate design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
 </div>
 </div>
 </div>
@@ -587,6 +593,8 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+    
     function syncFilterMobile() {
         const b = document.getElementById('filter-bulan-mobile').value;
         const t = document.getElementById('filter-tahun-mobile').value;

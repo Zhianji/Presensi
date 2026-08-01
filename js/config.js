@@ -255,8 +255,8 @@ function setupCommonUI(session) {
   });
 
   // 2. Render Sidebar Navigation & Active States
-  const navElement = document.querySelector('aside nav');
-  if (!navElement) return;
+  const navElements = document.querySelectorAll('aside nav');
+  if (!navElements.length) return;
 
   const role = session.role || getRole();
 
@@ -293,7 +293,9 @@ function setupCommonUI(session) {
     }
   });
 
-  navElement.innerHTML = navHtml;
+  navElements.forEach(el => {
+    el.innerHTML = navHtml;
+  });
 }
 
 // ==== TOAST FEEDBACK HELPER ====

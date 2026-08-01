@@ -28,31 +28,31 @@
 <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
 </div>
 <nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="dashboard.html">
 <span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
 <span class="font-label-md text-label-md">Beranda</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="input-absensi.html">
 <span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
 <span class="font-label-md text-label-md">Input Absen</span>
 </a>
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="#">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="master-data.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
 <span class="font-label-md text-label-md">Master Data</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="laporan.html">
 <span class="material-symbols-outlined group-hover:text-primary">description</span>
 <span class="font-label-md text-label-md">Laporan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="notifikasi.html">
 <span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
 <span class="font-label-md text-label-md">Notifikasi</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="pengaturan.html">
 <span class="material-symbols-outlined group-hover:text-primary">settings</span>
 <span class="font-label-md text-label-md">Pengaturan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="log-aktivitas.html">
 <span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
 <span class="font-label-md text-label-md">Log Aktivitas</span>
 </a>
@@ -125,26 +125,27 @@
     }
 </script>
 <!-- Bottom Navigation Bar (Mobile) -->
-<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-2 md:hidden shadow-lg">
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="dashboard.html">
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-lg flex justify-around items-center px-2 py-2 z-50 md:hidden border-t border-outline-variant">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="dashboard.html">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="text-[10px] font-medium">Beranda</span>
+<span class="text-[10px]">Beranda</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="input-absensi.html">
-<span class="material-symbols-outlined">how_to_reg</span>
-<span class="text-[10px] font-medium">Absen</span>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="input-absensi.html">
+<span class="material-symbols-outlined" >how_to_reg</span>
+<span class="text-[10px]">Absen</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="laporan.html">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="master-data.html">
+<span class="material-symbols-outlined" >database</span>
+<span class="text-[10px]">Master</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="laporan.html">
 <span class="material-symbols-outlined">description</span>
-<span class="text-[10px] font-medium">Laporan</span>
+<span class="text-[10px]">Laporan</span>
 </a>
-<a class="flex flex-col items-center gap-1 bg-primary-container text-on-primary-container rounded-lg px-3 py-1 border-b-2 border-primary" href="notifikasi.html">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
-<span class="text-[10px] font-bold">Notif</span>
-</a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="pengaturan.html">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="pengaturan.html">
 <span class="material-symbols-outlined">settings</span>
-<span class="text-[10px] font-medium">Seting</span>
+<span class="text-[10px]">Seting</span>
 </a>
 </nav>
 </body></html>

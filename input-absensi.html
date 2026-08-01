@@ -36,21 +36,25 @@
         
 <!-- Top Navigation Bar -->
 <header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-title-lg">how_to_reg</span>
-<h1 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Presensi</h1>
+<div class="flex items-center gap-2">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Absen</span>
+<span class="font-display-md text-display-md font-light text-primary dark:text-primary-fixed-dim opacity-70">Online</span>
 </div>
 <div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant rounded-full transition-colors" onclick="window.location.href='notifikasi.html'">notifications</button>
 <div class="relative">
-<button onclick="toggleMobileDropdown('dropdown-mobile-input-absensi')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-input-absensi'), 200)" class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
-<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSyehDonBLmC99pTGEPAdBbvvoMVP9G_ulWokMo5bk6UdnK-bq20_t8_7EwOszxrKOWfcZCV59se3aOydAXmX56nN5FyP9Z22D3ffALn1qZAP8KYeqPQifmi1C3ufyNmLvXEXdVK-7GKiZIa-4eqRLzgBbdzbg5PVCtrf6XoC2XFiri2FakeA0zc4bfWs0MUX_CRtjEab0nhzlgjX0E_ujDL1-o0kPXPqvnsU11GmDtMlc0O_40M5s"/>
+<button onclick="toggleMobileDropdown('dropdown-mobile-input-absensi')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-input-absensi'), 200)" class="flex items-center gap-2 pr-3 pl-1 py-1 rounded-full border border-outline-variant bg-surface hover:bg-surface-variant transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<img class="w-7 h-7 rounded-full object-cover shrink-0" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+<span class="font-label-md text-label-md font-bold text-on-surface user-name-display truncate max-w-[90px]">Admin Utama</span>
 </button>
 <div id="dropdown-mobile-input-absensi" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
 <div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest">
-<p class="text-sm font-bold text-on-surface truncate" id="dropdown-mobile-input-absensi-name">Pengguna</p>
-<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5" id="dropdown-mobile-input-absensi-role">Role</p>
+<p class="text-sm font-bold text-on-surface user-name-display truncate" id="dropdown-mobile-input-absensi-name">Pengguna</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5 user-role-display" id="dropdown-mobile-input-absensi-role">Role</p>
 </div>
+<a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">database</span> Master Data
+</a>
 <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
 <span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
 </a>
@@ -119,78 +123,29 @@
 </div>
 </div>
 <!-- Bottom Navigation Bar (Mobile Only Style) -->
-<nav class="fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex items-center justify-around z-50 px-2 md:hidden shadow-lg">
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="dashboard.html">
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface shadow-lg flex justify-around items-center px-2 py-2 z-50 md:hidden border-t border-outline-variant">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="dashboard.html">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="text-[10px] font-medium">Beranda</span>
+<span class="text-[10px]">Beranda</span>
 </a>
-<a class="flex flex-col items-center gap-1 bg-primary-container text-on-primary-container rounded-lg px-3 py-1 border-b-2 border-primary" href="input-absensi.html">
+<a class="flex flex-col items-center gap-1 p-2 text-primary font-bold" href="input-absensi.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
-<span class="text-[10px] font-bold">Absen</span>
+<span class="text-[10px]">Absen</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="laporan.html">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="master-data.html">
+<span class="material-symbols-outlined" >database</span>
+<span class="text-[10px]">Master</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="laporan.html">
 <span class="material-symbols-outlined">description</span>
-<span class="text-[10px] font-medium">Laporan</span>
+<span class="text-[10px]">Laporan</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="notifikasi.html">
-<span class="material-symbols-outlined">notifications</span>
-<span class="text-[10px] font-medium">Notif</span>
-</a>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant hover:bg-surface-container px-2 py-1 transition-all" href="pengaturan.html">
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant" href="pengaturan.html">
 <span class="material-symbols-outlined">settings</span>
-<span class="text-[10px] font-medium">Seting</span>
+<span class="text-[10px]">Seting</span>
 </a>
 </nav>
-<!-- Side Navigation Bar (Hidden on Mobile) -->
-<aside class="hidden md:flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-40 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant">
-<div class="p-6">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
-<span class="material-symbols-outlined" data-icon="school">school</span>
-</div>
-<div>
-<h2 class="font-title-lg text-title-lg font-black text-primary leading-tight">Absen Online</h2>
-<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
-</div>
-</div>
-<nav class="space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="dashboard">dashboard</span>
-<span class="font-label-md text-label-md">Beranda</span>
-</a>
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
-<span class="font-label-md text-label-md">Input Absen</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="database">database</span>
-<span class="font-label-md text-label-md">Master Data</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="description">description</span>
-<span class="font-label-md text-label-md">Laporan</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="notifications_active">notifications_active</span>
-<span class="font-label-md text-label-md">Notifikasi</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings">settings</span>
-<span class="font-label-md text-label-md">Pengaturan</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary" data-icon="history_edu">history_edu</span>
-<span class="font-label-md text-label-md">Log Aktivitas</span>
-</a>
-<div class="pt-10">
-<a class="flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-label-md text-label-md">Keluar</span>
-</a>
-</div>
-</nav>
-</div>
-</aside>
 <script>
         function markAllPresent() {
             const hRadios = document.querySelectorAll('input[id^="h-"]');
@@ -246,40 +201,40 @@
 </div>
 </div>
 <nav class="flex-1 px-4 py-6 space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="dashboard.html">
 <span class="material-symbols-outlined">dashboard</span>
 <span class="font-label-md text-label-md">Beranda</span>
 </a>
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all scale-95 active:scale-90" href="input-absensi.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
 <span class="font-label-md text-label-md">Input Absen</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="master-data.html">
 <span class="material-symbols-outlined">database</span>
 <span class="font-label-md text-label-md">Master Data</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="laporan.html">
 <span class="material-symbols-outlined">description</span>
 <span class="font-label-md text-label-md">Laporan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="notifikasi.html">
 <span class="material-symbols-outlined">notifications_active</span>
 <span class="font-label-md text-label-md">Notifikasi</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="pengaturan.html">
 <span class="material-symbols-outlined">settings</span>
 <span class="font-label-md text-label-md">Pengaturan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="log-aktivitas.html">
 <span class="material-symbols-outlined">history_edu</span>
 <span class="font-label-md text-label-md">Log Aktivitas</span>
 </a>
 </nav>
 <div class="p-4 mt-auto border-t border-outline-variant">
-<a class="flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="#">
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">logout</span>
 <span class="font-label-md text-label-md">Keluar</span>
-</a>
+</button>
 </div>
 </aside>
 <!-- Main Content Area -->
@@ -307,7 +262,7 @@
 <span class="material-symbols-outlined text-on-surface-variant">help</span>
 </button>
 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
-<img class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in a clean office setting, soft natural lighting, high resolution, minimalist and academic aesthetic with a palette of white and primary blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE108GQgV9j16aS_ZaFMW2D4RaWhnCV87tIGupmEQE_LfntrQco2SRYBciDxc4lsqe67i13qR8PByVWchQxqlQrYvQgb79vKzwMXxfnwrIC51xzdp8oEq41JYsSYzOHx2x6s-UJ70d0j3g51qhGGKWT_RZRLUQhCtpLsz17Dfbb0egtIKsm032cQotwSVKKFpc2H2jC57jHtkG0FbNczSuXwXvytQpHRy2Kv4Jvk7Hc-5X_8NoGiVU"/>
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in a clean office setting, soft natural lighting, high resolution, minimalist and academic aesthetic with a palette of white and primary blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
 </div>
 </div>
 </div>
@@ -414,7 +369,6 @@
         document.getElementById('input-tanggal-desktop').value = todayStr;
         const mobileDate = document.getElementById('input-tanggal-mobile');
         if(mobileDate) mobileDate.value = todayStr;
-.toISOString().split('T')[0];
         
         loadStatusHarian();
     });
@@ -451,10 +405,6 @@
         } catch (e) {
             if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
             if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-error">Gagal terhubung</div>`;
-        }
-    }
-        } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
         }
     }
 
@@ -540,47 +490,6 @@
         if(mobileList) mobileList.innerHTML = htmlMobile;
     }
 
-        let html = '';
-        data.forEach((s, idx) => {
-            const rowNo = String(idx + 1).padStart(2, '0');
-            const status = s.status || '';
-
-            html += `
-                <tr class="hover:bg-surface-container-lowest transition-colors group" data-siswa-id="${s.siswa_id}">
-                    <td class="px-6 py-4 font-body-md text-on-surface-variant">${rowNo}</td>
-                    <td class="px-6 py-4 font-title-md text-on-surface">
-                        <div>${s.nama}</div>
-                        <div class="text-xs text-on-surface-variant opacity-70">${s.kelas}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="flex justify-center items-center gap-4">
-                            <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-5 h-5 text-green-600 border-outline-variant focus:ring-green-500"/>
-                                <span class="font-label-sm text-label-sm">Hadir</span>
-                            </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-5 h-5 text-primary border-outline-variant focus:ring-primary"/>
-                                <span class="font-label-sm text-label-sm">Sakit</span>
-                            </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-5 h-5 text-secondary border-outline-variant focus:ring-secondary"/>
-                                <span class="font-label-sm text-label-sm">Izin</span>
-                            </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-5 h-5 text-error border-outline-variant focus:ring-error"/>
-                                <span class="font-label-sm text-label-sm">Alfa</span>
-                            </label>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <input type="text" id="ket-${s.siswa_id}" class="w-full bg-surface-container-low border border-outline-variant rounded px-3 py-1.5 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Tambah catatan..." value="${s.keterangan || ''}"/>
-                    </td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
-    }
-
     document.getElementById('markAllBtn').addEventListener('click', function() {
         const radioButtons = document.querySelectorAll('input[type="radio"][value="Hadir"]');
         radioButtons.forEach(radio => {
@@ -657,45 +566,10 @@
         simpanAbsensi();
     }
 
-        const btn = document.getElementById('btn-simpan');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Menyimpan...`;
-        btn.disabled = true;
-
-        try {
-            let count = 0;
-            for (const row of rows) {
-                const siswaId = row.getAttribute('data-siswa-id');
-                const checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
-                const ketInput = document.getElementById(`ket-${siswaId}`);
-
-                if (checkedRadio) {
-                    const status = checkedRadio.value;
-                    const keterangan = ketInput ? ketInput.value : '';
-                    await apiPost('setAbsensiStatus', {
-                        token: getToken(),
-                        siswa_id: siswaId,
-                        mapel: mapel,
-                        tanggal: tanggal,
-                        status: status,
-                        keterangan: keterangan
-                    });
-                    count++;
-                }
-            }
-            showToast(`Absensi berhasil disimpan untuk ${count} siswa!`);
-            loadStatusHarian();
-        } catch (e) {
-            alert('Gagal menyimpan absensi: ' + e.message);
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
-    }
-</script>
     document.addEventListener('change', function(e) {
         if(e.target.id === 'select-kelas-mobile' || e.target.id === 'select-mapel-mobile' || e.target.id === 'input-tanggal-mobile') {
             loadStatusHarian();
         }
     });
+</script>
 </body></html>
