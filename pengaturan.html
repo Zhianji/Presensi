@@ -24,7 +24,7 @@
         .toggle-checkbox:checked + .toggle-label { background-color: #003d9b; }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen">
+<body class="bg-background text-on-surface flex min-h-screen">
     <!-- MOBILE VIEW -->
     <div class="block md:hidden w-full pb-24">
         
@@ -546,7 +546,7 @@
 
     </div>
 
-<div id="action-footer" class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/20 sticky bottom-6 shadow-lg z-30 opacity-0 translate-y-10 pointer-events-none transition-all duration-300">
+<div id="action-footer" class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/20 fixed bottom-20 md:bottom-6 left-4 right-4 md:left-[280px] md:right-8 shadow-lg z-40 opacity-0 translate-y-10 pointer-events-none transition-all duration-300">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
 <p id="last-updated-text" class="text-body-md font-medium text-on-surface">Terakhir diperbarui: -</p>
