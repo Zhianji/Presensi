@@ -190,21 +190,44 @@ function initGoogleSignIn(containerId, handleSuccess) {
   }
 }
 
-function triggerRealGoogleSignIn(handleSuccess) {
+function triggerRealGoogleSignIn(handleSuccess, fallbackFn) {
   if (typeof google !== 'undefined' && google.accounts && GOOGLE_CLIENT_ID) {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      use_fedcm_for_prompt: false,
-      callback: async (response) => {
-        const payload = decodeJwtToken(response.credential);
-        if (payload && payload.email) {
-          const res = await mockGoogleLogin(payload.email, payload.name || '', payload.picture || '');
-          if (handleSuccess) handleSuccess(res);
-        }
+    if (google.accounts.oauth2) {
+      try {
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+          callback: async (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              try {
+                const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                const userInfo = await userRes.json();
+                if (userInfo && userInfo.email) {
+                  const res = await mockGoogleLogin(userInfo.email, userInfo.name || '', userInfo.picture || '');
+                  if (handleSuccess) handleSuccess(res);
+                  return;
+                }
+              } catch (err) {
+                console.error("GSI UserInfo fetch error:", err);
+              }
+            }
+            if (fallbackFn) fallbackFn();
+          },
+          error_callback: (err) => {
+            console.warn("Google OAuth popup error:", err);
+            if (fallbackFn) fallbackFn();
+          }
+        });
+        client.requestAccessToken();
+        return;
+      } catch (e) {
+        console.warn("initTokenClient failed, fallback:", e);
       }
-    });
-    google.accounts.id.prompt();
+    }
   }
+  if (fallbackFn) fallbackFn();
 }
 
 function handleLogout() {

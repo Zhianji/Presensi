@@ -284,13 +284,16 @@
                         } else {
                             alert('Login gagal: ' + res.error);
                         }
-                    });
+                    }, showGoogleModalFallback);
                     return;
                 } catch (e) {
                     console.error("Google Sign-In failed, falling back to mock modal:", e);
                 }
             }
+            showGoogleModalFallback();
+        }
 
+        function showGoogleModalFallback() {
             const modal = document.getElementById('google-modal');
             const card = document.getElementById('google-modal-card');
             const errorMsg = document.getElementById('modal-error-msg');
