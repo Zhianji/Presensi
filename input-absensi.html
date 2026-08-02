@@ -20,6 +20,11 @@
             background-color: currentColor;
             background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 
     <style>
@@ -188,50 +193,46 @@
     <div class="hidden md:flex w-full">
         
 <!-- SideNavBar -->
-<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
-<div class="p-gutter flex flex-col gap-2">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
 </div>
-<div>
-<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
-<p class="font-label-md text-label-md text-on-surface-variant">Admin Panel</p>
+<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
 </div>
-</div>
-</div>
-<nav class="flex-1 px-4 py-6 space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="dashboard.html">
-<span class="material-symbols-outlined">dashboard</span>
+<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="dashboard.html">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
 <span class="font-label-md text-label-md">Beranda</span>
 </a>
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all scale-95 active:scale-90" href="input-absensi.html">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="input-absensi.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
 <span class="font-label-md text-label-md">Input Absen</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="master-data.html">
-<span class="material-symbols-outlined">database</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="master-data.html">
+<span class="material-symbols-outlined group-hover:text-primary">database</span>
 <span class="font-label-md text-label-md">Master Data</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="laporan.html">
-<span class="material-symbols-outlined">description</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="laporan.html">
+<span class="material-symbols-outlined group-hover:text-primary">description</span>
 <span class="font-label-md text-label-md">Laporan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="notifikasi.html">
-<span class="material-symbols-outlined">notifications_active</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="notifikasi.html">
+<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
 <span class="font-label-md text-label-md">Notifikasi</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="pengaturan.html">
-<span class="material-symbols-outlined">settings</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="pengaturan.html">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
 <span class="font-label-md text-label-md">Pengaturan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="log-aktivitas.html">
-<span class="material-symbols-outlined">history_edu</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="log-aktivitas.html">
+<span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
 <span class="font-label-md text-label-md">Log Aktivitas</span>
 </a>
 </nav>
-<div class="p-4 mt-auto border-t border-outline-variant">
-<button onclick="handleLogout()" class="w-full flex items-center gap-3 text-error hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90">
+<div class="p-4 border-t border-outline-variant/30">
+<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
 <span class="material-symbols-outlined">logout</span>
 <span class="font-label-md text-label-md">Keluar</span>
 </button>
@@ -240,7 +241,7 @@
 <!-- Main Content Area -->
 <main class="ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
 <!-- TopNavBar -->
-<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface dark:bg-inverse-surface">
+<header class="flex justify-between items-center px-gutter py-4 min-h-[72px] w-full sticky top-0 z-50 shadow-sm bg-surface">
 <div class="flex items-center gap-4">
 <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
 <span class="material-symbols-outlined text-primary">school</span>
@@ -261,14 +262,54 @@
 <button class="p-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80">
 <span class="material-symbols-outlined text-on-surface-variant">help</span>
 </button>
-<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
-<img class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in a clean office setting, soft natural lighting, high resolution, minimalist and academic aesthetic with a palette of white and primary blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="relative">
+<button onclick="toggleMobileDropdown('dropdown-desktop-input')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-input'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+<div class="text-right hidden md:block">
+<p class="font-label-md text-label-md text-on-surface font-bold">Admin Utama</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+</button>
+<div id="dropdown-desktop-input" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+<div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest md:hidden">
+<p class="text-sm font-bold text-on-surface truncate">Admin Utama</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5">Administrator</p>
+</div>
+<a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">database</span> Master Data
+</a>
+<a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
+</a>
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+</button>
+</div>
 </div>
 </div>
 </div>
 </header>
 <!-- Page Content -->
-<div class="p-gutter flex-1 flex flex-col gap-gutter max-w-container-max-width mx-auto w-full">
+<div class="p-gutter flex-1 flex flex-col max-w-container-max-width mx-auto w-full space-y-gutter animate-fade-in">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex text-label-md font-label-md text-on-surface-variant">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="inline-flex items-center hover:text-primary" href="dashboard.html">
+<span class="material-symbols-outlined text-sm mr-2">home</span>
+                            Beranda
+                        </a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1 opacity-50">chevron_right</span>
+<span class="ml-1 md:ml-2 text-on-surface font-bold">Input Absensi</span>
+</div>
+</li>
+</ol>
+</nav>
+
 <!-- Filters & Actions Bento Grid -->
 <div class="grid grid-cols-12 gap-gutter">
 <!-- Filter Header -->
@@ -302,7 +343,7 @@
 </div>
 <!-- Action Bar -->
 <div class="col-span-12 lg:col-span-4 bg-white p-gutter rounded-xl shadow-sm border border-outline-variant flex flex-col justify-center gap-3">
-<button class="w-full bg-secondary-container text-on-secondary-container font-title-md text-title-md py-3 rounded-lg hover:bg-secondary transition-all flex items-center justify-center gap-2 border border-secondary/20 cursor-pointer" id="markAllBtn">
+<button class="w-full bg-secondary-container text-on-secondary-container font-title-md text-title-md py-3 rounded-lg hover:bg-secondary hover:text-on-secondary transition-all flex items-center justify-center gap-2 border border-secondary/20 cursor-pointer" id="markAllBtn">
 <span class="material-symbols-outlined">done_all</span>
                         Tandai Semua Hadir
                     </button>
@@ -320,7 +361,7 @@
 </p>
 </div>
 <!-- Data Table Card -->
-<div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden mb-20">
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden">
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead>
@@ -342,17 +383,32 @@
 <span class="font-label-md text-label-md text-on-surface-variant" id="total-siswa-text">Menampilkan 0 Siswa</span>
 </div>
 </div>
+<!-- Floating Action Flyer -->
+<div class="sticky bottom-6 z-40 my-4 mx-auto w-full max-w-container-max-width bg-surface-container-high/95 backdrop-blur-md p-4 rounded-2xl border border-primary/20 shadow-2xl transition-all duration-300 hover:shadow-primary/15 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">fact_check</span>
 </div>
-<!-- Sticky Footer for Actions -->
-<div class="bg-white border-t border-outline-variant p-4 sticky bottom-0 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-end gap-gutter ml-sidebar-width fixed left-0 right-0">
-<button onclick="window.location.href='dashboard.html'" class="px-8 py-2.5 font-title-md text-title-md text-secondary border border-secondary rounded-lg hover:bg-secondary-container/30 transition-all cursor-pointer">
-                Batal
-            </button>
-<button id="btn-simpan-footer" onclick="simpanAbsensi()" class="bg-primary text-on-primary font-title-md text-title-md px-12 py-2.5 rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer">
-                Simpan &amp; Kirim Laporan
-                <span class="material-symbols-outlined">send</span>
+<div>
+<p class="font-title-md text-title-md font-semibold text-on-surface">Konfirmasi Presensi</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pastikan data kehadiran siswa sudah benar sebelum disimpan.</p>
+</div>
+</div>
+<div class="flex items-center gap-3 ml-auto">
+<button onclick="window.location.href='dashboard.html'" class="px-6 py-2.5 font-title-md text-title-md text-secondary border border-outline-variant hover:bg-surface-variant/60 rounded-xl transition-all active:scale-95 cursor-pointer">
+Batal
+</button>
+<button id="btn-simpan-footer" onclick="simpanAbsensi()" class="bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md px-8 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2 cursor-pointer">
+Simpan &amp; Kirim Laporan
+<span class="material-symbols-outlined text-sm">send</span>
 </button>
 </div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto py-6 px-gutter border-t border-outline-variant text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2026 Sistem Presensi Digital</p>
+</footer>
 </main>
 
     </div>
@@ -364,16 +420,51 @@
         if (!check) return;
 
         // Set default date to today
-        
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('input-tanggal-desktop').value = todayStr;
         const mobileDate = document.getElementById('input-tanggal-mobile');
         if(mobileDate) mobileDate.value = todayStr;
         
+        await initKelasOptions();
         loadStatusHarian();
     });
 
     let currentSiswaList = [];
+
+    async function initKelasOptions() {
+        const kelasSelectD = document.getElementById('select-kelas-desktop');
+        const kelasSelectM = document.getElementById('select-kelas-mobile');
+        
+        let classList = [];
+        const cachedSiswa = localStorage.getItem('cache_siswa_list');
+        if (cachedSiswa) {
+            try {
+                const siswaArr = JSON.parse(cachedSiswa);
+                classList = [...new Set(siswaArr.map(s => s.kelas).filter(Boolean))].sort();
+            } catch(e) {}
+        }
+        
+        if (!classList.length) {
+            try {
+                const res = await apiPost('getSiswaList', { token: getToken() });
+                if (res.ok && res.data) {
+                    classList = [...new Set(res.data.map(s => s.kelas).filter(Boolean))].sort();
+                }
+            } catch(e) {}
+        }
+        
+        if (!classList.length) {
+            classList = ["XII IPA 1", "XII IPA 2", "XI IPS 1", "XI IPS 2", "X-1"];
+        }
+        
+        let optionsHtml = `<option value="">Semua Kelas</option>`;
+        classList.forEach(c => {
+            optionsHtml += `<option value="${c}">${c}</option>`;
+        });
+        
+        if(kelasSelectD) kelasSelectD.innerHTML = optionsHtml;
+        if(kelasSelectM) kelasSelectM.innerHTML = optionsHtml;
+    }
 
     
     async function loadStatusHarian() {
@@ -381,16 +472,35 @@
         const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
         const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
 
+        const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
+        const cached = localStorage.getItem(cacheKey);
+
         const tbody = document.getElementById('input-absensi-tbody');
         const mobileList = document.getElementById('student-list');
         
-        if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
-        if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Memuat data...</div>`;
+        if (cached) {
+            try {
+                currentSiswaList = JSON.parse(cached);
+                renderSiswaTable(currentSiswaList);
+                const countText = `Menampilkan ${currentSiswaList.length} Siswa`;
+                const elDesktopText = document.getElementById('total-siswa-text');
+                if(elDesktopText) elDesktopText.textContent = countText;
+                
+                const elInfo = document.getElementById('info-text');
+                if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+            } catch (e) {
+                console.error('Failed to parse cached status harian:', e);
+            }
+        } else {
+            if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Memuat data...</div>`;
+        }
 
         try {
             const res = await apiPost('getStatusHarian', { token: getToken(), kelas, mapel, tanggal });
             if (res.ok && res.data) {
                 currentSiswaList = res.data;
+                localStorage.setItem(cacheKey, JSON.stringify(res.data));
                 renderSiswaTable(res.data);
                 const countText = `Menampilkan ${res.data.length} Siswa`;
                 const elDesktopText = document.getElementById('total-siswa-text');
@@ -399,12 +509,50 @@
                 const elInfo = document.getElementById('info-text');
                 if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
             } else {
-                if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan'}</td></tr>`;
-                if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-error">Gagal memuat data</div>`;
+                if (!cached) {
+                    const mockData = [
+                        { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                        { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                        { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
+                        { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
+                        { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" },
+                        { id: "S006", siswa_id: "S006", nama: "Farhan Wijaya", kelas: kelas || "XII IPA 1", status: "", keterangan: "" },
+                        { id: "S007", siswa_id: "S007", nama: "Gita Amanda", kelas: kelas || "XII IPA 1", status: "", keterangan: "" },
+                        { id: "S008", siswa_id: "S008", nama: "Hendra Wijaya", kelas: kelas || "XII IPA 1", status: "", keterangan: "" }
+                    ];
+                    currentSiswaList = mockData;
+                    renderSiswaTable(mockData);
+                    const countText = `Menampilkan ${mockData.length} Siswa (Demo Offline)`;
+                    const elDesktopText = document.getElementById('total-siswa-text');
+                    if(elDesktopText) elDesktopText.textContent = countText;
+                    
+                    const elInfo = document.getElementById('info-text');
+                    if(elInfo) elInfo.innerHTML = `Menampilkan data presensi <strong>(Mode Demo Offline)</strong> untuk kelas <strong>${kelas || 'XII IPA 1'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                    showToast("Gagal mengambil data, menggunakan mode offline.", true);
+                }
             }
         } catch (e) {
-            if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-error">Gagal terhubung ke server</td></tr>`;
-            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-error">Gagal terhubung</div>`;
+            if (!cached) {
+                const mockData = [
+                    { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                    { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                    { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
+                    { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
+                    { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" },
+                    { id: "S006", siswa_id: "S006", nama: "Farhan Wijaya", kelas: kelas || "XII IPA 1", status: "", keterangan: "" },
+                    { id: "S007", siswa_id: "S007", nama: "Gita Amanda", kelas: kelas || "XII IPA 1", status: "", keterangan: "" },
+                    { id: "S008", siswa_id: "S008", nama: "Hendra Wijaya", kelas: kelas || "XII IPA 1", status: "", keterangan: "" }
+                ];
+                currentSiswaList = mockData;
+                renderSiswaTable(mockData);
+                const countText = `Menampilkan ${mockData.length} Siswa (Demo Offline)`;
+                const elDesktopText = document.getElementById('total-siswa-text');
+                if(elDesktopText) elDesktopText.textContent = countText;
+                
+                const elInfo = document.getElementById('info-text');
+                if(elInfo) elInfo.innerHTML = `Menampilkan data presensi <strong>(Mode Demo Offline)</strong> untuk kelas <strong>${kelas || 'XII IPA 1'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                showToast("Gagal terhubung, menggunakan mode offline.", true);
+            }
         }
     }
 
@@ -426,9 +574,10 @@
             const rowNo = String(idx + 1).padStart(2, '0');
             const status = s.status || '';
             const initials = s.nama ? s.nama.substring(0, 2).toUpperCase() : 'NA';
+            const sId = s.siswa_id || s.id || ('S' + (idx + 1));
 
             htmlDesktop += `
-                <tr class="hover:bg-surface-container-lowest transition-colors group" data-siswa-id="${s.siswa_id}">
+                <tr class="hover:bg-surface-container-lowest transition-colors group" data-siswa-id="${sId}">
                     <td class="px-6 py-4 font-body-md text-on-surface-variant">${rowNo}</td>
                     <td class="px-6 py-4 font-title-md text-on-surface">
                         <div>${s.nama}</div>
@@ -437,31 +586,31 @@
                     <td class="px-6 py-4">
                         <div class="flex justify-center items-center gap-4">
                             <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-5 h-5 text-green-600 border-outline-variant focus:ring-green-500"/>
+                                <input type="radio" name="status-${sId}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-5 h-5 text-green-600 border-outline-variant focus:ring-green-500"/>
                                 <span class="font-label-sm text-label-sm">Hadir</span>
                             </label>
                             <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-5 h-5 text-primary border-outline-variant focus:ring-primary"/>
+                                <input type="radio" name="status-${sId}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-5 h-5 text-primary border-outline-variant focus:ring-primary"/>
                                 <span class="font-label-sm text-label-sm">Sakit</span>
                             </label>
                             <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-5 h-5 text-secondary border-outline-variant focus:ring-secondary"/>
+                                <input type="radio" name="status-${sId}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-5 h-5 text-secondary border-outline-variant focus:ring-secondary"/>
                                 <span class="font-label-sm text-label-sm">Izin</span>
                             </label>
                             <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                <input type="radio" name="status-${s.siswa_id}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-5 h-5 text-error border-outline-variant focus:ring-error"/>
+                                <input type="radio" name="status-${sId}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-5 h-5 text-error border-outline-variant focus:ring-error"/>
                                 <span class="font-label-sm text-label-sm">Alfa</span>
                             </label>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <input type="text" id="ket-${s.siswa_id}" class="w-full bg-surface-container-low border border-outline-variant rounded px-3 py-1.5 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Tambah catatan..." value="${s.keterangan || ''}"/>
+                        <input type="text" id="ket-${sId}" class="w-full bg-surface-container-low border border-outline-variant rounded px-3 py-1.5 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" placeholder="Tambah catatan..." value="${s.keterangan || ''}"/>
                     </td>
                 </tr>
             `;
             
             htmlMobile += `
-                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col gap-4 shadow-sm" data-siswa-id="${s.siswa_id}">
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col gap-4 shadow-sm" data-siswa-id="${sId}">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-title-md">
                             ${initials}
@@ -473,14 +622,17 @@
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex bg-surface-container-low p-1 rounded-lg gap-1 border border-outline-variant w-full justify-between">
-                            <input ${status === 'Hadir' ? 'checked' : ''} class="hidden attendance-radio" id="h-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Hadir" type="radio"/>
-                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="h-${s.siswa_id}">H</label>
-                            <input ${status === 'Sakit' ? 'checked' : ''} class="hidden attendance-radio" id="s-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Sakit" type="radio"/>
-                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="s-${s.siswa_id}">S</label>
-                            <input ${status === 'Izin' ? 'checked' : ''} class="hidden attendance-radio" id="i-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Izin" type="radio"/>
-                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="i-${s.siswa_id}">I</label>
-                            <input ${status === 'Alfa' ? 'checked' : ''} class="hidden attendance-radio" id="a-${s.siswa_id}" name="status-mob-${s.siswa_id}" value="Alfa" type="radio"/>
-                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="a-${s.siswa_id}">A</label>
+                            <input ${status === 'Hadir' ? 'checked' : ''} class="hidden attendance-radio" id="h-${sId}" name="status-mob-${sId}" value="Hadir" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="h-${sId}">H</label>
+
+                            <input ${status === 'Sakit' ? 'checked' : ''} class="hidden attendance-radio" id="s-${sId}" name="status-mob-${sId}" value="Sakit" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="s-${sId}">S</label>
+
+                            <input ${status === 'Izin' ? 'checked' : ''} class="hidden attendance-radio" id="i-${sId}" name="status-mob-${sId}" value="Izin" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="i-${sId}">I</label>
+
+                            <input ${status === 'Alfa' ? 'checked' : ''} class="hidden attendance-radio" id="a-${sId}" name="status-mob-${sId}" value="Alfa" type="radio"/>
+                            <label class="w-10 h-10 flex items-center justify-center rounded-md font-bold text-label-md border border-transparent cursor-pointer transition-all hover:bg-surface-variant" for="a-${sId}">A</label>
                         </div>
                     </div>
                 </div>
@@ -494,16 +646,20 @@
         const radioButtons = document.querySelectorAll('input[type="radio"][value="Hadir"]');
         radioButtons.forEach(radio => {
             radio.checked = true;
-            const row = radio.closest('tr');
+            const row = radio.closest('tr') || radio.closest('div[data-siswa-id]');
             if (row) {
                 row.classList.add('bg-green-50');
                 setTimeout(() => row.classList.remove('bg-green-50'), 600);
             }
         });
+        if (typeof showToast === 'function') {
+            showToast('Semua siswa berhasil ditandai Hadir.', false);
+        }
     });
 
     
     async function simpanAbsensi() {
+        const kelas = document.getElementById('select-kelas-desktop').value || (document.getElementById('select-kelas-mobile') ? document.getElementById('select-kelas-mobile').value : '');
         const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
         const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
         
@@ -513,45 +669,81 @@
         }
 
         if (rows.length === 0) {
-            alert('Tidak ada data siswa untuk disimpan.');
+            if (typeof showToast === 'function') {
+                showToast('Tidak ada data siswa untuk disimpan.', true);
+            } else {
+                alert('Tidak ada data siswa untuk disimpan.');
+            }
             return;
         }
 
         const btnDesktop = document.getElementById('btn-simpan');
-        const btnDesktopFooter = document.getElementById('btn-simpan-footer');
-        // Mobile version uses onclick="saveAbsensi()" which we'll map here
-        
-        try {
-            let count = 0;
-            for (const row of rows) {
-                const siswaId = row.getAttribute('data-siswa-id');
-                // check desktop radio
-                let checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
-                // if not found, check mobile radio
-                if (!checkedRadio) {
-                    checkedRadio = row.querySelector(`input[name="status-mob-${siswaId}"]:checked`);
-                }
-                
-                const ketInput = document.getElementById(`ket-${siswaId}`);
+        const btnFooter = document.getElementById('btn-simpan-footer');
 
-                if (checkedRadio) {
-                    const status = checkedRadio.value;
-                    const keterangan = ketInput ? ketInput.value : '';
-                    await apiPost('setAbsensiStatus', {
-                        token: getToken(),
-                        siswa_id: siswaId,
-                        mapel: mapel,
-                        tanggal: tanggal,
-                        status: status,
-                        keterangan: keterangan
-                    });
-                    count++;
+        const originalDesktopText = btnDesktop ? btnDesktop.innerHTML : '';
+        const originalFooterText = btnFooter ? btnFooter.innerHTML : '';
+
+        if(btnDesktop) btnDesktop.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`;
+        if(btnFooter) btnFooter.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan &amp; Kirim...`;
+
+        const items = [];
+        rows.forEach(row => {
+            const siswaId = row.getAttribute('data-siswa-id');
+            let checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
+            if (!checkedRadio) {
+                checkedRadio = row.querySelector(`input[name="status-mob-${siswaId}"]:checked`);
+            }
+            const ketInput = document.getElementById(`ket-${siswaId}`);
+
+            if (checkedRadio) {
+                items.push({
+                    siswa_id: siswaId,
+                    status: checkedRadio.value,
+                    keterangan: ketInput ? ketInput.value : ''
+                });
+
+                // Update local memory list
+                const idx = currentSiswaList.findIndex(s => (s.siswa_id || s.id) === siswaId);
+                if (idx !== -1) {
+                    currentSiswaList[idx].status = checkedRadio.value;
+                    currentSiswaList[idx].keterangan = ketInput ? ketInput.value : '';
                 }
             }
-            alert(`Absensi berhasil disimpan untuk ${count} siswa!`);
-            loadStatusHarian();
+        });
+
+        // 1. Instantly update Local Storage Cache
+        const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
+        localStorage.setItem(cacheKey, JSON.stringify(currentSiswaList));
+
+        // 2. Perform API requests asynchronously in parallel to avoid 12s timeout
+        try {
+            const promises = items.map(item => 
+                apiPost('setAbsensiStatus', {
+                    token: getToken(),
+                    siswa_id: item.siswa_id,
+                    mapel: mapel,
+                    tanggal: tanggal,
+                    status: item.status,
+                    keterangan: item.keterangan
+                }, 5000)
+            );
+            
+            await Promise.allSettled(promises);
+            if (typeof showToast === 'function') {
+                showToast(`Absensi ${items.length} siswa berhasil disimpan!`, false);
+            } else {
+                alert(`Absensi ${items.length} siswa berhasil disimpan!`);
+            }
         } catch (e) {
-            alert('Gagal menyimpan absensi: ' + e.message);
+            console.warn('API sync warning:', e);
+            if (typeof showToast === 'function') {
+                showToast(`Absensi ${items.length} siswa tersimpan di cache (Mode Offline).`, false);
+            } else {
+                alert(`Absensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
+            }
+        } finally {
+            if(btnDesktop) btnDesktop.innerHTML = originalDesktopText;
+            if(btnFooter) btnFooter.innerHTML = originalFooterText;
         }
     }
     

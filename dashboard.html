@@ -21,6 +21,11 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d8e3fb; border-radius: 10px; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 
     <style>
@@ -249,60 +254,55 @@
     <div class="hidden md:flex w-full">
         
 <!-- SideNavBar -->
-<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant -translate-x-full md:translate-x-0 transition-transform duration-300">
-<div class="px-6 py-8">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-on-primary">school</span>
+<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
 </div>
-<div>
-<h1 class="font-title-lg text-title-lg font-black text-primary">Absen Online</h1>
+<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
 <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
 </div>
-</div>
-<nav class="space-y-1">
-<!-- Beranda Active -->
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary scale-95 active:scale-90 transition-transform" href="dashboard.html">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="dashboard.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
 <span class="font-label-md text-label-md">Beranda</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="input-absensi.html">
-<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="input-absensi.html">
+<span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
 <span class="font-label-md text-label-md">Input Absen</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="master-data.html">
-<span class="material-symbols-outlined" data-icon="database">database</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="master-data.html">
+<span class="material-symbols-outlined group-hover:text-primary">database</span>
 <span class="font-label-md text-label-md">Master Data</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="laporan.html">
-<span class="material-symbols-outlined" data-icon="description">description</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="laporan.html">
+<span class="material-symbols-outlined group-hover:text-primary">description</span>
 <span class="font-label-md text-label-md">Laporan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="notifikasi.html">
-<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="notifikasi.html">
+<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
 <span class="font-label-md text-label-md">Notifikasi</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="pengaturan.html">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="pengaturan.html">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
 <span class="font-label-md text-label-md">Pengaturan</span>
 </a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" href="log-aktivitas.html">
-<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="log-aktivitas.html">
+<span class="material-symbols-outlined group-hover:text-primary">history_edu</span>
 <span class="font-label-md text-label-md">Log Aktivitas</span>
 </a>
 </nav>
-</div>
-<div class="mt-auto px-6 py-6 border-t border-outline-variant">
-<button class="flex items-center gap-3 text-error w-full hover:bg-error-container/20 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-label-md text-label-md font-bold">Keluar</span>
+<div class="p-4 border-t border-outline-variant/30">
+<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Keluar</span>
 </button>
 </div>
 </aside>
 <!-- Main Content Area -->
 <main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
 <!-- TopNavBar -->
-<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 bg-surface dark:bg-inverse-surface shadow-sm">
+<header class="flex justify-between items-center px-gutter py-4 min-h-[72px] w-full sticky top-0 z-50 bg-surface shadow-sm">
 <div class="flex items-center gap-4">
 <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
 <span class="material-symbols-outlined text-primary">school</span>
@@ -322,18 +322,52 @@
 <span class="material-symbols-outlined text-primary" data-icon="help">help</span>
 </button>
 <div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
-<div class="flex items-center gap-3 cursor-pointer group">
-<div class="text-right hidden sm:block">
-<p class="font-label-md text-label-md font-bold text-on-surface user-name-display">Admin Utama</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant user-role-display">Administrator</p>
+<div class="relative">
+<button onclick="toggleMobileDropdown('dropdown-desktop-dashboard')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-dashboard'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+<div class="text-right hidden md:block">
+<p class="font-label-md text-label-md text-on-surface font-bold">Admin Utama</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
 </div>
-<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+</button>
+<div id="dropdown-desktop-dashboard" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+<div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest md:hidden">
+<p class="text-sm font-bold text-on-surface truncate">Admin Utama</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5">Administrator</p>
+</div>
+<a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">database</span> Master Data
+</a>
+<a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
+</a>
+<button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+</button>
+</div>
 </div>
 </div>
 </div>
 </header>
 <!-- Dashboard Content -->
-<div class="p-gutter max-w-container-max-width mx-auto w-full space-y-gutter">
+<div class="p-gutter max-w-container-max-width mx-auto w-full space-y-gutter animate-fade-in">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex mb-2 text-label-md font-label-md text-on-surface-variant">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="inline-flex items-center hover:text-primary" href="#">
+<span class="material-symbols-outlined text-sm mr-2">home</span>
+                            Beranda
+                        </a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1 opacity-50">chevron_right</span>
+<span class="ml-1 md:ml-2 text-on-surface font-bold">Dashboard Overview</span>
+</div>
+</li>
+</ol>
+</nav>
 <!-- Statistics Bento Grid -->
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
 <!-- Total Hadir -->
@@ -519,8 +553,8 @@
 </section>
 </div>
 <!-- Footer / Technical info -->
-<footer class="mt-auto p-gutter text-center border-t border-outline-variant">
-<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Sistem Presensi Edukasi. Membangun Kedisiplinan Sejak Dini.</p>
+<footer class="mt-auto py-6 px-gutter text-center border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2026 Sistem Presensi Digital</p>
 </footer>
 </main>
 

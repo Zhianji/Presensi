@@ -15,6 +15,11 @@
         .sidebar-active { border-left-width: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
 <body class="text-on-surface bg-background">
@@ -194,12 +199,12 @@
 <!-- Main Content Wrapper -->
 <main class="ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
 <!-- Top Navigation Bar -->
-<header class="flex justify-between items-center px-gutter py-stack-sm w-full sticky top-0 z-50 shadow-sm bg-surface">
+<header class="flex justify-between items-center px-gutter py-4 min-h-[72px] w-full sticky top-0 z-50 shadow-sm bg-surface">
 <div class="flex items-center gap-4">
 <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
 <span class="material-symbols-outlined text-primary">school</span>
 </button>
-<h2 class="font-title-md text-title-md text-on-surface">Master Data Siswa</h2>
+<h2 class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Master Data Siswa</h2>
 </div>
 <div class="flex items-center gap-6">
 <div class="relative hidden md:block">
@@ -242,7 +247,7 @@
 </div>
 </header>
 <!-- Canvas Area -->
-<div class="flex-1 p-gutter max-w-container-max-width mx-auto w-full">
+<div class="flex-1 p-gutter max-w-container-max-width mx-auto w-full animate-fade-in">
 <!-- Breadcrumbs -->
 <nav aria-label="Breadcrumb" class="flex mb-6 text-label-md font-label-md text-on-surface-variant">
 <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -260,49 +265,89 @@
 </li>
 </ol>
 </nav>
-<!-- Action Bar & Filter Section -->
-<section class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm mb-stack-lg">
-<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-<!-- Search and Action Buttons -->
-<div class="flex flex-wrap items-center gap-3">
-<div class="relative w-full sm:w-80">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input id="search-siswa-desktop" oninput="filterSiswaTable()" class="w-full pl-12 pr-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="Cari Nama Siswa, NIS, atau Email..." type="text"/>
-</div>
-<button onclick="openSiswaModal()" class="bg-primary text-on-primary px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm active:scale-95 cursor-pointer">
-<span class="material-symbols-outlined">add</span>
-                            Tambah Siswa
-                        </button>
-<button onclick="openImportModal()" class="bg-surface-container-lowest border border-primary text-primary px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-primary-container/10 transition-all active:scale-95 cursor-pointer">
-<span class="material-symbols-outlined">upload_file</span>
-                            Import CSV
-                        </button>
-<button onclick="exportSiswaCSV()" class="bg-surface-container-lowest border border-outline-variant text-on-surface px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm active:scale-95 cursor-pointer" title="Export Data & Template CSV">
-<span class="material-symbols-outlined">download</span>
-                            Export CSV
-                        </button>
-<button id="btn-bulk-delete" onclick="deleteSelectedSiswaConfirm()" class="hidden bg-error text-white px-5 py-3 rounded-lg font-title-md flex items-center gap-2 hover:bg-red-700 transition-all shadow-sm active:scale-95 cursor-pointer">
-<span class="material-symbols-outlined">delete</span>
-                            Hapus Terpilih (<span id="selected-count">0</span>)
-                        </button>
-</div>
-<!-- Filter Dropdowns -->
-<div class="flex items-center gap-4 border-t lg:border-t-0 pt-4 lg:pt-0 border-outline-variant">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-on-surface-variant text-sm">filter_list</span>
-<span class="font-label-md text-label-md text-on-surface-variant uppercase">Filter:</span>
-</div>
-<select id="filter-kelas-desktop" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
-<option value="">Semua Kelas</option>
-</select>
-<select id="filter-status-desktop" onchange="filterSiswaTable()" class="bg-background border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-primary focus:border-primary">
-<option value="">Semua Status</option>
-<option value="Aktif">Aktif</option>
-<option value="Nonaktif">Nonaktif</option>
-</select>
-</div>
-</div>
-</section>
+            <!-- Action Bar & Filter Section -->
+            <section class="bg-surface-container-lowest p-5 md:p-6 rounded-2xl border border-outline-variant/80 shadow-sm mb-stack-lg transition-all duration-300 hover:shadow-md">
+                <div class="flex flex-col gap-4">
+                    
+                    <!-- Main Toolbar Row: Search, Actions -->
+                    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                        
+                        <!-- Left Group: Search Bar -->
+                        <div class="relative flex-1 min-w-[280px] max-w-xl">
+                            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">search</span>
+                            <input id="search-siswa-desktop" oninput="filterSiswaTable()" class="w-full pl-11 pr-10 py-2.5 h-11 bg-surface-container-low border border-outline-variant/80 rounded-xl focus:bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 font-body-md text-body-md text-on-surface outline-none" placeholder="Cari Nama Siswa, NIS, atau Email..." type="text"/>
+                            <button onclick="document.getElementById('search-siswa-desktop').value=''; filterSiswaTable();" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-on-surface transition-colors cursor-pointer" title="Bersihkan pencarian">
+                                <span class="material-symbols-outlined text-[18px]">cancel</span>
+                            </button>
+                        </div>
+
+                        <!-- Right Group: Primary Actions -->
+                        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                            
+                            <!-- Import CSV Button -->
+                            <button onclick="openImportModal()" class="flex-1 sm:flex-none h-11 px-4 bg-surface border border-outline-variant/80 text-primary font-title-md text-sm rounded-xl hover:bg-primary-container/10 hover:border-primary/40 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 shadow-2xs">
+                                <span class="material-symbols-outlined text-[20px]">upload_file</span>
+                                <span>Import CSV</span>
+                            </button>
+
+                            <!-- Export CSV Button -->
+                            <button onclick="exportSiswaCSV()" class="flex-1 sm:flex-none h-11 px-4 bg-surface border border-outline-variant/80 text-on-surface font-title-md text-sm rounded-xl hover:bg-surface-container hover:border-outline transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 shadow-2xs" title="Export Data & Template CSV">
+                                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">download</span>
+                                <span>Export CSV</span>
+                            </button>
+
+                            <!-- Bulk Delete Button (hidden by default) -->
+                            <button id="btn-bulk-delete" onclick="deleteSelectedSiswaConfirm()" class="hidden h-11 px-4 bg-error text-on-error font-title-md text-sm rounded-xl hover:bg-red-700 transition-all duration-200 shadow-sm active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                <span>Hapus (<span id="selected-count">0</span>)</span>
+                            </button>
+
+                            <!-- Tambah Siswa Button -->
+                            <button onclick="openSiswaModal()" class="w-full sm:w-auto h-11 px-5 bg-primary text-on-primary font-title-md text-sm rounded-xl hover:bg-primary-container hover:text-on-primary-container transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap">
+                                <span class="material-symbols-outlined text-[20px]">person_add</span>
+                                <span>Tambah Siswa</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Sub-Toolbar Row: Modern Pill Selects -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-3.5 border-t border-outline-variant/60">
+                        
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+                                <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+                                <span class="font-semibold uppercase tracking-wider text-xs">Filter Data:</span>
+                            </div>
+
+                            <!-- Kelas Pill Select -->
+                            <div class="relative flex-1 sm:flex-initial min-w-[150px]">
+                                <select id="filter-kelas-desktop" onchange="filterSiswaTable()" class="w-full h-9 pl-9 pr-8 bg-surface-container-low border border-outline-variant/80 rounded-xl font-body-sm text-body-sm text-on-surface hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 cursor-pointer outline-none appearance-none">
+                                    <option value="">Semua Kelas</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">school</span>
+                                <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">expand_more</span>
+                            </div>
+
+                            <!-- Status Pill Select -->
+                            <div class="relative flex-1 sm:flex-initial min-w-[150px]">
+                                <select id="filter-status-desktop" onchange="filterSiswaTable()" class="w-full h-9 pl-9 pr-8 bg-surface-container-low border border-outline-variant/80 rounded-xl font-body-sm text-body-sm text-on-surface hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 cursor-pointer outline-none appearance-none">
+                                    <option value="">Semua Status</option>
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Nonaktif">Nonaktif</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">verified_user</span>
+                                <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Filter Stats Summary -->
+                        <div id="master-siswa-count-summary" class="text-xs font-label-md text-on-surface-variant hidden md:block">
+                            Menampilkan data siswa terdaftar
+                        </div>
+                    </div>
+
+                </div>
+            </section>
 <!-- Data Table Section -->
 <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
 <div class="overflow-x-auto">
@@ -339,7 +384,7 @@
 
 <!-- Footer -->
 <footer class="mt-auto py-6 px-gutter border-t border-outline-variant text-center">
-<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Sistem Presensi Edukasi. Seluruh Hak Cipta Dilindungi.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2026 Sistem Presensi Digital</p>
 </footer>
 </main>
 
@@ -440,20 +485,60 @@
 
     async function loadSiswaData() {
         const tbody = document.getElementById('master-siswa-tbody');
-        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+        
+        // Cek cache untuk render cepat tanpa render ulang kosong
+        const cached = localStorage.getItem('cache_siswa_list');
+        if (cached) {
+            try {
+                allSiswa = JSON.parse(cached);
+                populateKelasFilter(allSiswa);
+                filterSiswaTable();
+            } catch (e) {
+                console.error('Failed to parse cached siswa list:', e);
+            }
+        } else {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
+        }
 
         try {
             const res = await apiPost('getSiswaList', { token: getToken() });
             if (res.ok && res.data) {
                 allSiswa = res.data;
+                localStorage.setItem('cache_siswa_list', JSON.stringify(res.data));
                 populateKelasFilter(allSiswa);
                 filterSiswaTable();
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal memuat data: ${res.error || 'Terjadi kesalahan pada backend Apps Script'}</td></tr>`;
+                if (!cached) {
+                    const mockData = [
+                        { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "XII IPA 1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "XII IPA 1", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "XII IPA 2", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "XII IPA 2", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "XI IPS 1", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "XI IPS 1", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
+                    ];
+                    allSiswa = mockData;
+                    populateKelasFilter(allSiswa);
+                    filterSiswaTable();
+                    showToast("Gagal mengambil data, menggunakan mode offline.", true);
+                }
             }
         } catch (e) {
             console.error('Error loading siswa data:', e);
-            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-error">Gagal terhubung ke Google Apps Script: ${e.message || 'Error koneksi'}.<br/><span class="text-xs text-on-surface-variant">Pastikan URL Apps Script benar dan sudah di-deploy dengan akses 'Anyone'.</span></td></tr>`;
+            if (!cached) {
+                const mockData = [
+                    { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "XII IPA 1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "XII IPA 1", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "XII IPA 2", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "XII IPA 2", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "XI IPS 1", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "XI IPS 1", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
+                ];
+                allSiswa = mockData;
+                populateKelasFilter(allSiswa);
+                filterSiswaTable();
+                showToast("Gagal terhubung, menggunakan mode offline.", true);
+            }
         }
     }
 
@@ -481,6 +566,9 @@
             const matchStatus = !status || String(s.status_aktif).toLowerCase() === status.toLowerCase();
             return matchSearch && matchKelas && matchStatus;
         });
+
+        const summaryEl = document.getElementById('master-siswa-count-summary');
+        if (summaryEl) summaryEl.textContent = `Menampilkan ${filtered.length} dari ${allSiswa.length} Siswa`;
 
         renderSiswaTable(filtered);
     }

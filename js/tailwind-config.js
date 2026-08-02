@@ -66,6 +66,9 @@ tailwind.config = {
                     "container-max-width": "1280px",
                     "stack-sm": "0.5rem"
             },
+            "maxWidth": {
+                    "container-max-width": "1280px"
+            },
             "fontFamily": {
                     "label-md": ["Inter"],
                     "display-lg": ["Inter"],
