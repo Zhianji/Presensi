@@ -19,10 +19,7 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 
-    <style>
-        .toggle-checkbox:checked { right: 0; border-color: #003d9b; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #003d9b; }
-    </style>
+
 </head>
 <body class="bg-background text-on-surface flex min-h-screen">
     <!-- MOBILE VIEW -->
@@ -114,37 +111,37 @@
 <h2 class="px-2 font-label-md text-label-md text-primary uppercase tracking-widest">Batasan Operasional</h2>
 <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant divide-y divide-outline-variant">
 <!-- Time Limit -->
-<div class="flex items-center justify-between p-4">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
-<span class="material-symbols-outlined">timer</span>
-</div>
-<div>
-<p class="font-title-md text-title-md text-on-surface">Batas Waktu Absen</p>
-<input id="batas-waktu-mobile" type="time" class="bg-surface-container border border-outline-variant rounded p-1 text-sm outline-none" value="07:30">
-</div>
-</div>
-<div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out">
-<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-outline-variant appearance-none cursor-pointer z-10 transition-all duration-300 translate-x-0 checked:translate-x-6" id="toggle-time" type="checkbox"/>
-<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-high cursor-pointer transition-colors duration-300" for="toggle-time"></label>
-</div>
-</div>
+<div class="flex items-center justify-between p-4 gap-3 mx-2 sm:mx-0">
+    <div class="flex items-center gap-3.5 min-w-0">
+      <div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary shrink-0">
+        <span class="material-symbols-outlined">timer</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-title-md text-title-md text-on-surface truncate">Batas Waktu Absen</p>
+        <input id="batas-waktu-mobile" type="time" class="bg-surface-container border border-outline-variant rounded px-2 py-0.5 text-xs sm:text-sm outline-none mt-0.5" value="07:30">
+      </div>
+    </div>
+    <label for="toggle-time" class="relative inline-flex items-center cursor-pointer shrink-0">
+      <input type="checkbox" id="toggle-time" checked class="sr-only peer toggle-checkbox"/>
+      <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+    </label>
+  </div>
 <!-- Geofencing -->
-<div class="flex items-center justify-between p-4">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
-<span class="material-symbols-outlined">location_on</span>
-</div>
-<div>
-<p class="font-title-md text-title-md text-on-surface">Radius Geofencing</p>
-<p class="font-body-md text-body-md text-on-surface-variant">Aktif (100 Meter)</p>
-</div>
-</div>
-<div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out">
-<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-2 border-outline-variant appearance-none cursor-pointer z-10 transition-all duration-300 translate-x-0 checked:translate-x-6" id="toggle-geo" type="checkbox"/>
-<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-high cursor-pointer transition-colors duration-300" for="toggle-geo"></label>
-</div>
-</div>
+<div class="flex items-center justify-between p-4 gap-3 mx-2 sm:mx-0">
+    <div class="flex items-center gap-3.5 min-w-0">
+      <div class="w-10 h-10 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center text-tertiary shrink-0">
+        <span class="material-symbols-outlined">location_on</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-title-md text-title-md text-on-surface truncate">Radius Geofencing</p>
+        <p class="font-body-md text-body-md text-on-surface-variant truncate">Aktif (100 Meter)</p>
+      </div>
+    </div>
+    <label for="toggle-geo" class="relative inline-flex items-center cursor-pointer shrink-0">
+      <input type="checkbox" id="toggle-geo" checked class="sr-only peer toggle-checkbox"/>
+      <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+    </label>
+  </div>
 <!-- Late Allowance -->
 <div class="flex items-center justify-between p-4 hover:bg-surface-container transition-colors cursor-pointer group">
 <div class="flex items-center gap-4">
@@ -552,23 +549,26 @@
 
     </div>
 
-<div id="action-footer" class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-primary/20 fixed bottom-20 md:bottom-6 left-4 right-4 md:left-[280px] md:right-8 shadow-lg z-40 opacity-0 translate-y-10 pointer-events-none transition-all duration-300">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
-<p id="last-updated-text" class="text-body-md font-medium text-on-surface">Terakhir diperbarui: -</p>
+<div id="action-footer" class="fixed bottom-[72px] md:bottom-6 left-3 right-3 sm:left-6 sm:right-6 md:left-[280px] md:right-8 bg-surface-container-high/95 backdrop-blur-md p-3.5 sm:p-4 rounded-xl border border-primary/20 shadow-2xl z-[60] opacity-0 translate-y-10 pointer-events-none transition-all duration-300 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 max-w-full">
+<div class="flex items-center gap-2.5 min-w-0">
+<span class="material-symbols-outlined text-primary text-[20px] sm:text-[22px] shrink-0" data-icon="sync">sync</span>
+<div class="min-w-0 flex-1">
+<p class="text-xs sm:text-sm font-semibold text-on-surface truncate">Perubahan Belum Disimpan</p>
+<p id="last-updated-text" class="text-[11px] sm:text-xs text-on-surface-variant truncate">Terakhir diperbarui: -</p>
 </div>
-<div class="flex gap-4">
-<button class="px-6 py-3 border border-primary text-primary rounded-lg font-title-md text-title-md hover:bg-primary/5 transition-colors cursor-pointer active:scale-95" onclick="handleCancelSettings()">Batal</button>
-<button class="px-8 py-3 bg-primary text-on-primary rounded-lg font-title-md text-title-md shadow-md hover:bg-primary-container transition-all cursor-pointer active:scale-95 flex items-center gap-2" onclick="handleSaveSettings()">
-<span class="material-symbols-outlined text-[20px]" data-icon="save">save</span>
-                        Simpan Perubahan
-                    </button>
+</div>
+<div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
+<button type="button" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 border border-primary/40 text-primary rounded-lg text-xs sm:text-sm font-medium hover:bg-primary/5 transition-colors cursor-pointer active:scale-95 text-center" onclick="handleCancelSettings()">Batal</button>
+<button type="button" class="flex-1 sm:flex-none px-5 sm:px-8 py-2 sm:py-2.5 bg-primary text-on-primary rounded-lg text-xs sm:text-sm font-semibold shadow-md hover:bg-primary-container transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 whitespace-nowrap" onclick="handleSaveSettings()">
+<span class="material-symbols-outlined text-[18px] sm:text-[20px]" data-icon="save">save</span>
+Simpan Perubahan
+</button>
 </div>
 </div>
 <!-- Success Toast (Hidden by default) -->
-<div class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 opacity-0 pointer-events-none transition-all duration-300 z-[100]" id="toast">
-<span class="material-symbols-outlined text-emerald-400" data-icon="check_circle">check_circle</span>
-<p class="font-body-md text-body-md">Pengaturan berhasil disimpan dan diperbarui ke sistem.</p>
+<div class="fixed bottom-20 md:bottom-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-5 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl flex items-center gap-3 sm:gap-4 opacity-0 pointer-events-none transition-all duration-300 z-[100] max-w-[90vw] text-xs sm:text-sm" id="toast">
+<span class="material-symbols-outlined text-emerald-400 shrink-0" data-icon="check_circle">check_circle</span>
+<p class="font-body-md text-body-md truncate">Pengaturan berhasil disimpan dan diperbarui ke sistem.</p>
 </div>
 <script src="js/config.js"></script>
 <script>
