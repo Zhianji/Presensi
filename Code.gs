@@ -190,6 +190,11 @@ function doPost(e) {
           getRekapBulanan(body.bulan, body.tahun, body.kelas, body.tanggal)
         );
         break;
+      case 'resetAbsensi':
+        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) =>
+          resetAbsensi(session, body.kelas, body.mapel, body.tanggal)
+        );
+        break;
       case 'getRiwayatSiswa':
         result = requireRole(body.token, 'siswa', (session) =>
           getRiwayatSiswa(session, body.bulan, body.tahun)
@@ -660,6 +665,38 @@ function getStatusHarian(kelas, mapel, tanggal) {
     .sort((a, b) => String(a.nama).localeCompare(String(b.nama), 'id'));
 
   return { ok: true, tanggal: tanggalNorm, mapel: mapel, data: data };
+}
+
+/**
+ * Reset / Hapus seluruh data presensi untuk kelas, mapel, dan tanggal tertentu.
+ */
+function resetAbsensi(session, kelasFilter, mapelFilter, tanggalInput) {
+  if (!kelasFilter || !mapelFilter || !tanggalInput) {
+    return { ok: false, error: 'Kelas, mata pelajaran, dan tanggal wajib diisi' };
+  }
+
+  const tanggalNorm = normalizeTanggal(tanggalInput);
+  const kelasNorm = String(kelasFilter).trim().toLowerCase();
+  const mapelNorm = String(mapelFilter).trim().toLowerCase();
+
+  const sheet = getSheet(SHEET_ABSENSI);
+  const rows = sheet.getDataRange().getValues();
+  let deletedCount = 0;
+
+  for (let i = rows.length - 1; i >= 1; i--) {
+    const [, , , rowKelas, rowMapel, rowTanggal] = rows[i];
+    const rTanggal = normalizeTanggal(rowTanggal);
+    const rKelas = String(rowKelas || '').trim().toLowerCase();
+    const rMapel = String(rowMapel || '').trim().toLowerCase();
+
+    if (rTanggal === tanggalNorm && rMapel === mapelNorm && (rKelas === kelasNorm || !rowKelas)) {
+      sheet.deleteRow(i + 1);
+      deletedCount++;
+    }
+  }
+
+  logAction(session, 'RESET_ABSENSI', 'Reset presensi ' + mapelFilter + ' kelas ' + kelasFilter + ' tanggal ' + tanggalNorm + ' (' + deletedCount + ' baris)');
+  return { ok: true, message: 'Presensi ' + mapelFilter + ' kelas ' + kelasFilter + ' tanggal ' + tanggalNorm + ' berhasil direset (' + deletedCount + ' data terhapus).', count: deletedCount };
 }
 
 // ============ CRUD SISWA (guru) ============
