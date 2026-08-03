@@ -89,9 +89,8 @@
 <div class="space-y-1">
 <label class="font-label-md text-label-md text-on-surface-variant">Mata Pelajaran</label>
 <select id="select-mapel-mobile" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-3 py-2 text-body-md focus:ring-primary focus:border-primary">
-<option>TIK (Teknologi Informasi &amp; Komunikasi)</option>
-<option>KKA (Kreativitas &amp; Kewirausahaan)</option>
-<option>Matematika</option>
+<option value="TIK">TIK (Teknologi Informasi &amp; Komunikasi)</option>
+<option value="KKA">KKA (Kreativitas &amp; Kewirausahaan)</option>
 </select>
 </div>
 <!-- Date Filter -->
@@ -99,6 +98,16 @@
 <label class="font-label-md text-label-md text-on-surface-variant">Tanggal</label>
 <input id="input-tanggal-mobile" class="w-full bg-surface-container-low border-outline-variant rounded-lg px-3 py-2 text-body-md focus:ring-primary focus:border-primary" type="date" value="2023-10-27"/>
 </div>
+</div>
+<div class="mt-3 flex gap-2">
+<button id="btn-terapkan-mobile" onclick="loadStatusHarian(true)" class="flex-1 bg-surface-variant text-primary font-title-md py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 border border-outline-variant hover:bg-primary-container active:scale-95 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                    Terapkan
+                </button>
+<button onclick="openTodayModal()" class="flex-1 bg-primary/10 text-primary font-title-md py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 border border-primary/20 active:scale-95 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-lg">today</span>
+                    Today
+                </button>
 </div>
 </section>
 <!-- Student List Header -->
@@ -337,10 +346,16 @@
 <input id="input-tanggal-desktop" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none" type="date"/>
 </div>
 </div>
-<button id="btn-terapkan" onclick="loadStatusHarian()" class="bg-surface-variant text-primary font-title-md text-title-md px-6 py-2.5 rounded-lg hover:bg-primary-container transition-colors flex items-center gap-2 cursor-pointer">
+<div class="flex items-center gap-2">
+<button id="btn-terapkan" onclick="loadStatusHarian(true)" class="bg-surface-variant text-primary font-title-md text-title-md px-6 py-2.5 rounded-lg hover:bg-primary-container transition-colors flex items-center gap-2 cursor-pointer">
 <span class="material-symbols-outlined">filter_list</span>
                         Terapkan
                     </button>
+<button id="btn-today" onclick="openTodayModal()" class="bg-primary text-on-primary font-title-md text-title-md px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-95">
+<span class="material-symbols-outlined">today</span>
+                        Today
+                    </button>
+</div>
 </div>
 <!-- Action Bar -->
 <div class="col-span-12 lg:col-span-4 bg-white p-gutter rounded-xl shadow-sm border border-outline-variant flex flex-col justify-center gap-2">
@@ -362,8 +377,30 @@
 <div id="info-banner" class="bg-tertiary-fixed text-on-tertiary-fixed px-gutter py-stack-md rounded-lg flex items-center gap-3 border border-tertiary/20">
 <span class="material-symbols-outlined text-tertiary">info</span>
 <p class="font-body-md text-body-md" id="info-text">
-<strong>Pemberitahuan:</strong> Pilih kelas dan mata pelajaran lalu klik <strong>Terapkan</strong> untuk menampilkan daftar siswa.
-</p>
+<strong>Pemberitahuan:</strong> Menampilkan daftar presensi siswa berdasarkan filter kelas, mata pelajaran, dan tanggal.
+</div>
+<!-- Modern Search Bar Above Data Table -->
+<div class="w-full bg-white p-3.5 rounded-xl shadow-sm border border-outline-variant flex items-center gap-3 transition-all focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+        <span class="material-symbols-outlined">search</span>
+    </div>
+    <div class="flex-1 relative">
+        <input 
+            id="search-siswa-input" 
+            type="text" 
+            oninput="handleSearchSiswaInput()" 
+            placeholder="Cari siswa berdasarkan nama, NIS, atau kelas..." 
+            class="w-full bg-transparent border-none outline-none font-body-md text-on-surface placeholder:text-on-surface-variant/60 text-base"
+        />
+    </div>
+    <button 
+        id="btn-clear-search-siswa" 
+        onclick="clearSearchSiswaInput()" 
+        class="hidden p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors cursor-pointer"
+        title="Bersihkan pencarian"
+    >
+        <span class="material-symbols-outlined text-sm">close</span>
+    </button>
 </div>
 <!-- Data Table Card -->
 <div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden">
@@ -379,7 +416,7 @@
 </thead>
 <tbody id="input-absensi-tbody" class="divide-y divide-outline-variant">
 <tr class="hover:bg-surface-container-lowest transition-colors">
-<td colspan="4" class="px-6 py-6 text-center text-on-surface-variant">Klik <strong>Terapkan</strong> untuk memuat data siswa...</td>
+<td colspan="4" class="px-6 py-6 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data siswa...</td>
 </tr>
 </tbody>
 </table>
@@ -403,15 +440,44 @@
         const check = await guardPage(['admin', 'guru', 'kepsek']);
         if (!check) return;
 
-        // Set default date to today
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('input-tanggal-desktop').value = todayStr;
-        const mobileDate = document.getElementById('input-tanggal-mobile');
-        if(mobileDate) mobileDate.value = todayStr;
+        // Set default date to local today
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+
+        const inputD = document.getElementById('input-tanggal-desktop');
+        if (inputD) inputD.value = todayStr;
+        const inputM = document.getElementById('input-tanggal-mobile');
+        if (inputM) inputM.value = todayStr;
         
+        setupFilterSync();
         await initKelasOptions();
-        loadStatusHarian();
+        await loadStatusHarian();
     });
+
+    function setupFilterSync() {
+        const kD = document.getElementById('select-kelas-desktop');
+        const kM = document.getElementById('select-kelas-mobile');
+        const mD = document.getElementById('select-mapel-desktop');
+        const mM = document.getElementById('select-mapel-mobile');
+        const tD = document.getElementById('input-tanggal-desktop');
+        const tM = document.getElementById('input-tanggal-mobile');
+
+        if (kD && kM) {
+            kD.addEventListener('change', () => { kM.value = kD.value; loadStatusHarian(); });
+            kM.addEventListener('change', () => { kD.value = kM.value; loadStatusHarian(); });
+        }
+        if (mD && mM) {
+            mD.addEventListener('change', () => { mM.value = mD.value; loadStatusHarian(); });
+            mM.addEventListener('change', () => { mD.value = mM.value; loadStatusHarian(); });
+        }
+        if (tD && tM) {
+            tD.addEventListener('change', () => { tM.value = tD.value; loadStatusHarian(); });
+            tM.addEventListener('change', () => { tD.value = tM.value; loadStatusHarian(); });
+        }
+    }
 
     let currentSiswaList = [];
 
@@ -451,7 +517,19 @@
     }
 
     
-    async function loadStatusHarian() {
+    async function loadStatusHarian(isManualClick = false) {
+        const btnD = document.getElementById('btn-terapkan');
+        const btnM = document.getElementById('btn-terapkan-mobile');
+        
+        if (btnD) {
+            btnD.disabled = true;
+            btnD.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat...`;
+        }
+        if (btnM) {
+            btnM.disabled = true;
+            btnM.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat...`;
+        }
+
         const kelas = document.getElementById('select-kelas-desktop').value || (document.getElementById('select-kelas-mobile') ? document.getElementById('select-kelas-mobile').value : '');
         const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
         const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
@@ -492,6 +570,9 @@
                 
                 const elInfo = document.getElementById('info-text');
                 if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                if (isManualClick && typeof showToast === 'function') {
+                    showToast(`Data presensi ${kelas || 'Semua Kelas'} berhasil dimuat.`);
+                }
             } else {
                 if (!cached) {
                     const mockData = [
@@ -537,10 +618,60 @@
                 if(elInfo) elInfo.innerHTML = `Menampilkan data presensi <strong>(Mode Demo Offline)</strong> untuk kelas <strong>${kelas || 'XII IPA 1'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
                 showToast("Gagal terhubung, menggunakan mode offline.", true);
             }
+        } finally {
+            if (btnD) {
+                btnD.disabled = false;
+                btnD.innerHTML = `<span class="material-symbols-outlined">filter_list</span> Terapkan`;
+            }
+            if (btnM) {
+                btnM.disabled = false;
+                btnM.innerHTML = `<span class="material-symbols-outlined text-lg">filter_list</span> Terapkan`;
+            }
         }
     }
+    function handleSearchSiswaInput() {
+        const input = document.getElementById('search-siswa-input');
+        const clearBtn = document.getElementById('btn-clear-search-siswa');
+        const query = input ? input.value.toLowerCase().trim() : '';
 
-    
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        if (!currentSiswaList || currentSiswaList.length === 0) return;
+
+        if (!query) {
+            renderSiswaTable(currentSiswaList);
+            const countText = `Menampilkan ${currentSiswaList.length} Siswa`;
+            const elDesktopText = document.getElementById('total-siswa-text');
+            if (elDesktopText) elDesktopText.textContent = countText;
+            return;
+        }
+
+        const filtered = currentSiswaList.filter(s => 
+            String(s.nama || '').toLowerCase().includes(query) ||
+            String(s.nis || s.siswa_id || s.id || '').toLowerCase().includes(query) ||
+            String(s.kelas || '').toLowerCase().includes(query)
+        );
+
+        renderSiswaTable(filtered);
+        const countText = `Menampilkan ${filtered.length} dari ${currentSiswaList.length} Siswa`;
+        const elDesktopText = document.getElementById('total-siswa-text');
+        if (elDesktopText) elDesktopText.textContent = countText;
+    }
+
+    function clearSearchSiswaInput() {
+        const input = document.getElementById('search-siswa-input');
+        const clearBtn = document.getElementById('btn-clear-search-siswa');
+        if (input) input.value = '';
+        if (clearBtn) clearBtn.classList.add('hidden');
+        handleSearchSiswaInput();
+    }
+
     function renderSiswaTable(data) {
         const tbody = document.getElementById('input-absensi-tbody');
         const mobileList = document.getElementById('student-list');
@@ -667,75 +798,115 @@
         const originalDesktopText = btnDesktop ? btnDesktop.innerHTML : '';
         const originalFooterText = btnFooter ? btnFooter.innerHTML : '';
 
-        if(btnDesktop) btnDesktop.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`;
-        if(btnFooter) btnFooter.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan &amp; Kirim...`;
+        if(btnDesktop) { btnDesktop.disabled = true; btnDesktop.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`; }
+        if(btnFooter) { btnFooter.disabled = true; btnFooter.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`; }
 
         const items = [];
         rows.forEach(row => {
             const siswaId = row.getAttribute('data-siswa-id');
-            let checkedRadio = row.querySelector(`input[name="status-${siswaId}"]:checked`);
-            if (!checkedRadio) {
-                checkedRadio = row.querySelector(`input[name="status-mob-${siswaId}"]:checked`);
-            }
+            let checkedRadio = row.querySelector('input[type="radio"]:checked');
             const ketInput = document.getElementById(`ket-${siswaId}`);
 
-            if (checkedRadio) {
-                items.push({
-                    siswa_id: siswaId,
-                    status: checkedRadio.value,
-                    keterangan: ketInput ? ketInput.value : ''
-                });
+            const statusVal = checkedRadio ? checkedRadio.value : 'Hadir';
 
-                // Update local memory list
-                const idx = currentSiswaList.findIndex(s => (s.siswa_id || s.id) === siswaId);
-                if (idx !== -1) {
-                    currentSiswaList[idx].status = checkedRadio.value;
-                    currentSiswaList[idx].keterangan = ketInput ? ketInput.value : '';
-                }
+            items.push({
+                siswa_id: siswaId,
+                status: statusVal,
+                keterangan: ketInput ? ketInput.value : ''
+            });
+
+            // Update local memory list
+            const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(siswaId));
+            if (idx !== -1) {
+                currentSiswaList[idx].status = statusVal;
+                currentSiswaList[idx].keterangan = ketInput ? ketInput.value : '';
             }
         });
+
+        if (items.length === 0) {
+            if (typeof showToast === 'function') {
+                showToast('Pilih status presensi setidaknya untuk 1 siswa.', true);
+            }
+            if(btnDesktop) { btnDesktop.disabled = false; btnDesktop.innerHTML = originalDesktopText; }
+            if(btnFooter) { btnFooter.disabled = false; btnFooter.innerHTML = originalFooterText; }
+            return;
+        }
 
         // 1. Instantly update Local Storage Cache
         const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
         localStorage.setItem(cacheKey, JSON.stringify(currentSiswaList));
 
-        // 2. Perform API requests asynchronously in parallel to avoid 12s timeout
+        // Use a single outer try-finally to guarantee button reset
         try {
-            const promises = items.map(item => 
-                apiPost('setAbsensiStatus', {
+            // 2. Perform API request using single Batch Endpoint
+            let isBatchSaved = false;
+            try {
+                const batchRes = await apiPost('saveAbsensiBatch', {
                     token: getToken(),
-                    siswa_id: item.siswa_id,
+                    items: items,
                     mapel: mapel,
-                    tanggal: tanggal,
-                    status: item.status,
-                    keterangan: item.keterangan
-                }, 5000)
-            );
-            
-            await Promise.allSettled(promises);
-            if (typeof showToast === 'function') {
-                showToast(`Absensi ${items.length} siswa berhasil disimpan!`, false);
-            } else {
-                alert(`Absensi ${items.length} siswa berhasil disimpan!`);
+                    tanggal: tanggal
+                }, 25000);
+
+                if (batchRes && batchRes.ok) {
+                    if (typeof showToast === 'function') {
+                        showToast(`Presensi ${items.length} siswa berhasil disimpan ke spreadsheet!`, false);
+                    } else {
+                        alert(`Presensi ${items.length} siswa berhasil disimpan!`);
+                    }
+                    isBatchSaved = true;
+                }
+            } catch (e) {
+                console.warn('Batch save error, trying sequential chunked fallback:', e);
+            }
+
+            // 3. Fallback: Process in small sequential chunks (chunk size 5) if legacy Apps Script is deployed
+            if (!isBatchSaved) {
+                let savedCount = 0;
+                const chunkSize = 5;
+                for (let i = 0; i < items.length; i += chunkSize) {
+                    const chunk = items.slice(i, i + chunkSize);
+                    const promises = chunk.map(item => 
+                        apiPost('setAbsensiStatus', {
+                            token: getToken(),
+                            siswa_id: item.siswa_id,
+                            mapel: mapel,
+                            tanggal: tanggal,
+                            status: item.status,
+                            keterangan: item.keterangan
+                        }, 10000)
+                    );
+                    const results = await Promise.allSettled(promises);
+                    savedCount += results.filter(r => r.status === 'fulfilled' && r.value && r.value.ok).length;
+                }
+
+                if (typeof showToast === 'function') {
+                    showToast(`Absensi ${savedCount}/${items.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < items.length);
+                } else {
+                    alert(`Absensi ${savedCount}/${items.length} siswa berhasil disimpan!`);
+                }
             }
         } catch (e) {
-            console.warn('API sync warning:', e);
+            console.warn('Simpan absensi error:', e);
             if (typeof showToast === 'function') {
-                showToast(`Absensi ${items.length} siswa tersimpan di cache (Mode Offline).`, false);
+                showToast(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`, false);
             } else {
-                alert(`Absensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
+                alert(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
             }
         } finally {
-            if(btnDesktop) btnDesktop.innerHTML = originalDesktopText;
-            if(btnFooter) btnFooter.innerHTML = originalFooterText;
+            if(btnDesktop) { btnDesktop.disabled = false; btnDesktop.innerHTML = originalDesktopText; }
+            if(btnFooter) { btnFooter.disabled = false; btnFooter.innerHTML = originalFooterText; }
         }
     }
     
     function markAllPresentMobile() {
-        const hRadios = document.querySelectorAll('#student-list input[value="Hadir"]');
-        hRadios.forEach(radio => {
+        const radioButtons = document.querySelectorAll('input[type="radio"][value="Hadir"]');
+        radioButtons.forEach(radio => {
             radio.checked = true;
         });
+        if (typeof showToast === 'function') {
+            showToast('Semua siswa berhasil ditandai Hadir.', false);
+        }
     }
     
     function saveAbsensi() {
@@ -744,50 +915,50 @@
 
     async function confirmResetAbsensi() {
         const isMob = window.innerWidth < 768;
-        const kelasSelect = isMob ? document.getElementById('select-kelas-mobile') : document.getElementById('select-kelas-desktop');
-        const mapelSelect = isMob ? document.getElementById('select-mapel-mobile') : document.getElementById('select-mapel-desktop');
         const tanggalInput = isMob ? document.getElementById('input-tanggal-mobile') : document.getElementById('input-tanggal-desktop');
-
-        const kelas = kelasSelect ? kelasSelect.value : '';
-        const mapel = mapelSelect ? mapelSelect.value : '';
-        const tanggal = tanggalInput ? tanggalInput.value : '';
-
-        if (!kelas || !mapel || !tanggal) {
-            alert('Silakan pilih Kelas, Mata Pelajaran, dan Tanggal terlebih dahulu!');
-            return;
+        
+        let tanggal = tanggalInput ? tanggalInput.value : '';
+        if (!tanggal) {
+            tanggal = new Date().toISOString().split('T')[0];
         }
 
-        const yakin = confirm(`Apakah Anda yakin ingin MERESET/MENGHAPUS seluruh data presensi:\n• Kelas: ${kelas}\n• Mapel: ${mapel}\n• Tanggal: ${tanggal}?`);
+        const yakin = confirm(`Apakah Anda yakin ingin MERESET/MENGHAPUS SELURUH data presensi pada tanggal ${tanggal}?\n\n⚠️ Peringatan: Seluruh data absensi siswa dari SEMUA KELAS dan MATA PELAJARAN pada tanggal tersebut akan terhapus.`);
         if (!yakin) return;
 
         const btnReset = document.getElementById('btn-reset');
         let origText = '';
         if (btnReset) {
             origText = btnReset.innerHTML;
-            btnReset.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Mereset...';
+            btnReset.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">refresh</span> Mereset...';
             btnReset.disabled = true;
         }
 
         try {
             const res = await apiPost('resetAbsensi', {
                 token: getToken(),
-                kelas: kelas,
-                mapel: mapel,
                 tanggal: tanggal
             });
 
             if (res.ok) {
-                const cacheKey = `absensi_cache_${kelas}_${mapel}_${tanggal}`;
-                localStorage.removeItem(cacheKey);
+                // Clear all absensi cache in localStorage
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('absensi_cache_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
 
                 if (typeof showToast === 'function') {
-                    showToast(res.message || 'Presensi berhasil direset!', false);
+                    showToast(res.message || `Presensi tanggal ${tanggal} berhasil direset!`, false);
                 } else {
-                    alert(res.message || 'Presensi berhasil direset!');
+                    alert(res.message || `Presensi tanggal ${tanggal} berhasil direset!`);
                 }
                 loadStatusHarian();
             } else {
-                alert('Gagal mereset presensi: ' + (res.error || 'Terjadi kesalahan.'));
+                if (res.error && res.error.includes('Action tidak dikenal')) {
+                    alert('❌ Backend Apps Script Belum Diperbarui!\n\nPenyebab: Google Apps Script di Cloud masih menjalankan versi lama.\n\nCara Memperbaiki:\n1. Salin seluruh isi file Code.gs terbaru.\n2. Buka script.google.com editor Anda.\n3. Paste isi Code.gs lalu klik Simpan.\n4. Klik Deploy > Kelola Deployment > Edit (ikon pensil) > Versi Baru (New Version) > Deploy.');
+                } else {
+                    alert('Gagal mereset presensi: ' + (res.error || 'Terjadi kesalahan.'));
+                }
             }
         } catch (err) {
             console.error('Error reset presensi:', err);
@@ -805,5 +976,237 @@
             loadStatusHarian();
         }
     });
+
+    // ============ TODAY MODAL FUNCTIONS ============
+    let allTodayData = [];
+
+    function openTodayModal() {
+        const modal = document.getElementById('today-modal');
+        const modalCard = document.getElementById('today-modal-card');
+        if (!modal || !modalCard) return;
+
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('today-modal-date-text').textContent = now.toLocaleDateString('id-ID', options);
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+        modalCard.classList.remove('scale-95');
+        modalCard.classList.add('scale-100');
+
+        fetchTodayModalData();
+    }
+
+    function closeTodayModal() {
+        const modal = document.getElementById('today-modal');
+        const modalCard = document.getElementById('today-modal-card');
+        if (!modal || !modalCard) return;
+
+        modalCard.classList.remove('scale-100');
+        modalCard.classList.add('scale-95');
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    async function fetchTodayModalData(forceRefresh = false) {
+        const refreshIcon = document.getElementById('icon-refresh-today');
+        if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+        const tbody = document.getElementById('today-modal-tbody');
+        if (forceRefresh && tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-8 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined animate-spin text-primary text-2xl">refresh</span>
+                        <p class="mt-2 text-sm">Memperbarui data absensi hari ini...</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        try {
+            const now = new Date();
+            const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+            const res = await apiPost('getLaporan', { token: getToken() });
+            if (res.ok && res.data) {
+                allTodayData = res.data.filter(item => {
+                    const itemTanggalNorm = item.tanggal ? String(item.tanggal).split('T')[0] : '';
+                    return itemTanggalNorm === todayStr;
+                });
+                renderTodayModalTable(allTodayData);
+            } else {
+                allTodayData = [];
+                renderTodayModalTable([]);
+            }
+        } catch (err) {
+            console.error('Error fetch today modal data:', err);
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-error">Gagal mengambil data absensi hari ini.</td>
+                    </tr>
+                `;
+            }
+        } finally {
+            if (refreshIcon) {
+                setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
+            }
+        }
+    }
+
+    function handleTodaySearch() {
+        const searchInput = document.getElementById('today-modal-search');
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        if (!query) {
+            renderTodayModalTable(allTodayData);
+            return;
+        }
+        const filtered = allTodayData.filter(item => 
+            String(item.nama_siswa || '').toLowerCase().includes(query) ||
+            String(item.kelas || '').toLowerCase().includes(query) ||
+            String(item.mapel || '').toLowerCase().includes(query)
+        );
+        renderTodayModalTable(filtered);
+    }
+
+    function renderTodayModalTable(data) {
+        const tbody = document.getElementById('today-modal-tbody');
+        const totalText = document.getElementById('today-modal-total-text');
+
+        let hadir = 0, sakit = 0, izin = 0, alfa = 0;
+        allTodayData.forEach(item => {
+            const st = String(item.status || '').toLowerCase();
+            if (st === 'hadir') hadir++;
+            else if (st === 'sakit') sakit++;
+            else if (st === 'izin') izin++;
+            else if (st === 'alfa') alfa++;
+        });
+
+        const elHadir = document.getElementById('today-stat-hadir');
+        if (elHadir) elHadir.textContent = hadir;
+        const elSakit = document.getElementById('today-stat-sakit');
+        if (elSakit) elSakit.textContent = sakit;
+        const elIzin = document.getElementById('today-stat-izin');
+        if (elIzin) elIzin.textContent = izin;
+        const elAlfa = document.getElementById('today-stat-alfa');
+        if (elAlfa) elAlfa.textContent = alfa;
+
+        if (totalText) totalText.textContent = `Total Presensi Hari Ini: ${data.length} Data`;
+
+        if (!data || data.length === 0) {
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-on-surface-variant font-body-md">Belum ada siswa yang melakukan absensi hari ini.</td>
+                    </tr>
+                `;
+            }
+            return;
+        }
+
+        let html = '';
+        data.forEach(item => {
+            const st = String(item.status || '').toLowerCase();
+            let badgeClass = 'bg-green-100 text-green-700';
+            if (st === 'sakit') badgeClass = 'bg-blue-100 text-blue-700';
+            else if (st === 'izin') badgeClass = 'bg-yellow-100 text-yellow-700';
+            else if (st === 'alfa') badgeClass = 'bg-red-100 text-red-700';
+
+            html += `
+                <tr class="hover:bg-surface-container-low transition-colors">
+                    <td class="px-4 py-3 font-body-md text-on-surface font-semibold">${item.nama_siswa || '-'}</td>
+                    <td class="px-4 py-3 font-body-md text-on-surface-variant">${item.kelas || '-'}</td>
+                    <td class="px-4 py-3 font-body-md text-on-surface-variant">${item.mapel || '-'}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2.5 py-1 ${badgeClass} rounded-full font-label-sm text-xs font-semibold uppercase">${item.status || '-'}</span>
+                    </td>
+                    <td class="px-4 py-3 font-body-md text-on-surface-variant text-sm">${item.waktu || '-'} WIB</td>
+                </tr>
+            `;
+        });
+        if (tbody) tbody.innerHTML = html;
+    }
 </script>
+
+<!-- Pop-up Modal Absensi Hari Ini (Today) -->
+<div id="today-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div id="today-modal-card" class="bg-surface rounded-2xl shadow-2xl border border-outline-variant w-full max-w-3xl overflow-hidden transform scale-95 transition-all duration-300 flex flex-col max-h-[85vh]">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-surface-container-low border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">today</span>
+                </div>
+                <div>
+                    <h3 class="font-title-lg text-title-lg font-bold text-on-surface">Absensi Hari Ini</h3>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant" id="today-modal-date-text">Memuat tanggal...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btn-refresh-today" onclick="fetchTodayModalData(true)" class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-all active:scale-90 cursor-pointer" title="Refresh Data">
+                    <span id="icon-refresh-today" class="material-symbols-outlined">refresh</span>
+                </button>
+                <button onclick="closeTodayModal()" class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors cursor-pointer" title="Tutup">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Toolbar / Filter & Summary Stats -->
+        <div class="px-6 py-3 bg-surface-container-lowest border-b border-outline-variant flex flex-wrap items-center justify-between gap-3">
+            <!-- Search Bar inside Modal -->
+            <div class="relative flex-1 min-w-[200px]">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+                <input id="today-modal-search" oninput="handleTodaySearch()" type="text" placeholder="Cari siswa atau kelas..." class="w-full bg-surface-container-low border border-outline-variant rounded-lg pl-9 pr-3 py-1.5 font-body-md text-sm outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+
+            <!-- Stats Pills -->
+            <div class="flex items-center gap-2 text-xs font-title-md">
+                <span class="px-2.5 py-1 bg-green-100 text-green-800 rounded-full flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-600"></span> Hadir: <strong id="today-stat-hadir">0</strong>
+                </span>
+                <span class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span> Sakit: <strong id="today-stat-sakit">0</strong>
+                </span>
+                <span class="px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-full flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-yellow-600"></span> Izin: <strong id="today-stat-izin">0</strong>
+                </span>
+                <span class="px-2.5 py-1 bg-red-100 text-red-800 rounded-full flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-red-600"></span> Alfa: <strong id="today-stat-alfa">0</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Modal Body / Content List -->
+        <div class="p-6 overflow-y-auto flex-1">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-bright text-on-surface-variant font-label-md text-xs uppercase tracking-wider border-b border-outline-variant">
+                            <th class="px-4 py-3">Nama Siswa</th>
+                            <th class="px-4 py-3">Kelas</th>
+                            <th class="px-4 py-3">Mapel</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="today-modal-tbody" class="divide-y divide-outline-variant">
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-on-surface-variant">Memuat data absensi hari ini...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-3 bg-surface-container-low border-t border-outline-variant flex justify-between items-center text-xs text-on-surface-variant">
+            <span id="today-modal-total-text">Total Presensi: 0 Siswa</span>
+            <button onclick="closeTodayModal()" class="px-4 py-2 bg-surface-variant hover:bg-surface-container-high text-on-surface font-title-md rounded-lg transition-colors cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
 </body></html>

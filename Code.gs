@@ -138,6 +138,12 @@ function doPost(e) {
           setAbsensiStatus(session, body.siswa_id, body.mapel, body.tanggal, body.status, body.keterangan)
         );
         break;
+      case 'saveAbsensiBatch':
+      case 'setAbsensiStatusBatch':
+        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) =>
+          saveAbsensiBatch(session, body.items, body.mapel, body.tanggal)
+        );
+        break;
       case 'setAbsensiStatusBulk':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) =>
           setAbsensiStatusBulk(session, body.siswa_ids, body.mapel, body.tanggal, body.status)
@@ -627,6 +633,94 @@ function setAbsensiStatusBulk(session, siswaIds, mapel, tanggal, status) {
 }
 
 /**
+ * Simpan absensi secara batch/massal untuk daftar siswa dengan status dan keterangan masing-masing.
+ * LockService hanya diambil sekali untuk seluruh batch demi kecepatan dan reliabilitas.
+ */
+function saveAbsensiBatch(session, items, mapel, tanggal) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { ok: false, error: 'Tidak ada data presensi yang dikirim' };
+  }
+  if (!mapel || !tanggal) {
+    return { ok: false, error: 'Mata pelajaran dan tanggal harus diisi' };
+  }
+
+  let cleanM = mapel ? String(mapel).trim() : 'TIK';
+  if (cleanM.toUpperCase().startsWith('TIK')) cleanM = 'TIK';
+  else if (cleanM.toUpperCase().startsWith('KKA')) cleanM = 'KKA';
+
+  const tanggalNorm = normalizeTanggal(tanggal);
+
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(25000);
+  } catch (e) {
+    return { ok: false, error: 'Server sibuk saat menyimpan batch presensi, silakan coba lagi.' };
+  }
+
+  try {
+    const sheet = getSheet(SHEET_ABSENSI);
+    const data = sheet.getDataRange().getValues();
+    
+    // Map untuk mencari baris absensi yang sudah ada (Key: siswaId_mapel_tanggal -> 0-indexed row in data)
+    const existingMap = {};
+    for (let r = 1; r < data.length; r++) {
+      const rowSId = String(data[r][1] || '').trim();
+      let rowM = String(data[r][4] || '').trim();
+      if (rowM.toUpperCase().startsWith('TIK')) rowM = 'TIK';
+      else if (rowM.toUpperCase().startsWith('KKA')) rowM = 'KKA';
+
+      const rowT = normalizeTanggal(data[r][5]);
+      if (rowSId && rowM && rowT) {
+        existingMap[`${rowSId}_${rowM}_${rowT}`] = r;
+      }
+    }
+
+    // Map untuk data siswa dari SHEET_SISWA
+    const siswaRows = getSheet(SHEET_SISWA).getDataRange().getValues();
+    const siswaMap = {};
+    for (let i = 1; i < siswaRows.length; i++) {
+      const [sId, , sNama, sKelas] = siswaRows[i];
+      if (sId) siswaMap[String(sId).trim()] = { nama: sNama, kelas: sKelas };
+    }
+
+    let updatedCount = 0;
+
+    items.forEach(item => {
+      const siswaId = String(item.siswa_id || item.id || '').trim();
+      if (!siswaId) return;
+
+      const status = item.status || 'Hadir';
+      const keterangan = item.keterangan || '';
+      const siswaData = siswaMap[siswaId] || { nama: item.nama || 'Siswa', kelas: item.kelas || '' };
+      const key = `${siswaId}_${cleanM}_${tanggalNorm}`;
+
+      if (existingMap.hasOwnProperty(key)) {
+        const rIndex = existingMap[key];
+        data[rIndex][7] = status;      // Kolom H (index 7) = status
+        data[rIndex][8] = keterangan;  // Kolom I (index 8) = keterangan
+      } else {
+        const newId = Utilities.getUuid();
+        data.push([newId, siswaId, siswaData.nama, siswaData.kelas, cleanM, tanggalNorm, '', status, keterangan]);
+        existingMap[key] = data.length - 1;
+      }
+      updatedCount++;
+    });
+
+    // Write updated array back to sheet in 1 single bulk call
+    if (data.length > 0) {
+      sheet.getRange(1, 1, data.length, 9).setValues(data);
+    }
+
+    logAction(session.user_id, session.nama, 'Save Absensi Batch', `Simpan batch ${updatedCount} siswa untuk ${cleanM} tanggal ${tanggalNorm}`);
+    return { ok: true, count: updatedCount, message: `Berhasil menyimpan presensi ${updatedCount} siswa` };
+  } catch (err) {
+    return { ok: false, error: 'Gagal menyimpan batch: ' + err.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
  * Rekap status kehadiran satu kelas untuk satu mapel+tanggal. Beda dengan
  * getLaporan() (yang cuma menampilkan baris yang SUDAH ada di Absensi),
  * fungsi ini menggabungkan seluruh roster Siswa dengan baris Absensi yang
@@ -634,7 +728,10 @@ function setAbsensiStatusBulk(session, siswaIds, mapel, tanggal, status) {
  * (status null) dan menandainya lewat setAbsensiStatus().
  */
 function getStatusHarian(kelas, mapel, tanggal) {
-  if (MAPEL_LIST.indexOf(mapel) === -1) return { ok: false, error: 'Mata pelajaran tidak valid' };
+  let cleanMapel = mapel ? String(mapel).trim() : 'TIK';
+  if (cleanMapel.startsWith('TIK')) cleanMapel = 'TIK';
+  else if (cleanMapel.startsWith('KKA')) cleanMapel = 'KKA';
+
   const tanggalNorm = normalizeTanggal(tanggal);
 
   const siswaRows = getSheet(SHEET_SISWA).getDataRange().getValues();
@@ -648,7 +745,8 @@ function getStatusHarian(kelas, mapel, tanggal) {
   const statusById = {};
   for (let i = 1; i < absensiRows.length; i++) {
     const [, siswaId, , , rowMapel, rowTanggal, waktu, status, keterangan] = absensiRows[i];
-    if (rowMapel === mapel && normalizeTanggal(rowTanggal) === tanggalNorm) {
+    const rMapel = String(rowMapel || '').trim();
+    if ((rMapel === cleanMapel || rMapel === mapel) && normalizeTanggal(rowTanggal) === tanggalNorm) {
       statusById[siswaId] = { status: status, waktu: waktu, keterangan: keterangan || '' };
     }
   }
@@ -664,20 +762,20 @@ function getStatusHarian(kelas, mapel, tanggal) {
     }))
     .sort((a, b) => String(a.nama).localeCompare(String(b.nama), 'id'));
 
-  return { ok: true, tanggal: tanggalNorm, mapel: mapel, data: data };
+  return { ok: true, tanggal: tanggalNorm, mapel: cleanMapel, data: data };
 }
 
 /**
- * Reset / Hapus seluruh data presensi untuk kelas, mapel, dan tanggal tertentu.
+ * Reset / Hapus seluruh data presensi untuk tanggal tertentu (seluruh kelas & mapel jika kelas/mapel tidak diisi).
  */
 function resetAbsensi(session, kelasFilter, mapelFilter, tanggalInput) {
-  if (!kelasFilter || !mapelFilter || !tanggalInput) {
-    return { ok: false, error: 'Kelas, mata pelajaran, dan tanggal wajib diisi' };
+  if (!tanggalInput) {
+    return { ok: false, error: 'Tanggal wajib diisi' };
   }
 
   const tanggalNorm = normalizeTanggal(tanggalInput);
-  const kelasNorm = String(kelasFilter).trim().toLowerCase();
-  const mapelNorm = String(mapelFilter).trim().toLowerCase();
+  const kelasNorm = kelasFilter ? String(kelasFilter).trim().toLowerCase() : null;
+  const mapelNorm = mapelFilter ? String(mapelFilter).trim().toLowerCase() : null;
 
   const sheet = getSheet(SHEET_ABSENSI);
   const rows = sheet.getDataRange().getValues();
@@ -689,14 +787,26 @@ function resetAbsensi(session, kelasFilter, mapelFilter, tanggalInput) {
     const rKelas = String(rowKelas || '').trim().toLowerCase();
     const rMapel = String(rowMapel || '').trim().toLowerCase();
 
-    if (rTanggal === tanggalNorm && rMapel === mapelNorm && (rKelas === kelasNorm || !rowKelas)) {
+    const matchTanggal = (rTanggal === tanggalNorm);
+    const matchKelas = !kelasNorm || (rKelas === kelasNorm || !rowKelas);
+    const matchMapel = !mapelNorm || (rMapel === mapelNorm);
+
+    if (matchTanggal && matchKelas && matchMapel) {
       sheet.deleteRow(i + 1);
       deletedCount++;
     }
   }
 
-  logAction(session, 'RESET_ABSENSI', 'Reset presensi ' + mapelFilter + ' kelas ' + kelasFilter + ' tanggal ' + tanggalNorm + ' (' + deletedCount + ' baris)');
-  return { ok: true, message: 'Presensi ' + mapelFilter + ' kelas ' + kelasFilter + ' tanggal ' + tanggalNorm + ' berhasil direset (' + deletedCount + ' data terhapus).', count: deletedCount };
+  const scopeInfo = (kelasFilter && mapelFilter) 
+    ? mapelFilter + ' kelas ' + kelasFilter 
+    : 'SELURUH kelas & mata pelajaran';
+
+  logAction(session, 'RESET_ABSENSI', 'Reset presensi ' + scopeInfo + ' tanggal ' + tanggalNorm + ' (' + deletedCount + ' baris)');
+  return { 
+    ok: true, 
+    message: 'Seluruh data presensi pada tanggal ' + tanggalNorm + ' berhasil direset (' + deletedCount + ' data terhapus).', 
+    count: deletedCount 
+  };
 }
 
 // ============ CRUD SISWA (guru) ============
