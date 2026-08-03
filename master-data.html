@@ -374,7 +374,19 @@
 </div>
 <!-- Pagination Footer -->
 <div class="bg-surface-container-low px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant">
-<p class="font-label-md text-label-md text-on-surface-variant" id="siswa-count-info">Menampilkan 0 Siswa</p>
+  <div class="flex flex-wrap items-center gap-3">
+    <p class="font-label-md text-label-md text-on-surface-variant" id="siswa-count-info">Menampilkan 0 Siswa</p>
+    <div class="flex items-center gap-1.5 text-xs text-on-surface-variant bg-surface-container-lowest border border-outline-variant/80 rounded-xl px-3 py-1.5">
+      <span>Tampilkan:</span>
+      <select id="siswa-page-size" onchange="changePageSize(this.value)" class="bg-transparent text-xs font-bold text-on-surface focus:outline-none cursor-pointer">
+        <option value="50" selected>50 per halaman</option>
+        <option value="25">25 per halaman</option>
+        <option value="10">10 per halaman</option>
+        <option value="100">100 per halaman</option>
+      </select>
+    </div>
+  </div>
+  <div id="siswa-pagination-controls" class="flex items-center gap-1.5 flex-wrap justify-center sm:justify-end"></div>
 </div>
 </section>
 </div>
@@ -565,32 +577,132 @@
         if(kelasSelectM) kelasSelectM.innerHTML = options;
     }
 
+    let currentFilteredSiswa = [];
+    let currentPage = 1;
+    let pageSize = 50;
+
     function filterSiswaTable() {
         const search = document.getElementById('search-siswa-desktop').value.toLowerCase().trim();
         const kelas = document.getElementById('filter-kelas-desktop').value;
         const status = document.getElementById('filter-status-desktop').value;
 
-        const filtered = allSiswa.filter(s => {
+        currentFilteredSiswa = allSiswa.filter(s => {
             const matchSearch = !search || String(s.nama).toLowerCase().includes(search) || String(s.nis).toLowerCase().includes(search) || String(s.email).toLowerCase().includes(search);
             const matchKelas = !kelas || s.kelas === kelas;
             const matchStatus = !status || String(s.status_aktif).toLowerCase() === status.toLowerCase();
             return matchSearch && matchKelas && matchStatus;
         });
 
-        const summaryEl = document.getElementById('master-siswa-count-summary');
-        if (summaryEl) summaryEl.textContent = `Menampilkan ${filtered.length} dari ${allSiswa.length} Siswa`;
-
-        renderSiswaTable(filtered);
+        currentPage = 1;
+        renderPaginatedSiswaTable();
     }
 
-    
+    function renderPaginatedSiswaTable() {
+        const totalItems = currentFilteredSiswa.length;
+        const totalPages = Math.ceil(totalItems / pageSize) || 1;
+
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = Math.min(startIdx + pageSize, totalItems);
+        const pageData = currentFilteredSiswa.slice(startIdx, endIdx);
+
+        const summaryEl = document.getElementById('master-siswa-count-summary');
+        if (summaryEl) summaryEl.textContent = `Menampilkan ${totalItems} dari ${allSiswa.length} Siswa`;
+
+        const c1 = document.getElementById('siswa-count-info');
+        if (c1) {
+            if (totalItems === 0) {
+                c1.textContent = `Menampilkan 0 Siswa`;
+            } else {
+                c1.textContent = `Menampilkan ${startIdx + 1}-${endIdx} dari ${totalItems} Siswa`;
+            }
+        }
+
+        renderSiswaTable(pageData);
+        renderPaginationControls(totalPages);
+    }
+
+    function renderPaginationControls(totalPages) {
+        const container = document.getElementById('siswa-pagination-controls');
+        if (!container) return;
+
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        // Previous button
+        const prevDisabled = currentPage === 1;
+        html += `
+            <button onclick="goToPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''} class="h-8 px-3 rounded-lg text-xs font-medium border border-outline-variant text-on-surface hover:bg-surface-container ${prevDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} transition-all duration-150 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+                <span class="hidden sm:inline">Sebelumnya</span>
+            </button>
+        `;
+
+        // Page numbers
+        const maxButtons = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+        if (endPage - startPage + 1 < maxButtons) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+
+        if (startPage > 1) {
+            html += `<button onclick="goToPage(1)" class="w-8 h-8 rounded-lg text-xs font-medium border border-outline-variant hover:bg-surface-container transition-all duration-150 cursor-pointer text-on-surface">1</button>`;
+            if (startPage > 2) {
+                html += `<span class="px-1 text-xs text-on-surface-variant">...</span>`;
+            }
+        }
+
+        for (let p = startPage; p <= endPage; p++) {
+            const isActive = p === currentPage;
+            if (isActive) {
+                html += `<button class="w-8 h-8 rounded-lg text-xs font-bold bg-primary text-on-primary shadow-xs">${p}</button>`;
+            } else {
+                html += `<button onclick="goToPage(${p})" class="w-8 h-8 rounded-lg text-xs font-medium border border-outline-variant hover:bg-surface-container transition-all duration-150 cursor-pointer text-on-surface">${p}</button>`;
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += `<span class="px-1 text-xs text-on-surface-variant">...</span>`;
+            }
+            html += `<button onclick="goToPage(${totalPages})" class="w-8 h-8 rounded-lg text-xs font-medium border border-outline-variant hover:bg-surface-container transition-all duration-150 cursor-pointer text-on-surface">${totalPages}</button>`;
+        }
+
+        // Next button
+        const nextDisabled = currentPage === totalPages;
+        html += `
+            <button onclick="goToPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''} class="h-8 px-3 rounded-lg text-xs font-medium border border-outline-variant text-on-surface hover:bg-surface-container ${nextDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'} transition-all duration-150 flex items-center gap-1">
+                <span class="hidden sm:inline">Selanjutnya</span>
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        const totalPages = Math.ceil(currentFilteredSiswa.length / pageSize) || 1;
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderPaginatedSiswaTable();
+    }
+
+    function changePageSize(val) {
+        pageSize = parseInt(val) || 50;
+        currentPage = 1;
+        renderPaginatedSiswaTable();
+    }
+
     function renderSiswaTable(data) {
         const tbody = document.getElementById('master-siswa-tbody');
         const mobileList = document.getElementById('master-siswa-mobile-list');
-        
-        const countText = `Menampilkan ${data.length} dari ${allSiswa.length} Siswa`;
-        const c1 = document.getElementById('siswa-count-info');
-        if(c1) c1.textContent = countText;
         
         const cbAll = document.getElementById('checkbox-all');
         if(cbAll) cbAll.checked = false;
@@ -600,20 +712,16 @@
             if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada siswa yang cocok dengan filter.</td></tr>`;
             if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Tidak ada data siswa</div>`;
             
-            // update mobile sticky stats to 0
             updateMobileStats(0, 0, 0);
             return;
         }
 
         let htmlDesktop = '';
         let htmlMobile = '';
-        let aktifCount = 0;
-        let nonaktifCount = 0;
         
         data.forEach(s => {
             const initials = s.nama ? s.nama.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'SI';
             const isAktif = String(s.status_aktif).toLowerCase() === 'aktif';
-            if(isAktif) aktifCount++; else nonaktifCount++;
             
             const badgeD = isAktif 
                 ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Aktif</span>`
@@ -626,7 +734,7 @@
             const avatarClassM = isAktif ? "bg-secondary-container text-primary" : "bg-surface-variant text-outline";
             const nameClassM = isAktif ? "text-on-surface" : "text-on-surface opacity-70";
             
-            const safeNama = s.nama ? s.nama.replace(/'/g, "\'") : '';
+            const safeNama = s.nama ? s.nama.replace(/'/g, "\\'") : '';
 
             htmlDesktop += `
                 <tr class="hover:bg-surface-container-high/30 transition-colors">
@@ -690,7 +798,9 @@
         if(tbody) tbody.innerHTML = htmlDesktop;
         if(mobileList) mobileList.innerHTML = htmlMobile;
         
-        updateMobileStats(data.length, aktifCount, nonaktifCount);
+        let totalAktif = currentFilteredSiswa.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+        let totalNonaktif = currentFilteredSiswa.length - totalAktif;
+        updateMobileStats(currentFilteredSiswa.length, totalAktif, totalNonaktif);
     }
     
     function updateMobileStats(total, aktif, nonaktif) {
