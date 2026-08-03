@@ -187,7 +187,7 @@ function doPost(e) {
         break;
       case 'getRekapBulanan':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], () =>
-          getRekapBulanan(body.bulan, body.tahun, body.kelas)
+          getRekapBulanan(body.bulan, body.tahun, body.kelas, body.tanggal)
         );
         break;
       case 'getRiwayatSiswa':
@@ -1029,7 +1029,7 @@ function getOverview(tanggalMulai, tanggalSelesai) {
  *            total_hadir, total_hari, persen_total }]
  * }
  */
-function getRekapBulanan(bulan, tahun, kelasFilter) {
+function getRekapBulanan(bulan, tahun, kelasFilter, tanggalFilter) {
   bulan = parseInt(bulan, 10);
   tahun = parseInt(tahun, 10);
   if (!bulan || bulan < 1 || bulan > 12 || !tahun) {
@@ -1039,6 +1039,21 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
   // Prefix tanggal untuk filter bulan: "yyyy-MM"
   const bulanStr = String(bulan).padStart(2, '0');
   const prefix = tahun + '-' + bulanStr;
+
+  let exactTanggal = null;
+  if (tanggalFilter) {
+    const tStr = String(tanggalFilter).trim();
+    if (tStr) {
+      if (tStr.indexOf('-') !== -1) {
+        exactTanggal = normalizeTanggal(tStr);
+      } else {
+        const tNum = parseInt(tStr, 10);
+        if (tNum >= 1 && tNum <= 31) {
+          exactTanggal = prefix + '-' + String(tNum).padStart(2, '0');
+        }
+      }
+    }
+  }
 
   // Baca siswa
   const siswaRows = getSheet(SHEET_SISWA).getDataRange().getValues();
@@ -1065,6 +1080,7 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
     const sid = String(siswaId || '').trim();
     const tanggal = normalizeTanggal(tanggalRaw);
     if (!tanggal || !tanggal.startsWith(prefix)) continue;
+    if (exactTanggal && tanggal !== exactTanggal) continue;
 
     // Filter siswa berbasis siswaMap (sudah mencakup filter kelas)
     if (!siswaMap[sid]) continue;

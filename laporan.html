@@ -76,7 +76,7 @@
             <span class="material-symbols-outlined">calendar_today</span>
             <span class="font-title-md text-title-md">Periode</span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-3 gap-2">
             <select id="filter-bulan-mobile" onchange="syncFilterMobile()" class="bg-surface border-outline-variant rounded-lg p-2 text-label-md font-label-md focus:ring-primary focus:border-primary">
                 <option value="1">Januari</option>
                 <option value="2">Februari</option>
@@ -95,6 +95,9 @@
                 <option value="2024">2024</option>
                 <option value="2025">2025</option>
                 <option value="2026">2026</option>
+            </select>
+            <select id="filter-tanggal-mobile" onchange="syncFilterMobile()" class="bg-surface border-outline-variant rounded-lg p-2 text-label-md font-label-md focus:ring-primary focus:border-primary">
+                <option value="">Semua Tgl</option>
             </select>
         </div>
     </div>
@@ -344,7 +347,7 @@
 <span class="material-symbols-outlined">filter_alt</span>
 <h4 class="font-title-md text-title-md">Filter Laporan</h4>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bulan</label>
 <div class="relative">
@@ -371,6 +374,14 @@
 <option value="2024">2024</option>
 <option value="2025">2025</option>
 <option value="2026">2026</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tanggal</label>
+<div class="relative">
+<select id="filter-tanggal-desktop" onchange="syncFilterDesktop()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<option value="">Semua Tanggal</option>
 </select>
 </div>
 </div>
@@ -464,8 +475,7 @@
     </div>
 
 <script src="js/config.js"></script>
-<script>
-    let reportData = [];
+<script>    let reportData = [];
     const NAMA_BULAN = [
         "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
         "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -491,6 +501,7 @@
         if (yDesktop) yDesktop.value = y;
         if (yMobile) yMobile.value = y;
 
+        initTanggalOptions(m, y);
         await initKelasOptionsLaporan();
         loadLaporanData();
     });
@@ -507,6 +518,33 @@
         const yMobile = document.getElementById('filter-tahun-mobile');
         if (yDesktop) yDesktop.innerHTML = options;
         if (yMobile) yMobile.innerHTML = options;
+    }
+
+    function initTanggalOptions(bulan, tahun) {
+        const tglDesktop = document.getElementById('filter-tanggal-desktop');
+        const tglMobile = document.getElementById('filter-tanggal-mobile');
+        
+        const selectedVal = (tglDesktop && tglDesktop.value) || (tglMobile && tglMobile.value) || "";
+
+        const b = parseInt(bulan, 10) || (new Date().getMonth() + 1);
+        const y = parseInt(tahun, 10) || new Date().getFullYear();
+
+        const daysInMonth = new Date(y, b, 0).getDate();
+        let optionsDesktop = `<option value="">Semua Tanggal</option>`;
+        let optionsMobile = `<option value="">Semua Tgl</option>`;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            optionsDesktop += `<option value="${d}">Tanggal ${d}</option>`;
+            optionsMobile += `<option value="${d}">${d}</option>`;
+        }
+
+        if (tglDesktop) tglDesktop.innerHTML = optionsDesktop;
+        if (tglMobile) tglMobile.innerHTML = optionsMobile;
+
+        if (selectedVal && parseInt(selectedVal, 10) <= daysInMonth) {
+            if (tglDesktop) tglDesktop.value = selectedVal;
+            if (tglMobile) tglMobile.value = selectedVal;
+        }
     }
 
     async function initKelasOptionsLaporan() {
@@ -554,14 +592,18 @@
     function syncFilterMobile() {
         const b = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '';
         const t = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : '';
+        const tgl = document.getElementById('filter-tanggal-mobile') ? document.getElementById('filter-tanggal-mobile').value : '';
         const k = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
         
         const bD = document.getElementById('filter-bulan-desktop');
         const tD = document.getElementById('filter-tahun-desktop');
+        const tglD = document.getElementById('filter-tanggal-desktop');
         const kD = document.getElementById('filter-kelas-desktop');
         
         if (bD && b) bD.value = b;
         if (tD && t) tD.value = t;
+        initTanggalOptions(b, t);
+        if (tglD && tgl !== undefined) tglD.value = tgl;
         if (kD && k !== undefined) kD.value = k;
         
         loadLaporanData();
@@ -570,14 +612,18 @@
     function syncFilterDesktop() {
         const b = document.getElementById('filter-bulan-desktop') ? document.getElementById('filter-bulan-desktop').value : '';
         const t = document.getElementById('filter-tahun-desktop') ? document.getElementById('filter-tahun-desktop').value : '';
+        const tgl = document.getElementById('filter-tanggal-desktop') ? document.getElementById('filter-tanggal-desktop').value : '';
         const k = document.getElementById('filter-kelas-desktop') ? document.getElementById('filter-kelas-desktop').value : '';
         
         const bM = document.getElementById('filter-bulan-mobile');
         const tM = document.getElementById('filter-tahun-mobile');
+        const tglM = document.getElementById('filter-tanggal-mobile');
         const kM = document.getElementById('filter-kelas-mobile');
         
         if (bM && b) bM.value = b;
         if (tM && t) tM.value = t;
+        initTanggalOptions(b, t);
+        if (tglM && tgl !== undefined) tglM.value = tgl;
         if (kM && k !== undefined) kM.value = k;
         
         loadLaporanData();
@@ -586,17 +632,23 @@
     async function loadLaporanData() {
         const bDesktop = document.getElementById('filter-bulan-desktop');
         const tDesktop = document.getElementById('filter-tahun-desktop');
+        const tglDesktop = document.getElementById('filter-tanggal-desktop');
         const kDesktop = document.getElementById('filter-kelas-desktop');
 
         const bulan = bDesktop ? bDesktop.value : String(new Date().getMonth() + 1);
         const tahun = tDesktop ? tDesktop.value : String(new Date().getFullYear());
+        const tanggal = tglDesktop ? tglDesktop.value : '';
         const kelas = kDesktop ? kDesktop.value : '';
 
         // Update Periode Text Header
         const bulanName = NAMA_BULAN[parseInt(bulan, 10)] || '';
         const periodeTextElem = document.getElementById('periode-text');
         if (periodeTextElem) {
-            periodeTextElem.textContent = `Periode: ${bulanName} ${tahun}` + (kelas ? ` (Kelas: ${kelas})` : ` (Semua Kelas)`);
+            let periodeLabel = `Periode: ${bulanName} ${tahun}`;
+            if (tanggal) {
+                periodeLabel = `Periode: Tanggal ${tanggal} ${bulanName} ${tahun}`;
+            }
+            periodeTextElem.textContent = periodeLabel + (kelas ? ` (Kelas: ${kelas})` : ` (Semua Kelas)`);
         }
 
         const tbody = document.getElementById('laporan-tbody');
@@ -605,7 +657,7 @@
         }
 
         try {
-            const res = await apiPost('getRekapBulanan', { token: getToken(), bulan, tahun, kelas });
+            const res = await apiPost('getRekapBulanan', { token: getToken(), bulan, tahun, kelas, tanggal });
             if (res.ok && res.data) {
                 reportData = res.data;
                 const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
@@ -618,14 +670,14 @@
                     updateRingkasanUI(res.ringkasan.rata_rata, res.ringkasan.total_siswa);
                 }
             } else {
-                applyMockReportFallback(kelas);
+                applyMockReportFallback(kelas, tanggal);
             }
         } catch (e) {
-            applyMockReportFallback(kelas);
+            applyMockReportFallback(kelas, tanggal);
         }
     }
 
-    function applyMockReportFallback(kelas) {
+    function applyMockReportFallback(kelas, tanggal) {
         const mockReport = [
             { id: "S001", nama: "Ahmad Fauzi", kelas: "XII IPA 1", total_hadir: 20, total_sakit: 1, total_izin: 0, total_alfa: 0, persen_total: 95 },
             { id: "S002", nama: "Budi Santoso", kelas: "XII IPA 1", total_hadir: 20, total_sakit: 0, total_izin: 0, total_alfa: 0, persen_total: 100 },
@@ -804,14 +856,16 @@
 
         const bDesktop = document.getElementById('filter-bulan-desktop');
         const tDesktop = document.getElementById('filter-tahun-desktop');
+        const tglDesktop = document.getElementById('filter-tanggal-desktop');
         const bVal = bDesktop ? bDesktop.value : '';
         const tVal = tDesktop ? tDesktop.value : '';
+        const tglVal = tglDesktop && tglDesktop.value ? `Tgl_${tglDesktop.value}_` : '';
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `Rekap_Absensi_${bVal}_${tVal}.csv`);
+        link.setAttribute('download', `Rekap_Absensi_${tglVal}${bVal}_${tVal}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -830,6 +884,8 @@
         const bulanSelect = document.getElementById('filter-bulan-desktop');
         const bulanText = bulanSelect ? bulanSelect.options[bulanSelect.selectedIndex].text : '';
         const tahun = document.getElementById('filter-tahun-desktop').value;
+        const tglSelect = document.getElementById('filter-tanggal-desktop');
+        const tglText = tglSelect && tglSelect.value ? `Tanggal ${tglSelect.value} ` : '';
         const kelas = document.getElementById('filter-kelas-desktop').value || 'Semua Kelas';
         const avgPersen = document.getElementById('avg-persen-desktop') ? document.getElementById('avg-persen-desktop').textContent : '0%';
         const todayDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -873,7 +929,7 @@
             <html lang="id">
             <head>
                 <meta charset="utf-8">
-                <title>Laporan_Rekap_Presensi_${bulanText}_${tahun}</title>
+                <title>Laporan_Rekap_Presensi_${tglText.replace(/\s+/g, '_')}${bulanText}_${tahun}</title>
                 <style>
                     body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #0f172a; padding: 20px; line-height: 1.5; }
                     .header { text-align: center; border-bottom: 3px double #003d9b; padding-bottom: 12px; margin-bottom: 20px; }
@@ -900,7 +956,7 @@
                 </div>
                 <div class="meta-grid">
                     <div>
-                        <div class="meta-item"><strong>Periode:</strong> ${bulanText} ${tahun}</div>
+                        <div class="meta-item"><strong>Periode:</strong> ${tglText}${bulanText} ${tahun}</div>
                         <div class="meta-item"><strong>Kelas:</strong> ${kelas}</div>
                     </div>
                     <div style="text-align: right;">
@@ -952,17 +1008,21 @@
     }
 
     function syncFilterMobile() {
-        const b = document.getElementById('filter-bulan-mobile').value;
-        const t = document.getElementById('filter-tahun-mobile').value;
-        const k = document.getElementById('filter-kelas-mobile').value;
+        const b = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '';
+        const t = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : '';
+        const tgl = document.getElementById('filter-tanggal-mobile') ? document.getElementById('filter-tanggal-mobile').value : '';
+        const k = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
         
         const bD = document.getElementById('filter-bulan-desktop');
         const tD = document.getElementById('filter-tahun-desktop');
+        const tglD = document.getElementById('filter-tanggal-desktop');
         const kD = document.getElementById('filter-kelas-desktop');
         
-        if(bD) bD.value = b;
-        if(tD) tD.value = t;
-        if(kD) kD.value = k;
+        if(bD && b) bD.value = b;
+        if(tD && t) tD.value = t;
+        initTanggalOptions(b, t);
+        if(tglD && tgl !== undefined) tglD.value = tgl;
+        if(kD && k !== undefined) kD.value = k;
         
         loadLaporanData();
     }
