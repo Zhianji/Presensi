@@ -179,7 +179,7 @@
 <section class="mb-8">
 <div class="flex justify-between items-center mb-4">
 <h2 class="font-title-lg text-title-lg text-on-surface">Peringatan Absensi</h2>
-<button class="text-primary font-label-md hover:underline">Lihat Semua</button>
+<button onclick="window.location.href='input-absensi.html'" class="text-primary font-label-md hover:underline">Lihat Semua</button>
 </div>
 <div class="space-y-3">
 <!-- Alert Card 1 -->
@@ -530,7 +530,7 @@
 <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
 <div class="px-gutter py-4 bg-surface-container/50 border-b border-outline-variant flex justify-between items-center">
 <h3 class="font-title-md text-title-md text-on-surface">Data Absensi Siswa Terbaru</h3>
-<a class="text-primary font-label-md text-label-md hover:underline" href="#">Lihat Semua</a>
+<a id="btn-lihat-semua-recent" class="text-primary font-label-md text-label-md hover:underline cursor-pointer" href="javascript:void(0)" onclick="toggleLihatSemuaRecent(event)">Lihat Semua</a>
 </div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
@@ -562,6 +562,9 @@
 
 <script src="js/config.js"></script>
 <script>
+    let allDashboardAbsensi = [];
+    let isShowingAllRecent = false;
+
     document.addEventListener("DOMContentLoaded", async () => {
         const check = await guardPage(['admin', 'guru', 'kepsek']);
         if (!check) return;
@@ -577,10 +580,9 @@
             const res = await apiPost('getLaporan', { token: getToken() });
             
             let hadir = 0, sakit = 0, izin = 0, alfa = 0;
-            const tbody = document.getElementById('recent-absensi-tbody');
-            const mobileContainer = document.getElementById('recent-absensi-mobile');
 
             if (res.ok && res.data && res.data.length > 0) {
+                allDashboardAbsensi = res.data;
                 // Calculate today's stats
                 res.data.forEach(item => {
                     if (item.tanggal === today) {
@@ -592,74 +594,10 @@
                     }
                 });
 
-                // Desktop Table HTML (top 10 recent items)
-                let rowsHtml = '';
-                const recentItems = res.data.slice(0, 10);
-                recentItems.forEach(item => {
-                    const st = String(item.status).toLowerCase();
-                    let badgeClass = 'bg-green-100 text-green-700';
-                    if (st === 'sakit') badgeClass = 'bg-blue-100 text-blue-700';
-                    else if (st === 'izin') badgeClass = 'bg-yellow-100 text-yellow-700';
-                    else if (st === 'alfa') badgeClass = 'bg-red-100 text-red-700';
-
-                    rowsHtml += `
-                        <tr class="hover:bg-surface-container-low transition-colors">
-                            <td class="px-gutter py-4 font-body-md text-on-surface">${item.nama_siswa || '-'}</td>
-                            <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.kelas || '-'}</td>
-                            <td class="px-gutter py-4">
-                                <span class="px-3 py-1 ${badgeClass} rounded-full font-label-sm text-label-sm">${item.status}</span>
-                            </td>
-                            <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.waktu || '-'} WIB</td>
-                            <td class="px-gutter py-4">
-                                <a href="input-absensi.html" class="text-primary hover:text-on-primary-fixed-variant transition-colors">
-                                    <span class="material-symbols-outlined">edit</span>
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
-                if (tbody) tbody.innerHTML = rowsHtml;
-
-                // Mobile List HTML (top 10 recent items)
-                let mobileHtml = '';
-                recentItems.forEach(item => {
-                    const st = String(item.status).toLowerCase();
-                    let icon = 'check_circle';
-                    let iconBg = 'bg-green-100 text-green-700';
-                    if (st === 'sakit') { icon = 'medical_services'; iconBg = 'bg-blue-100 text-blue-700'; }
-                    else if (st === 'izin') { icon = 'event_note'; iconBg = 'bg-yellow-100 text-yellow-700'; }
-                    else if (st === 'alfa') { icon = 'cancel'; iconBg = 'bg-red-100 text-red-700'; }
-
-                    mobileHtml += `
-                        <div class="p-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full ${iconBg} flex items-center justify-center font-bold">
-                                    <span class="material-symbols-outlined text-sm">${icon}</span>
-                                </div>
-                                <div>
-                                    <p class="font-body-md font-semibold text-on-surface">${item.nama_siswa || '-'}</p>
-                                    <p class="font-label-md text-on-surface-variant text-xs">${item.kelas || '-'} • ${item.waktu || ''} WIB</p>
-                                </div>
-                            </div>
-                            <span class="px-2.5 py-1 ${iconBg} rounded-full font-label-sm text-xs capitalize">${item.status}</span>
-                        </div>
-                    `;
-                });
-                if (mobileContainer) mobileContainer.innerHTML = mobileHtml;
-
+                renderRecentAbsensiList();
             } else {
-                if (tbody) {
-                    tbody.innerHTML = `
-                        <tr class="hover:bg-surface-container-low transition-colors">
-                            <td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Belum ada data presensi. Silakan lakukan input absen.</td>
-                        </tr>
-                    `;
-                }
-                if (mobileContainer) {
-                    mobileContainer.innerHTML = `
-                        <div class="p-4 text-center text-on-surface-variant text-sm">Belum ada data presensi. Silakan lakukan input absen.</div>
-                    `;
-                }
+                allDashboardAbsensi = [];
+                renderRecentAbsensiList();
             }
 
             // Update stats counter for both views
@@ -677,5 +615,98 @@
         } catch (err) {
             console.error('Error loading dashboard data:', err);
         }
+    }
+
+    function toggleLihatSemuaRecent(event) {
+        if (event) event.preventDefault();
+        isShowingAllRecent = !isShowingAllRecent;
+        renderRecentAbsensiList();
+    }
+
+    function renderRecentAbsensiList() {
+        const tbody = document.getElementById('recent-absensi-tbody');
+        const mobileContainer = document.getElementById('recent-absensi-mobile');
+        const btnLink = document.getElementById('btn-lihat-semua-recent');
+
+        if (!allDashboardAbsensi || allDashboardAbsensi.length === 0) {
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                        <td colspan="5" class="px-gutter py-6 text-center text-on-surface-variant font-body-md">Belum ada data presensi. Silakan lakukan input absen.</td>
+                    </tr>
+                `;
+            }
+            if (mobileContainer) {
+                mobileContainer.innerHTML = `
+                    <div class="p-4 text-center text-on-surface-variant text-sm">Belum ada data presensi. Silakan lakukan input absen.</div>
+                `;
+            }
+            if (btnLink) btnLink.textContent = 'Lihat Semua';
+            return;
+        }
+
+        const displayItems = isShowingAllRecent ? allDashboardAbsensi : allDashboardAbsensi.slice(0, 10);
+
+        if (btnLink) {
+            if (isShowingAllRecent) {
+                btnLink.textContent = 'Tampilkan 10 Terbaru';
+            } else {
+                btnLink.textContent = `Lihat Semua (${allDashboardAbsensi.length})`;
+            }
+        }
+
+        // Desktop Table HTML
+        let rowsHtml = '';
+        displayItems.forEach(item => {
+            const st = String(item.status || '').toLowerCase();
+            let badgeClass = 'bg-green-100 text-green-700';
+            if (st === 'sakit') badgeClass = 'bg-blue-100 text-blue-700';
+            else if (st === 'izin') badgeClass = 'bg-yellow-100 text-yellow-700';
+            else if (st === 'alfa') badgeClass = 'bg-red-100 text-red-700';
+
+            rowsHtml += `
+                <tr class="hover:bg-surface-container-low transition-colors">
+                    <td class="px-gutter py-4 font-body-md text-on-surface">${item.nama_siswa || '-'}</td>
+                    <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.kelas || '-'}</td>
+                    <td class="px-gutter py-4">
+                        <span class="px-3 py-1 ${badgeClass} rounded-full font-label-sm text-label-sm">${item.status || '-'}</span>
+                    </td>
+                    <td class="px-gutter py-4 font-body-md text-on-surface-variant">${item.waktu || '-'} WIB</td>
+                    <td class="px-gutter py-4">
+                        <a href="input-absensi.html" class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+                            <span class="material-symbols-outlined">edit</span>
+                        </a>
+                    </td>
+                </tr>
+            `;
+        });
+        if (tbody) tbody.innerHTML = rowsHtml;
+
+        // Mobile List HTML
+        let mobileHtml = '';
+        displayItems.forEach(item => {
+            const st = String(item.status || '').toLowerCase();
+            let icon = 'check_circle';
+            let iconBg = 'bg-green-100 text-green-700';
+            if (st === 'sakit') { icon = 'medical_services'; iconBg = 'bg-blue-100 text-blue-700'; }
+            else if (st === 'izin') { icon = 'event_note'; iconBg = 'bg-yellow-100 text-yellow-700'; }
+            else if (st === 'alfa') { icon = 'cancel'; iconBg = 'bg-red-100 text-red-700'; }
+
+            mobileHtml += `
+                <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full ${iconBg} flex items-center justify-center font-bold">
+                            <span class="material-symbols-outlined text-sm">${icon}</span>
+                        </div>
+                        <div>
+                            <p class="font-body-md font-semibold text-on-surface">${item.nama_siswa || '-'}</p>
+                            <p class="font-label-md text-on-surface-variant text-xs">${item.kelas || '-'} • ${item.waktu || ''} WIB</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 ${iconBg} rounded-full font-label-sm text-xs capitalize">${item.status || '-'}</span>
+                </div>
+            `;
+        });
+        if (mobileContainer) mobileContainer.innerHTML = mobileHtml;
     }
 </script></body></html>

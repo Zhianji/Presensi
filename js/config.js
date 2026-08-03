@@ -1,5 +1,5 @@
 // ==== KONFIGURASI APLIKASI ====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxcAfcE40nJq9yVNGKSJzV5t7jwX9jKDYlO1yxcgv3-KcecUWggz9iJgYdD35RjmAE8A/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxm3Z6Iq2yKixp5jLsK6TY16sSCxtvOJn8GcCxqUvMWcUCEmquN-Gy9yiYgbHAVMl9Q7w/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
 const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
