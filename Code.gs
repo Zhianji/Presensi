@@ -362,11 +362,40 @@ function requireRole(token, allowedRoles, fn) {
  * dengan string via ===/</> selalu bernilai salah (silent bug).
  */
 function normalizeTanggal(value) {
+  if (!value) return '';
   if (value instanceof Date) {
     const tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
     return Utilities.formatDate(value, tz, 'yyyy-MM-dd');
   }
-  return String(value || '').trim();
+  let str = String(value).trim();
+  if (str.indexOf('T') !== -1) {
+    str = str.split('T')[0];
+  }
+  if (str.indexOf(' ') !== -1) {
+    str = str.split(' ')[0];
+  }
+  if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(str)) {
+    const parts = str.split(/[\/\-]/);
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    return year + '-' + month + '-' + day;
+  }
+  if (/^\d{4}[\/]\d{1,2}[\/]\d{1,2}$/.test(str)) {
+    const parts = str.split('/');
+    const year = parts[0];
+    const month = parts[1].padStart(2, '0');
+    const day = parts[2].padStart(2, '0');
+    return year + '-' + month + '-' + day;
+  }
+  if (/^\d{4}\-\d{1,2}\-\d{1,2}$/.test(str)) {
+    const parts = str.split('-');
+    const year = parts[0];
+    const month = parts[1].padStart(2, '0');
+    const day = parts[2].padStart(2, '0');
+    return year + '-' + month + '-' + day;
+  }
+  return str;
 }
 
 // ============ CHECK-IN SISWA ============
@@ -1014,56 +1043,61 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
   // Baca siswa
   const siswaRows = getSheet(SHEET_SISWA).getDataRange().getValues();
   const siswaMap = {}; // id -> {nama, kelas, nis}
+  const kelasFilterNorm = kelasFilter ? String(kelasFilter).trim().toLowerCase() : null;
+
   for (let i = 1; i < siswaRows.length; i++) {
     const [id, nis, nama, kelas] = siswaRows[i];
-    if (kelasFilter && kelas !== kelasFilter) continue;
-    siswaMap[id] = { nama: nama, kelas: kelas, nis: nis };
+    if (!id && !nama) continue;
+    const sid = String(id || '').trim();
+    const skelas = String(kelas || '').trim();
+    if (kelasFilterNorm && skelas.toLowerCase() !== kelasFilterNorm) continue;
+    siswaMap[sid] = { nama: String(nama || '').trim(), kelas: skelas, nis: String(nis || '').trim() };
   }
 
   // Baca absensi bulan ini
   const absensiRows = getSheet(SHEET_ABSENSI).getDataRange().getValues();
-  // Struktur: siswaId -> mapel -> { hadir, izin, sakit, alfa }
-  const rekapData = {};
-  // Track tanggal unik per mapel (untuk hitung hari efektif)
+  const rekapData = {}; // siswaId -> mapel -> { hadir, izin, sakit, alfa }
+  const mapelSet = new Set(MAPEL_LIST); // default MAPEL_LIST + dynamic mapels
   const tanggalUnikPerMapel = {};
-  MAPEL_LIST.forEach(function(m) { tanggalUnikPerMapel[m] = {}; });
 
   for (let i = 1; i < absensiRows.length; i++) {
-    const [, siswaId, , kelas, mapel, tanggalRaw, , status] = absensiRows[i];
+    const [, siswaId, , , mapelRaw, tanggalRaw, , status] = absensiRows[i];
+    const sid = String(siswaId || '').trim();
     const tanggal = normalizeTanggal(tanggalRaw);
-    if (!tanggal.startsWith(prefix)) continue;
-    if (kelasFilter && kelas !== kelasFilter) continue;
+    if (!tanggal || !tanggal.startsWith(prefix)) continue;
 
-    // Track tanggal unik per mapel
-    if (tanggalUnikPerMapel[mapel]) {
-      tanggalUnikPerMapel[mapel][tanggal] = true;
+    // Filter siswa berbasis siswaMap (sudah mencakup filter kelas)
+    if (!siswaMap[sid]) continue;
+
+    const mapel = String(mapelRaw || '').trim() || 'Umum';
+    mapelSet.add(mapel);
+
+    if (!tanggalUnikPerMapel[mapel]) {
+      tanggalUnikPerMapel[mapel] = {};
+    }
+    tanggalUnikPerMapel[mapel][tanggal] = true;
+
+    if (!rekapData[sid]) {
+      rekapData[sid] = {};
+    }
+    if (!rekapData[sid][mapel]) {
+      rekapData[sid][mapel] = { hadir: 0, izin: 0, sakit: 0, alfa: 0 };
     }
 
-    // Hanya hitung siswa yang ada di roster (sesuai filter kelas)
-    if (!siswaMap[siswaId]) continue;
-
-    if (!rekapData[siswaId]) {
-      rekapData[siswaId] = {};
-      MAPEL_LIST.forEach(function(m) {
-        rekapData[siswaId][m] = { hadir: 0, izin: 0, sakit: 0, alfa: 0 };
-      });
-    }
-
-    const statusLower = String(status).toLowerCase();
-    if (rekapData[siswaId][mapel]) {
-      if (statusLower === 'hadir') rekapData[siswaId][mapel].hadir++;
-      else if (statusLower === 'izin') rekapData[siswaId][mapel].izin++;
-      else if (statusLower === 'sakit') rekapData[siswaId][mapel].sakit++;
-      else if (statusLower === 'alfa') rekapData[siswaId][mapel].alfa++;
-    }
+    const statusLower = String(status || '').trim().toLowerCase();
+    if (statusLower === 'hadir') rekapData[sid][mapel].hadir++;
+    else if (statusLower === 'izin') rekapData[sid][mapel].izin++;
+    else if (statusLower === 'sakit') rekapData[sid][mapel].sakit++;
+    else if (statusLower === 'alfa') rekapData[sid][mapel].alfa++;
   }
+
+  const allMapel = Array.from(mapelSet);
 
   // Hitung hari efektif per mapel
   const hariEfektif = {};
-  MAPEL_LIST.forEach(function(m) {
-    hariEfektif[m] = Object.keys(tanggalUnikPerMapel[m]).length;
+  allMapel.forEach(function(m) {
+    hariEfektif[m] = tanggalUnikPerMapel[m] ? Object.keys(tanggalUnikPerMapel[m]).length : 0;
   });
-  const totalHariEfektif = MAPEL_LIST.reduce(function(sum, m) { return sum + hariEfektif[m]; }, 0);
 
   // Bangun result array
   const result = [];
@@ -1072,13 +1106,16 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
     const info = siswaMap[sid];
     const perMapel = {};
     let totalHadir = 0;
+    let totalIzin = 0;
+    let totalSakit = 0;
+    let totalAlfa = 0;
     let totalHari = 0;
 
-    MAPEL_LIST.forEach(function(m) {
+    allMapel.forEach(function(m) {
       const d = rekapData[sid] && rekapData[sid][m]
         ? rekapData[sid][m]
         : { hadir: 0, izin: 0, sakit: 0, alfa: 0 };
-      const hari = hariEfektif[m];
+      const hari = hariEfektif[m] || 0;
       const persen = hari > 0 ? Math.round((d.hadir / hari) * 100) : 0;
       perMapel[m] = {
         hadir: d.hadir,
@@ -1089,6 +1126,9 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
         persen: persen
       };
       totalHadir += d.hadir;
+      totalIzin += d.izin;
+      totalSakit += d.sakit;
+      totalAlfa += d.alfa;
       totalHari += hari;
     });
 
@@ -1100,6 +1140,9 @@ function getRekapBulanan(bulan, tahun, kelasFilter) {
       kelas: info.kelas,
       per_mapel: perMapel,
       total_hadir: totalHadir,
+      total_izin: totalIzin,
+      total_sakit: totalSakit,
+      total_alfa: totalAlfa,
       total_hari: totalHari,
       persen_total: persenTotal
     });

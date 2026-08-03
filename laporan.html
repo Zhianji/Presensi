@@ -154,7 +154,7 @@
 <div id="laporan-mobile-list" class="space-y-3"></div>
 </div>
 <button onclick="document.getElementById('filter-kelas-mobile').value=''; syncFilterMobile(); window.scrollTo({top: 0, behavior: 'smooth'});" class="w-full py-3 text-primary font-title-md border border-dashed border-primary rounded-xl hover:bg-primary-container/10 transition-colors">
-                Lihat Semua Siswa (32)
+                <span id="see-all-mobile-label">Lihat Semua Siswa</span>
             </button>
 </section>
 </main>
@@ -265,7 +265,7 @@
 <!-- Search on Right (Implicitly handled by gap and flex) -->
 <div class="hidden md:flex items-center bg-surface-container-high rounded-full px-4 py-2 w-64 border border-outline-variant focus-within:border-primary transition-all">
 <span class="material-symbols-outlined text-outline">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-2 text-on-surface" placeholder="Cari laporan..." type="text"/>
+<input id="search-input" oninput="handleSearchInput()" class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-2 text-on-surface" placeholder="Cari laporan..." type="text"/>
 </div>
 <div class="flex items-center gap-4">
 <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors cursor-pointer active:opacity-80">notifications</button>
@@ -348,7 +348,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bulan</label>
 <div class="relative">
-<select id="filter-bulan-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-bulan-desktop" onchange="syncFilterDesktop()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="1">Januari</option>
 <option value="2">Februari</option>
 <option value="3">Maret</option>
@@ -367,7 +367,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tahun</label>
 <div class="relative">
-<select id="filter-tahun-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-tahun-desktop" onchange="syncFilterDesktop()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="2024">2024</option>
 <option value="2025">2025</option>
 <option value="2026">2026</option>
@@ -377,7 +377,7 @@
 <div class="flex flex-col gap-2">
 <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kelas</label>
 <div class="relative">
-<select id="filter-kelas-desktop" onchange="loadLaporanData()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+<select id="filter-kelas-desktop" onchange="syncFilterDesktop()" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all">
 <option value="">Semua Kelas</option>
 <option value="X-E1">X-E1</option>
 <option value="X-E2">X-E2</option>
@@ -466,33 +466,55 @@
 <script src="js/config.js"></script>
 <script>
     let reportData = [];
+    const NAMA_BULAN = [
+        "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
 
     document.addEventListener("DOMContentLoaded", async () => {
         const check = await guardPage(['admin', 'guru', 'kepsek']);
         if (!check) return;
 
+        initYearOptions();
+
         const now = new Date();
-        
         const m = String(now.getMonth() + 1);
+        const y = String(now.getFullYear());
+
         const mDesktop = document.getElementById('filter-bulan-desktop');
         const mMobile = document.getElementById('filter-bulan-mobile');
-        if(mDesktop) mDesktop.value = m;
-        if(mMobile) mMobile.value = m;
+        if (mDesktop) mDesktop.value = m;
+        if (mMobile) mMobile.value = m;
 
-        const y = String(now.getFullYear());
         const yDesktop = document.getElementById('filter-tahun-desktop');
         const yMobile = document.getElementById('filter-tahun-mobile');
-        if(yDesktop) yDesktop.value = y;
-        if(yMobile) yMobile.value = y;
+        if (yDesktop) yDesktop.value = y;
+        if (yMobile) yMobile.value = y;
 
         await initKelasOptionsLaporan();
         loadLaporanData();
     });
 
+    function initYearOptions() {
+        const currentYear = new Date().getFullYear();
+        const startYear = 2023;
+        const endYear = Math.max(currentYear + 1, 2026);
+        let options = '';
+        for (let y = startYear; y <= endYear; y++) {
+            options += `<option value="${y}">${y}</option>`;
+        }
+        const yDesktop = document.getElementById('filter-tahun-desktop');
+        const yMobile = document.getElementById('filter-tahun-mobile');
+        if (yDesktop) yDesktop.innerHTML = options;
+        if (yMobile) yMobile.innerHTML = options;
+    }
+
     async function initKelasOptionsLaporan() {
         const kDesktop = document.getElementById('filter-kelas-desktop');
         const kMobile = document.getElementById('filter-kelas-mobile');
         
+        const selectedVal = (kDesktop && kDesktop.value) || (kMobile && kMobile.value) || "";
+
         let classList = [];
         const cached = localStorage.getItem('cache_siswa_list');
         if (cached) {
@@ -522,21 +544,76 @@
         
         if (kDesktop) kDesktop.innerHTML = options;
         if (kMobile) kMobile.innerHTML = options;
+
+        if (selectedVal) {
+            if (kDesktop) kDesktop.value = selectedVal;
+            if (kMobile) kMobile.value = selectedVal;
+        }
+    }
+
+    function syncFilterMobile() {
+        const b = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '';
+        const t = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : '';
+        const k = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
+        
+        const bD = document.getElementById('filter-bulan-desktop');
+        const tD = document.getElementById('filter-tahun-desktop');
+        const kD = document.getElementById('filter-kelas-desktop');
+        
+        if (bD && b) bD.value = b;
+        if (tD && t) tD.value = t;
+        if (kD && k !== undefined) kD.value = k;
+        
+        loadLaporanData();
+    }
+
+    function syncFilterDesktop() {
+        const b = document.getElementById('filter-bulan-desktop') ? document.getElementById('filter-bulan-desktop').value : '';
+        const t = document.getElementById('filter-tahun-desktop') ? document.getElementById('filter-tahun-desktop').value : '';
+        const k = document.getElementById('filter-kelas-desktop') ? document.getElementById('filter-kelas-desktop').value : '';
+        
+        const bM = document.getElementById('filter-bulan-mobile');
+        const tM = document.getElementById('filter-tahun-mobile');
+        const kM = document.getElementById('filter-kelas-mobile');
+        
+        if (bM && b) bM.value = b;
+        if (tM && t) tM.value = t;
+        if (kM && k !== undefined) kM.value = k;
+        
+        loadLaporanData();
     }
 
     async function loadLaporanData() {
-        const bulan = document.getElementById('filter-bulan-desktop').value;
-        const tahun = document.getElementById('filter-tahun-desktop').value;
-        const kelas = document.getElementById('filter-kelas-desktop').value;
+        const bDesktop = document.getElementById('filter-bulan-desktop');
+        const tDesktop = document.getElementById('filter-tahun-desktop');
+        const kDesktop = document.getElementById('filter-kelas-desktop');
+
+        const bulan = bDesktop ? bDesktop.value : String(new Date().getMonth() + 1);
+        const tahun = tDesktop ? tDesktop.value : String(new Date().getFullYear());
+        const kelas = kDesktop ? kDesktop.value : '';
+
+        // Update Periode Text Header
+        const bulanName = NAMA_BULAN[parseInt(bulan, 10)] || '';
+        const periodeTextElem = document.getElementById('periode-text');
+        if (periodeTextElem) {
+            periodeTextElem.textContent = `Periode: ${bulanName} ${tahun}` + (kelas ? ` (Kelas: ${kelas})` : ` (Semua Kelas)`);
+        }
 
         const tbody = document.getElementById('laporan-tbody');
-        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data rekapitulasi...</td></tr>`;
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data rekapitulasi...</td></tr>`;
+        }
 
         try {
             const res = await apiPost('getRekapBulanan', { token: getToken(), bulan, tahun, kelas });
             if (res.ok && res.data) {
                 reportData = res.data;
-                renderLaporanTable(res.data);
+                const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
+                if (searchVal) {
+                    handleSearchInput();
+                } else {
+                    renderLaporanTable(res.data);
+                }
                 if (res.ringkasan) {
                     updateRingkasanUI(res.ringkasan.rata_rata, res.ringkasan.total_siswa);
                 }
@@ -563,8 +640,14 @@
             filtered = mockReport.filter(s => s.kelas === kelas);
         }
         reportData = filtered;
-        renderLaporanTable(filtered);
         
+        const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
+        if (searchVal) {
+            handleSearchInput();
+        } else {
+            renderLaporanTable(filtered);
+        }
+
         const total = filtered.length;
         const avg = total ? Math.round(filtered.reduce((acc, curr) => acc + curr.persen_total, 0) / total) : 0;
         updateRingkasanUI(avg, total);
@@ -588,17 +671,32 @@
         if (circle) circle.setAttribute('stroke-dashoffset', strokeOffset);
     }
 
-    
+    function handleSearchInput() {
+        const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+        if (!query) {
+            renderLaporanTable(reportData);
+            return;
+        }
+        const filtered = reportData.filter(s => 
+            (s.nama && s.nama.toLowerCase().includes(query)) ||
+            (s.kelas && s.kelas.toLowerCase().includes(query)) ||
+            (s.siswa_id && String(s.siswa_id).toLowerCase().includes(query))
+        );
+        renderLaporanTable(filtered);
+    }
+
     function renderLaporanTable(data) {
         const tbody = document.getElementById('laporan-tbody');
         const mobileList = document.getElementById('laporan-mobile-list');
         const countInfo = document.getElementById('laporan-count-info');
+        const seeAllLabel = document.getElementById('see-all-mobile-label');
         
-        if(countInfo) countInfo.textContent = `Menampilkan ${data.length} siswa`;
+        if (countInfo) countInfo.textContent = `Menampilkan ${data ? data.length : 0} siswa`;
+        if (seeAllLabel) seeAllLabel.textContent = `Lihat Semua Siswa (${data ? data.length : 0})`;
 
         if (!data || data.length === 0) {
             if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada data rekapitulasi untuk periode ini.</td></tr>`;
-            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4">Tidak ada data rekapitulasi</div>`;
+            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-on-surface-variant">Tidak ada data rekapitulasi</div>`;
             return;
         }
 
@@ -685,16 +783,35 @@
             return;
         }
 
-        let csv = 'Nama Siswa,Kelas,Total Hadir,Persentase Total\n';
+        let csv = 'Nama Siswa,Kelas,Total Hadir,Total Izin,Total Sakit,Total Alfa,Persentase Total\n';
         reportData.forEach(s => {
-            csv += `"${s.nama}","${s.kelas}",${s.total_hadir || 0},${s.persen_total || 0}%\n`;
+            let totalHadir = 0, totalIzin = 0, totalSakit = 0, totalAlfa = 0;
+            if (s.per_mapel) {
+                Object.values(s.per_mapel).forEach(m => {
+                    totalHadir += m.hadir || 0;
+                    totalIzin += m.izin || 0;
+                    totalSakit += m.sakit || 0;
+                    totalAlfa += m.alfa || 0;
+                });
+            } else {
+                totalHadir = s.total_hadir || 0;
+                totalIzin = s.total_izin || 0;
+                totalSakit = s.total_sakit || 0;
+                totalAlfa = s.total_alfa || 0;
+            }
+            csv += `"${s.nama}","${s.kelas}",${totalHadir},${totalIzin},${totalSakit},${totalAlfa},${s.persen_total || 0}%\n`;
         });
+
+        const bDesktop = document.getElementById('filter-bulan-desktop');
+        const tDesktop = document.getElementById('filter-tahun-desktop');
+        const bVal = bDesktop ? bDesktop.value : '';
+        const tVal = tDesktop ? tDesktop.value : '';
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `Rekap_Absensi_${document.getElementById('filter-bulan-desktop').value}_${document.getElementById('filter-tahun-desktop').value}.csv`);
+        link.setAttribute('download', `Rekap_Absensi_${bVal}_${tVal}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
