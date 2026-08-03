@@ -411,11 +411,19 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold text-on-surface-variant mb-1">Kelas *</label>
-          <input type="text" id="siswa-kelas" placeholder="Misal: XII IPA 1" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm"/>
+          <select id="siswa-kelas" required class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
+            <option value="" disabled selected>Pilih Kelas</option>
+            <option value="X-E1">X-E1</option>
+            <option value="X-E2">X-E2</option>
+            <option value="X-E3">X-E3</option>
+            <option value="X-E4">X-E4</option>
+            <option value="X-E5">X-E5</option>
+            <option value="X-E6">X-E6</option>
+          </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-on-surface-variant mb-1">Status</label>
-          <select id="siswa-status" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm">
+          <select id="siswa-status" class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
             <option value="Aktif">Aktif</option>
             <option value="Nonaktif">Nonaktif</option>
           </select>
@@ -510,12 +518,12 @@
             } else {
                 if (!cached) {
                     const mockData = [
-                        { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "XII IPA 1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
-                        { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "XII IPA 1", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
-                        { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "XII IPA 2", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
-                        { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "XII IPA 2", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
-                        { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "XI IPS 1", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
-                        { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "XI IPS 1", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
+                        { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "X-E1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "X-E2", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "X-E3", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "X-E4", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "X-E5", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
+                        { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "X-E6", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
                     ];
                     allSiswa = mockData;
                     populateKelasFilter(allSiswa);
@@ -527,12 +535,12 @@
             console.error('Error loading siswa data:', e);
             if (!cached) {
                 const mockData = [
-                    { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "XII IPA 1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
-                    { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "XII IPA 1", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
-                    { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "XII IPA 2", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
-                    { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "XII IPA 2", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
-                    { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "XI IPS 1", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
-                    { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "XI IPS 1", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
+                    { id: "S001", nis: "1024001", nama: "Ahmad Fauzi", kelas: "X-E1", email: "ahmad.fauzi@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S002", nis: "1024002", nama: "Budi Santoso", kelas: "X-E2", email: "budi.santoso@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S003", nis: "1024003", nama: "Citra Lestari", kelas: "X-E3", email: "citra.lestari@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S004", nis: "1024004", nama: "Dewi Sartika", kelas: "X-E4", email: "dewi.sartika@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S005", nis: "1024005", nama: "Eko Prasetyo", kelas: "X-E5", email: "eko.prasetyo@school.sch.id", status_aktif: "Aktif" },
+                    { id: "S006", nis: "1024006", nama: "Farhan Wijaya", kelas: "X-E6", email: "farhan.wijaya@school.sch.id", status_aktif: "Nonaktif" }
                 ];
                 allSiswa = mockData;
                 populateKelasFilter(allSiswa);
@@ -546,7 +554,9 @@
     function populateKelasFilter(data) {
         const kelasSelectD = document.getElementById('filter-kelas-desktop');
         const kelasSelectM = document.getElementById('filter-kelas-mobile');
-        const classes = [...new Set(data.map(s => s.kelas).filter(Boolean))].sort();
+        const defaultClasses = ['X-E1', 'X-E2', 'X-E3', 'X-E4', 'X-E5', 'X-E6'];
+        const dataClasses = data ? data.map(s => s.kelas).filter(Boolean) : [];
+        const classes = [...new Set([...defaultClasses, ...dataClasses])].sort();
         let options = `<option value="">Semua Kelas</option>`;
         classes.forEach(c => {
             options += `<option value="${c}">${c}</option>`;
@@ -701,7 +711,19 @@
         document.getElementById('siswa-id').value = siswa ? siswa.id : '';
         document.getElementById('siswa-nis').value = siswa ? siswa.nis : '';
         document.getElementById('siswa-nama').value = siswa ? siswa.nama : '';
-        document.getElementById('siswa-kelas').value = siswa ? siswa.kelas : '';
+        
+        const kelasSelect = document.getElementById('siswa-kelas');
+        const targetKelas = siswa ? (siswa.kelas || '') : '';
+        if (kelasSelect) {
+            if (targetKelas && ![...kelasSelect.options].some(opt => opt.value === targetKelas)) {
+                const newOpt = document.createElement('option');
+                newOpt.value = targetKelas;
+                newOpt.textContent = targetKelas;
+                kelasSelect.appendChild(newOpt);
+            }
+            kelasSelect.value = targetKelas;
+        }
+
         document.getElementById('siswa-status').value = siswa ? (siswa.status_aktif || 'Aktif') : 'Aktif';
         document.getElementById('siswa-wali').value = siswa ? (siswa.wali_murid || '') : '';
         document.getElementById('siswa-email').value = siswa ? (siswa.email || '') : '';
