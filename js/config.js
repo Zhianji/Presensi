@@ -16,7 +16,7 @@ async function apiGet(action, params = {}) {
   return res.json();
 }
 
-async function apiPost(action, data = {}, timeoutMs = 12000) {
+async function apiPost(action, data = {}, timeoutMs = 30000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -31,7 +31,7 @@ async function apiPost(action, data = {}, timeoutMs = 12000) {
   } catch (err) {
     clearTimeout(timer);
     if (err.name === 'AbortError') {
-      throw new Error('Koneksi ke Google Apps Script timeout (melewati 12 detik).');
+      throw new Error(`Koneksi ke Google Apps Script timeout (melewati ${Math.round(timeoutMs/1000)} detik). Silakan coba lagi.`);
     }
     throw err;
   }

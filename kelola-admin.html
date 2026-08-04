@@ -393,14 +393,18 @@
             if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
 
             try {
-                let res = await apiPost(primaryAction, payload);
-                
-                // Fallback otomatis jika Web App Apps Script belum memuat action updatePengguna/createPengguna
-                if (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal'))) {
+                let res = null;
+                try {
+                    res = await apiPost(primaryAction, payload);
+                } catch(pErr) {
+                    console.warn('[kelola-admin] Primary action failed, trying fallback:', pErr.message);
+                }
+
+                if (!res || (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal')))) {
                     res = await apiPost(fallbackAction, payload);
                 }
 
-                if (res.ok) {
+                if (res && res.ok) {
                     closeAdminModal();
                     if (typeof showToast === 'function') {
                         showToast('Data pengguna berhasil disimpan!', false);
@@ -409,7 +413,7 @@
                     }
                     loadPengguna(true);
                 } else {
-                    alert('Gagal menyimpan: ' + (res.error || 'Terjadi kesalahan'));
+                    alert('Gagal menyimpan: ' + ((res && res.error) || 'Terjadi kesalahan pada server'));
                 }
             } catch(err) {
                 alert('Gagal terhubung ke server: ' + (err.message || 'Terjadi kesalahan koneksi'));
@@ -421,12 +425,16 @@
         async function deleteAdmin(id) {
             if (!confirm('Yakin ingin menghapus pengguna ini?')) return;
             try {
-                let res = await apiPost('deletePengguna', { token: getToken(), id: id });
-                if (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal'))) {
+                let res = null;
+                try {
+                    res = await apiPost('deletePengguna', { token: getToken(), id: id });
+                } catch(pErr) {}
+
+                if (!res || (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal')))) {
                     res = await apiPost('deleteGuru', { token: getToken(), id: id });
                 }
 
-                if (res.ok) {
+                if (res && res.ok) {
                     if (typeof showToast === 'function') {
                         showToast('Pengguna berhasil dihapus!', false);
                     } else {
@@ -434,7 +442,7 @@
                     }
                     loadPengguna(true);
                 } else {
-                    alert('Gagal menghapus: ' + (res.error || 'Terjadi kesalahan'));
+                    alert('Gagal menghapus: ' + ((res && res.error) || 'Terjadi kesalahan'));
                 }
             } catch(e) {
                 alert('Terjadi kesalahan koneksi: ' + (e.message || 'Gagal terhubung ke server'));
