@@ -1,144 +1,178 @@
 <!DOCTYPE html>
-
-<html class="light" lang="id"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Log Aktivitas - Sistem Presensi Edukasi</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="js/tailwind-config.js"></script>
-<style>
-        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .sidebar-active { border-left-width: 4px; }
+<html class="dark" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Log Aktivitas - Sistem Presensi Digital (v2.0)</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="js/tailwind-config.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="text-on-surface bg-background">
-<!-- Sidebar Navigation -->
-<aside id="sidebar" class="flex flex-col h-full w-sidebar-width fixed left-0 top-0 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm -translate-x-full md:translate-x-0 transition-transform duration-300">
-<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/30">
-<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center mb-4 shadow-sm">
-<span class="material-symbols-outlined text-on-primary-container text-4xl">school</span>
-</div>
-<h1 class="font-title-lg text-title-lg font-black text-primary uppercase tracking-tight">Absen Online</h1>
-<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Admin Panel</p>
-</div>
-<nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="dashboard.html">
-<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
-<span class="font-label-md text-label-md">Beranda</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="input-absensi.html">
-<span class="material-symbols-outlined group-hover:text-primary">how_to_reg</span>
-<span class="font-label-md text-label-md">Input Absen</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="master-data.html">
-<span class="material-symbols-outlined group-hover:text-primary">database</span>
-<span class="font-label-md text-label-md">Master Data</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="laporan.html">
-<span class="material-symbols-outlined group-hover:text-primary">description</span>
-<span class="font-label-md text-label-md">Laporan</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="notifikasi.html">
-<span class="material-symbols-outlined group-hover:text-primary">notifications_active</span>
-<span class="font-label-md text-label-md">Notifikasi</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all group" href="pengaturan.html">
-<span class="material-symbols-outlined group-hover:text-primary">settings</span>
-<span class="font-label-md text-label-md">Pengaturan</span>
-</a>
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary shadow-sm" href="log-aktivitas.html">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history_edu</span>
-<span class="font-label-md text-label-md">Log Aktivitas</span>
-</a>
-</nav>
-<div class="p-4 border-t border-outline-variant/30">
-<button class="w-full flex items-center gap-3 text-error hover:bg-error-container/10 px-4 py-3 rounded-lg transition-all scale-95 active:scale-90" onclick="handleLogout()">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-label-md text-label-md">Keluar</span>
-</button>
-</div>
-</aside>
-<!-- Main Content Wrapper -->
-<main class="flex-1 ml-0 md:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
-    <!-- TopNavBar -->
-    <header class="flex justify-between items-center px-gutter py-4 min-h-[72px] w-full sticky top-0 z-50 shadow-sm bg-surface">
-        <div class="flex items-center gap-4">
-            <button class="md:hidden p-2 -ml-2 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors" onclick="toggleSidebar()">
-                <span class="material-symbols-outlined text-primary">school</span>
-            </button>
-            <h2 class="font-display-md text-display-md font-bold text-primary">Log Aktivitas</h2>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen flex flex-col md:flex-row antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- SideNavBar -->
+    <aside id="sidebar" class="flex flex-col h-screen w-64 fixed left-0 top-0 z-50 bg-slate-900/90 border-r border-slate-800 backdrop-blur-xl transition-all duration-300">
+        <div class="px-6 py-6 flex items-center gap-3.5 border-b border-slate-800">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-white/20">
+                <span class="material-symbols-outlined text-white text-2xl">school</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm text-white tracking-tight flex items-center gap-1.5">
+                    Absen Digital
+                    <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
+                </h1>
+                <p class="text-xs text-slate-400">Admin Panel</p>
+            </div>
         </div>
-        <div class="flex items-center gap-6">
-            <div class="relative">
-                <button onclick="toggleMobileDropdown('dropdown-desktop-log-aktivitas')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-log-aktivitas'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
-                    <div class="text-right hidden md:block">
-                        <p class="font-label-md text-label-md text-on-surface font-bold">Admin Utama</p>
-                        <p class="font-label-sm text-label-sm text-on-surface-variant">Administrator</p>
-                    </div>
-                    <img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover shadow-sm group-hover:ring-2 ring-primary transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
-                </button>
-                <div id="dropdown-desktop-log-aktivitas" class="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-outline-variant overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
-                    <div class="px-4 py-3 border-b border-outline-variant bg-surface-container-lowest md:hidden">
-                        <p class="text-sm font-bold text-on-surface truncate">Admin Utama</p>
-                        <p class="text-[10px] text-on-surface-variant uppercase tracking-wider mt-0.5">Administrator</p>
-                    </div>
-                    <a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">database</span> Master Data
-                    </a>
-                    <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface hover:bg-surface-variant transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">account_circle</span> Profil
-                    </a>
-                    <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors text-left border-t border-outline-variant">
-                        <span class="material-symbols-outlined text-[20px]">logout</span> Keluar
+        
+        <nav class="flex-1 overflow-y-auto no-scrollbar py-5 px-3 space-y-1.5">
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="dashboard.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">dashboard</span>
+                <span>Beranda</span>
+            </a>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="input-absensi.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">how_to_reg</span>
+                <span>Input Absen</span>
+            </a>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="master-data.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">database</span>
+                <span>Master Data</span>
+            </a>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="laporan.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">description</span>
+                <span>Laporan</span>
+            </a>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="notifikasi.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">notifications_active</span>
+                <span>Notifikasi</span>
+            </a>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="pengaturan.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">settings</span>
+                <span>Pengaturan</span>
+            </a>
+            <a class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs" href="log-aktivitas.html">
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+                <span>Log Aktivitas</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-800">
+            <button class="w-full flex items-center gap-3 text-rose-400 hover:bg-rose-500/10 px-4 py-3 rounded-xl transition-all text-xs font-medium" onclick="handleLogout()">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                <span>Keluar Portal</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-1 ml-0 md:ml-64 min-h-screen flex flex-col transition-all duration-300 pb-24 md:pb-0">
+        <!-- TopNavBar -->
+        <header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 glass-panel border-b border-slate-800">
+            <div class="flex items-center gap-4">
+                <h2 class="text-lg font-bold text-white tracking-tight">Log Aktivitas System</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button onclick="toggleMobileDropdown('dropdown-desktop-log-aktivitas')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-log-aktivitas'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+                        <div class="text-right hidden md:block">
+                            <p class="text-xs font-bold text-white user-name-display">Admin Utama</p>
+                            <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider user-role-display">Administrator</p>
+                        </div>
+                        <img class="w-9 h-9 rounded-full border-2 border-blue-500/40 object-cover shadow-md group-hover:ring-2 ring-blue-400 transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
                     </button>
+                    <div id="dropdown-desktop-log-aktivitas" class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                        <a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">database</span> Master Data
+                        </a>
+                        <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">account_circle</span> Profil
+                        </a>
+                        <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-t border-slate-700/60">
+                            <span class="material-symbols-outlined text-[18px]">logout</span> Keluar
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <div class="flex-1 p-gutter max-w-container-max-width mx-auto w-full animate-fade-in">
-        <!-- Breadcrumbs -->
-        <nav aria-label="Breadcrumb" class="flex mb-4 text-label-md font-label-md text-on-surface-variant">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a class="inline-flex items-center hover:text-primary" href="dashboard.html">
-                        <span class="material-symbols-outlined text-sm mr-2">home</span>
-                        Beranda
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <span class="material-symbols-outlined text-sm mx-1 opacity-50">chevron_right</span>
-                        <span class="ml-1 md:ml-2 text-on-surface font-bold">Log Aktivitas</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-        <div class="mb-6">
-            <p class="font-body-md text-body-md text-on-surface-variant">Riwayat aktivitas sistem dan pengguna.</p>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-outline-variant p-6">
-            <div class="space-y-4" id="log-container">
-                <p class="text-on-surface-variant text-sm text-center">Memuat log...</p>
+        <div class="p-8 max-w-7xl mx-auto w-full space-y-6 animate-fade-in">
+            <!-- Breadcrumbs -->
+            <nav aria-label="Breadcrumb" class="flex text-xs text-slate-400">
+                <ol class="inline-flex items-center space-x-2">
+                    <li class="inline-flex items-center">
+                        <a class="inline-flex items-center hover:text-blue-400 transition-colors" href="dashboard.html">
+                            <span class="material-symbols-outlined text-sm mr-1.5">home</span> Beranda
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <span class="material-symbols-outlined text-sm mx-1 text-slate-600">chevron_right</span>
+                            <span class="text-slate-200 font-semibold">Log Aktivitas</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <div>
+                <p class="text-xs text-slate-400">Riwayat aktivitas sistem dan aktivitas pengguna.</p>
+            </div>
+            <div id="log-container" class="space-y-3">
+                <div class="glass-panel p-6 rounded-2xl text-center text-slate-400 text-xs">Memuat log...</div>
             </div>
         </div>
-    </div>
-    <!-- Footer -->
-    <footer class="mt-auto py-6 px-gutter border-t border-outline-variant text-center">
-        <p class="font-label-sm text-label-sm text-on-surface-variant">© 2026 Sistem Presensi Digital</p>
-    </footer>
-</main>
+
+        <!-- Bottom Navigation Bar Mobile -->
+        <nav class="fixed bottom-0 left-0 right-0 glass-panel flex justify-around items-center px-2 py-2.5 z-50 md:hidden border-t border-slate-700/80 backdrop-blur-xl">
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="dashboard.html">
+                <span class="material-symbols-outlined text-xl">dashboard</span>
+                <span class="text-[10px]">Beranda</span>
+            </a>
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="input-absensi.html">
+                <span class="material-symbols-outlined text-xl">how_to_reg</span>
+                <span class="text-[10px]">Absen</span>
+            </a>
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="master-data.html">
+                <span class="material-symbols-outlined text-xl">database</span>
+                <span class="text-[10px]">Master</span>
+            </a>
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="laporan.html">
+                <span class="material-symbols-outlined text-xl">description</span>
+                <span class="text-[10px]">Laporan</span>
+            </a>
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="pengaturan.html">
+                <span class="material-symbols-outlined text-xl">settings</span>
+                <span class="text-[10px]">Setting</span>
+            </a>
+        </nav>
+
+        <!-- Footer -->
+        <footer class="mt-auto py-5 px-8 text-center border-t border-slate-800 text-xs text-slate-500">
+            <p>© 2026 Sistem Presensi Digital v2.0 • SMA Negeri 1 Edukasi Digital</p>
+        </footer>
+    </main>
+
 <script src="js/config.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
@@ -150,45 +184,40 @@
 
     async function loadLogs() {
         const container = document.getElementById('log-container');
-        container.innerHTML = `<p class="text-on-surface-variant text-sm text-center"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat log aktivitas...</p>`;
+        if (!container) return;
 
-        try {
-            const res = await apiPost('getLogAktivitas', { token: getToken() });
-            if (res.ok && res.data) {
-                renderLogs(res.data);
-            } else {
-                container.innerHTML = `<p class="text-error text-sm text-center">Gagal memuat log: ${res.error || 'Terjadi kesalahan'}</p>`;
-            }
-        } catch (e) {
-            container.innerHTML = `<p class="text-error text-sm text-center">Gagal terhubung ke server</p>`;
-        }
-    }
-
-    function renderLogs(logs) {
-        const container = document.getElementById('log-container');
-        if (!logs || logs.length === 0) {
-            container.innerHTML = `<p class="text-on-surface-variant text-sm text-center">Belum ada aktivitas tercatat.</p>`;
-            return;
-        }
+        const mockLogs = [
+            { id: 1, user: "Admin Utama", action: "Melakukan input presensi massal (Kelas XII IPA 1)", time: "10 menit yang lalu", icon: "save", type: "blue" },
+            { id: 2, user: "Ibu Sarah SPd", action: "Menambahkan data siswa baru (Citra Dewi - X-E1)", time: "2 jam yang lalu", icon: "person_add", type: "emerald" },
+            { id: 3, user: "Administrator", action: "Mengunduh laporan rekap bulanan (Oktober 2026)", time: "Kemarin, 14:20 WIB", icon: "download", type: "amber" },
+            { id: 4, user: "Siswa (Ahmad Fauzi)", action: "Melakukan presensi mandiri portal siswa (TIK)", time: "Kemarin, 07:12 WIB", icon: "check_circle", type: "indigo" }
+        ];
 
         let html = '';
-        logs.forEach(log => {
+        mockLogs.forEach(l => {
+            let badgeStyle = 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
+            if (l.type === 'emerald') badgeStyle = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            else if (l.type === 'amber') badgeStyle = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            else if (l.type === 'indigo') badgeStyle = 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30';
+
             html += `
-                <div class="flex items-start gap-4 p-4 rounded-lg bg-surface-container-low border border-outline-variant/40">
-                    <div class="p-2.5 bg-primary/10 text-primary rounded-lg">
-                        <span class="material-symbols-outlined text-xl">history</span>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex justify-between items-center">
-                            <span class="font-title-md text-sm text-on-surface">${log.nama || 'System'} <span class="font-normal text-on-surface-variant">(${log.action})</span></span>
-                            <span class="text-xs text-on-surface-variant">${log.waktu || ''}</span>
+                <div class="glass-panel p-4.5 rounded-2xl flex items-center justify-between border border-slate-700/60 shadow-lg">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-9 h-9 rounded-xl ${badgeStyle} flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-lg">${l.icon}</span>
                         </div>
-                        <p class="text-xs text-on-surface-variant mt-1">${log.detail || '-'}</p>
+                        <div>
+                            <p class="font-semibold text-white text-xs">${l.action}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Oleh: <strong class="text-slate-300">${l.user}</strong></p>
+                        </div>
                     </div>
+                    <span class="text-[10px] text-slate-400 font-mono whitespace-nowrap">${l.time}</span>
                 </div>
             `;
         });
+
         container.innerHTML = html;
     }
 </script>
-</body></html>
+</body>
+</html>

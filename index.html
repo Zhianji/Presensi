@@ -1,383 +1,508 @@
 <!DOCTYPE html>
-
-<html class="light" lang="id"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Login - Sistem Presensi Edukasi</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="js/tailwind-config.js"></script>
-<style>body {
-    font-family: "Inter", sans-serif;
-    background-color: #f9f9ff
-    }
-.glass-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2)
-    }
-.material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
-    }
-.bg-education-pattern {
-    background-image: linear-gradient(rgba(0, 61, 155, 0.8), rgba(0, 61, 155, 0.85)), url(https://lh3.googleusercontent.com/aida-public/AB6AXuC-NYDCtrQdmjcv6iesoKgSMOlgYblPTvfBWCMioPy8CKrbA9YG3Ex0TXPl7Y-Fx-MGzSqhgSMNSJ2jczGdvQDtDkVC_f6R7BEVK67jPhYeJKTZEhtAmoPvxccbKkyiBZyKbo-JrqU3pwaXEQCEGM1Ba_39Y603Q_5kOxwNojHvXcKpkgR8n8TiCO--7o5fxH9KeJqhtu-9GMGHKTgZA4XAHl2wzhGvsgf4sHVFrF905f9rzHNDcp7Y);
-    background-size: cover;
-    background-position: center
-    }</style>
-
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Portal Login - Sistem Presensi Digital</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="js/tailwind-config.js"></script>
     <style>
-        .login-gradient { background: radial-gradient(circle at top right, #cee5ff 0%, #003d9b 100%); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #0f172a;
+        }
+        .bg-education-pattern {
+            background-image: radial-gradient(circle at 50% 20%, rgba(30, 58, 138, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%), 
+                              url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .glass-portal {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-<!-- Hero Background Wrapper -->
+<body class="min-h-screen flex flex-col justify-between bg-education-pattern text-slate-100 relative overflow-x-hidden">
 
-    <!-- MOBILE VIEW -->
-    <div class="block md:hidden min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden login-gradient relative">
-        
-<!-- Atmospheric Effect (SVG background element) -->
-<div class="fixed inset-0 pointer-events-none opacity-20">
-<svg height="100%" preserveaspectratio="none" viewbox="0 0 100 100" width="100%">
-<defs>
-<pattern height="10" id="grid" patternunits="userSpaceOnUse" width="10">
-<path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"></path>
-</pattern>
-</defs>
-<rect fill="url(#grid)" height="100%" width="100%"></rect>
-</svg>
-</div>
-<main class="w-full max-w-md relative z-10 animate-fade-in">
-<!-- Logo & Branding Header -->
-<div class="flex flex-col items-center mb-stack-lg">
-<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center shadow-lg mb-stack-md border-4 border-primary-container">
-<span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'FILL' 1;">school</span>
-</div>
-<h1 class="font-display-md text-display-md text-surface-container-lowest text-center tracking-tight">
-                Sistem Presensi Edukasi
-            </h1>
-</div>
-<!-- Login Card -->
-<div class="glass-card rounded-xl shadow-2xl p-stack-lg flex flex-col items-center">
-<div class="text-center mb-stack-lg">
-<h2 class="font-title-lg text-title-lg text-on-surface mb-2">Selamat Datang</h2>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
-                    Akses dashboard administrasi dan kehadiran dalam satu langkah mudah.
-                </p>
-</div>
-<!-- Login Action -->
-<button class="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container transition-all py-3.5 px-gutter rounded-lg shadow-sm active:scale-[0.98]" onclick="openGoogleModal()">
-<svg class="w-5 h-5" viewbox="0 0 24 24">
-<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-<path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-</svg>
-<span class="font-title-md text-title-md text-on-surface">Masuk dengan Google</span>
-</button>
-<!-- Role Detection Info -->
-<div class="mt-stack-lg p-stack-md bg-primary-container/10 rounded-lg border border-primary/10">
-<div class="flex gap-3">
-<span class="material-symbols-outlined text-primary text-xl">verified_user</span>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-primary uppercase tracking-wider mb-1">Deteksi Peran Otomatis</span>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                            Sistem akan otomatis mendeteksi apakah Anda masuk sebagai <b>Admin</b>, <b>Guru</b>, atau <b>Staf</b> berdasarkan akun institusi Anda.
-                        </p>
-</div>
-</div>
-</div>
-<!-- Manual Help Link -->
-<button class="mt-stack-lg text-primary font-label-md text-label-md hover:underline cursor-pointer">
-                Butuh bantuan akses? Hubungi IT Support
-            </button>
-</div>
-<!-- Illustration Background (Subtle) -->
-<div class="mt-12 flex justify-center opacity-40 grayscale contrast-125">
-<div class="w-64 h-32" data-alt="A clean, minimalist vector illustration of a modern Indonesian school building with abstract shapes representing growth and education. The style is professional corporate minimalism using a monochrome palette of blues and whites to match a reliable, scholarly brand identity for a digital presence system." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2HNJxJmB4w3x4_1nfEjXMJoatU_qNJAG4L9yksgtiO351fDMWpAjYo0AEfMCSEkyVwbn1cxvUGAAB0rXcc7JggvfBEL8k7F0rOHlwHd72_YbhIHJK7fNEuGsx6QFgeTKn-s9OQQDbgYeGuUtnOovcssW7mNlgLjkpfyeXkEhC5nWWMaVr3LOJamtJyTYTzsRINK7JucCQBGBjcQWLEvut1ooIOIBgow0PPzLqKYDGkclAqu7LMUsV')"></div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="mt-auto py-stack-md text-center z-10">
-<p class="font-label-sm text-label-sm text-surface-container-lowest/80 uppercase tracking-widest">
-            © 2026 Sistem Presensi Digital
-        </p>
-</footer>
-
-
+    <!-- Ambient Light Effects -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[140px]"></div>
+        <div class="absolute bottom-10 right-10 w-[400px] h-[400px] bg-indigo-600/15 rounded-full blur-[120px]"></div>
     </div>
 
-    <main class="hidden md:flex flex-grow flex items-center justify-center relative overflow-hidden bg-education-pattern" data-alt="A cinematic, wide-angle photograph of a modern, bright university library with high ceilings and rows of organized books. Soft sunlight filters through large windows, creating a peaceful and scholarly atmosphere. The color palette is dominated by corporate blues and clean whites, reflecting a professional Indonesian educational environment. High-quality architectural photography style with a sense of depth and tranquility.">
-<!-- Decorative Elements -->
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<div class="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-<div class="absolute bottom-20 right-20 w-96 h-96 bg-primary-container rounded-full blur-3xl"></div>
-</div>
-<!-- Login Container -->
-<div class="container-max-width px-gutter py-stack-lg z-10">
-<div class="max-w-md mx-auto">
-<!-- Login Card -->
-<div class="glass-card rounded-xl shadow-2xl p-8 md:p-12 transition-all duration-300 hover:shadow-primary/20">
-<!-- Branding -->
-<div class="text-center mb-10">
-<div class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-xl mb-6 shadow-lg shadow-primary/30">
-<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;">school</span>
-</div>
-<h1 class="font-display-md text-display-md text-primary tracking-tight mb-2">Sistem Presensi Edukasi</h1>
-<p class="font-body-md text-body-md text-on-surface-variant">Portal Manajemen Absensi Sekolah</p>
-</div>
-<!-- Action Section -->
-<div class="space-y-6">
-<button class="w-full flex items-center justify-center gap-3 bg-white border border-outline-variant py-3.5 px-6 rounded-lg font-title-md text-title-md text-on-surface hover:bg-surface-container transition-all active:scale-95 shadow-sm cursor-pointer" onclick="openGoogleModal()">
-<svg class="w-5 h-5" viewbox="0 0 24 24">
-<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-<path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-</svg>
-<span>Masuk dengan Google</span>
-</button>
-<!-- Information Alert -->
-<div class="bg-surface-container-low border border-outline-variant p-4 rounded-lg flex gap-3">
-<span class="material-symbols-outlined text-primary shrink-0" style="font-variation-settings: 'opsz' 20;">info</span>
-<p class="font-label-md text-label-md text-on-surface-variant leading-relaxed">
-                                Jabatan Anda (Guru, Admin, atau Kepala Sekolah) akan dideteksi secara otomatis berdasarkan akun Google sekolah yang terdaftar.
-                            </p>
-</div>
-</div>
-<!-- Helper Links -->
-<div class="mt-8 text-center">
-<a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Butuh bantuan akses?</a>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Modal Google Account Selector -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 p-4" id="google-modal">
-<div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 transform scale-95 transition-all duration-300 border border-outline-variant/40 relative" id="google-modal-card">
-<!-- Close Button -->
-<button class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface p-1.5 rounded-full hover:bg-surface-container transition-colors cursor-pointer" onclick="closeGoogleModal()">
-<span class="material-symbols-outlined text-xl">close</span>
-</button>
-<!-- Header -->
-<div class="text-center mb-6">
-<div class="inline-flex items-center justify-center w-12 h-12 bg-surface-container-high rounded-full mb-3 shadow-sm border border-outline-variant/30">
-<svg class="w-6 h-6" viewbox="0 0 24 24">
-<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-<path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-</svg>
-</div>
-<h3 class="font-title-lg text-title-lg font-bold text-on-surface">Pilih Akun Google</h3>
-<p class="font-label-md text-label-md text-on-surface-variant mt-1">Single Sign-On (SSO) Sekolah</p>
-</div>
-<!-- Pre-defined accounts list -->
-<div class="space-y-2 mb-4">
-<p class="font-label-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold mb-2">Akun Demo Terdaftar:</p>
-<button class="w-full flex items-center justify-between p-3 rounded-xl border border-outline-variant/60 hover:border-primary hover:bg-primary-container/20 transition-all text-left group cursor-pointer" onclick="selectGoogleAccount('admin@sekolah.sch.id', 'Admin Utama')">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">A</div>
-<div>
-<p class="font-title-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">admin@sekolah.sch.id</p>
-<p class="text-xs text-on-surface-variant">Administrator Sistem</p>
-</div>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm">chevron_right</span>
-</button>
-<button class="w-full flex items-center justify-between p-3 rounded-xl border border-outline-variant/60 hover:border-primary hover:bg-primary-container/20 transition-all text-left group cursor-pointer" onclick="selectGoogleAccount('guru@sekolah.sch.id', 'Guru TIK')">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">G</div>
-<div>
-<p class="font-title-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">guru@sekolah.sch.id</p>
-<p class="text-xs text-on-surface-variant">Guru Pengajar</p>
-</div>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm">chevron_right</span>
-</button>
-<button class="w-full flex items-center justify-between p-3 rounded-xl border border-outline-variant/60 hover:border-primary hover:bg-primary-container/20 transition-all text-left group cursor-pointer" onclick="selectGoogleAccount('siswa@sekolah.sch.id', 'Siswa')">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center font-bold text-sm">S</div>
-<div>
-<p class="font-title-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">siswa@sekolah.sch.id</p>
-<p class="text-xs text-on-surface-variant">Portal Siswa</p>
-</div>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-sm">chevron_right</span>
-</button>
-</div>
-<!-- Divider -->
-<div class="relative flex py-2 items-center mb-4">
-<div class="flex-grow border-t border-outline-variant/40"></div>
-<span class="flex-shrink mx-3 text-xs text-on-surface-variant uppercase font-medium">atau Email Lain</span>
-<div class="flex-grow border-t border-outline-variant/40"></div>
-</div>
-<!-- Custom Email Form -->
-<form class="space-y-3" onsubmit="handleCustomEmailLogin(event)">
-<div>
-<input class="w-full px-4 py-2.5 rounded-xl border border-outline-variant text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" id="custom-google-email" placeholder="nama@sekolah.sch.id" required="" type="email"/>
-</div>
-<button class="w-full bg-primary text-white py-2.5 rounded-xl font-title-md text-sm hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer" id="btn-submit-modal" type="submit">
-<span>Lanjutkan Login</span>
-<span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</form>
-<div class="hidden mt-3 p-2.5 rounded-lg bg-error-container/30 border border-error/30 text-error text-xs text-center" id="modal-error-msg"></div>
-</div>
-</div>
-<!-- Footer -->
-<footer class="bg-surface-container-lowest py-6 px-gutter border-t border-outline-variant">
-<div class="container-max-width mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary text-sm">location_city</span>
-<span class="font-label-md text-label-md text-on-surface-variant">SMA Negeri 1 Edukasi Digital</span>
-</div>
-<div class="flex items-center gap-4">
-<span class="font-label-md text-label-md text-on-surface-variant opacity-60">Absen Online v1.0</span>
-<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
-<span class="font-label-md text-label-md text-on-surface-variant">© 2026 Sistem Presensi Digital</span>
-</div>
-</div>
-</footer>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="js/config.js"></script>
+    <!-- Header Navigation -->
+    <header class="w-full relative z-20 px-6 py-5 max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-white/20">
+                <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-2">
+                    Sistem Presensi Digital
+                    <span class="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-blue-400/30">v2.0</span>
+                </h1>
+                <p class="text-xs text-slate-400">SMA Negeri 1 Edukasi Digital</p>
+            </div>
+        </div>
+        
+        <!-- Status Indicator -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300 backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Sistem Online</span>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-5xl mx-auto px-4 py-8 relative z-10 my-auto">
+
+        <!-- STEP 1: ROLE SELECTION PORTAL -->
+        <div id="step-role-selection" class="step-transition opacity-100 scale-100">
+            <!-- Hero Welcome Header -->
+            <div class="text-center mb-10 max-w-2xl mx-auto">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-inner">
+                    <span class="material-symbols-outlined text-sm">vpn_key</span> Selamat Datang
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+                    Pilih Peran Anda untuk Login
+                </h2>
+                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                    Silakan pilih portal peran Anda di bawah ini atau gunakan Google OAuth untuk masuk secara otomatis.
+                </p>
+            </div>
+
+            <!-- OAuth Direct Login Option -->
+            <div class="max-w-md mx-auto mb-10">
+                <button onclick="openGoogleOAuthDirect()" 
+                        class="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-semibold py-3.5 px-6 rounded-2xl shadow-xl hover:bg-slate-100 hover:shadow-white/10 active:scale-[0.98] transition-all cursor-pointer group border border-slate-200">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewbox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                    </svg>
+                    <span>Masuk Langsung dengan Google OAuth</span>
+                    <span class="material-symbols-outlined text-sm text-slate-400 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </button>
+                <div class="relative flex py-4 items-center">
+                    <div class="flex-grow border-t border-slate-700/60"></div>
+                    <span class="flex-shrink mx-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Atau Pilih Portal Peran</span>
+                    <div class="flex-grow border-t border-slate-700/60"></div>
+                </div>
+            </div>
+
+            <!-- Role Selection Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- Administrator Card -->
+                <div onclick="selectRolePortal('admin')" 
+                     class="glass-portal rounded-2xl p-6 hover:border-blue-500/80 hover:bg-slate-800/90 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 cursor-pointer group flex flex-col justify-between active:scale-[0.97]">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mb-5 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">Management</span>
+                        <h3 class="text-xl font-bold text-white mt-3 group-hover:text-blue-300 transition-colors">Administrator</h3>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">Kelola pengguna, sistem, konfig, dan audit aktivitas.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-blue-400 group-hover:text-blue-300">
+                        <span>Masuk Portal Admin</span>
+                        <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Kepala Sekolah Card -->
+                <div onclick="selectRolePortal('kepsek')" 
+                     class="glass-portal rounded-2xl p-6 hover:border-purple-500/80 hover:bg-slate-800/90 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer group flex flex-col justify-between active:scale-[0.97]">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-purple-500/30 mb-5 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">Executive</span>
+                        <h3 class="text-xl font-bold text-white mt-3 group-hover:text-purple-300 transition-colors">Kepala Sekolah</h3>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">Pantau overview presensi, laporan, dan log sekolah.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-purple-400 group-hover:text-purple-300">
+                        <span>Masuk Portal Kepsek</span>
+                        <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Guru Pengajar Card -->
+                <div onclick="selectRolePortal('guru')" 
+                     class="glass-portal rounded-2xl p-6 hover:border-emerald-500/80 hover:bg-slate-800/90 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 cursor-pointer group flex flex-col justify-between active:scale-[0.97]">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 mb-5 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">school</span>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Pengajar</span>
+                        <h3 class="text-xl font-bold text-white mt-3 group-hover:text-emerald-300 transition-colors">Guru Pengajar</h3>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">Input presensi siswa kelas, rekapitulasi & data siswa.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-emerald-400 group-hover:text-emerald-300">
+                        <span>Masuk Portal Guru</span>
+                        <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Siswa Card -->
+                <div onclick="selectRolePortal('siswa')" 
+                     class="glass-portal rounded-2xl p-6 hover:border-amber-500/80 hover:bg-slate-800/90 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 cursor-pointer group flex flex-col justify-between active:scale-[0.97]">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30 mb-5 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">face</span>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">Siswa</span>
+                        <h3 class="text-xl font-bold text-white mt-3 group-hover:text-amber-300 transition-colors">Portal Siswa</h3>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">Check-in mandiri absensi & riwayat kehadiran pribadi.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs font-semibold text-amber-400 group-hover:text-amber-300">
+                        <span>Masuk Portal Siswa</span>
+                        <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STEP 2: ROLE-SPECIFIC LOGIN FORM -->
+        <div id="step-role-login" class="hidden step-transition opacity-0 scale-95 max-w-lg mx-auto">
+            <div class="glass-portal rounded-3xl p-8 sm:p-10 shadow-2xl border border-white/15 relative">
+                
+                <!-- Back Button -->
+                <button onclick="backToRoleSelection()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-6 cursor-pointer group">
+                    <span class="material-symbols-outlined text-base group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    <span>Kembali ke Pilih Role</span>
+                </button>
+
+                <!-- Dynamic Header for Selected Role -->
+                <div class="flex items-center gap-4 mb-6 pb-6 border-b border-slate-700/60">
+                    <div id="portal-role-avatar" class="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shrink-0">
+                        <span id="portal-role-icon" class="material-symbols-outlined text-3xl">person</span>
+                    </div>
+                    <div>
+                        <span id="portal-role-badge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">Portal Role</span>
+                        <h3 id="portal-role-title" class="text-2xl font-bold text-white mt-1">Login Portal</h3>
+                    </div>
+                </div>
+
+                <!-- Error Alert Box -->
+                <div id="portal-error-box" class="hidden mb-6 p-4 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-3">
+                    <span class="material-symbols-outlined text-rose-400 shrink-0 text-base">error</span>
+                    <div id="portal-error-msg" class="leading-relaxed"></div>
+                </div>
+
+                <!-- Registered Accounts List for Management/Teacher Roles -->
+                <div id="portal-accounts-wrapper" class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Akun Terdaftar:</span>
+                        <span class="text-[10px] text-slate-400">Klik akun untuk login 1-tap</span>
+                    </div>
+                    <div id="portal-accounts-list" class="space-y-2.5 max-h-52 overflow-y-auto pr-1">
+                        <div class="flex items-center justify-center py-6 text-slate-400 text-xs gap-2">
+                            <span class="material-symbols-outlined animate-spin text-base">sync</span>
+                            <span>Memuat akun terdaftar...</span>
+                        </div>
+                    </div>
+                    <div class="relative flex py-4 items-center">
+                        <div class="flex-grow border-t border-slate-700/60"></div>
+                        <span class="flex-shrink mx-3 text-[11px] text-slate-400 uppercase font-medium">Atau Masukkan Email Manual</span>
+                        <div class="flex-grow border-t border-slate-700/60"></div>
+                    </div>
+                </div>
+
+                <!-- Email Form -->
+                <form onsubmit="handleRoleFormSubmit(event)" class="space-y-4">
+                    <div>
+                        <label for="role-login-email" class="block text-xs font-semibold text-slate-300 mb-2">Email Terdaftar di Spreadsheet</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
+                            <input type="email" 
+                                   id="role-login-email" 
+                                   placeholder="nama@sekolah.sch.id" 
+                                   required 
+                                   class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-slate-500"/>
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                            id="btn-role-login-submit" 
+                            class="w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <span>Masuk ke Portal</span>
+                        <span class="material-symbols-outlined text-sm">login</span>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full relative z-20 py-6 border-t border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400 text-sm">location_city</span>
+                <span>SMA Negeri 1 Edukasi Digital</span>
+            </div>
+            <div>
+                <span>© 2026 Sistem Presensi Digital • Terintegrasi Google Apps Script</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="js/config.js"></script>
     <script>
+        let currentSelectedRole = null;
+
         document.addEventListener('DOMContentLoaded', async () => {
+            // Check active session
             const token = getToken();
             if (token) {
                 const check = await apiPost('checkSession', { token });
                 if (check && check.ok) {
-                    if (check.role === 'siswa') {
-                        window.location.href = 'absen-siswa.html';
-                    } else {
-                        window.location.href = 'dashboard.html';
-                    }
+                    window.location.href = check.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
                 }
-            }
-
-            if (typeof GOOGLE_CLIENT_ID !== 'undefined' && GOOGLE_CLIENT_ID) {
-                initGoogleSignIn('google-signin-container', (res) => {
-                    if (res.ok) {
-                        saveSession(res.token, res.role, res.nama);
-                        window.location.href = res.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
-                    } else {
-                        alert('Login gagal: ' + res.error);
-                    }
-                });
             }
         });
 
-        function openGoogleModal() {
-            const isLocalFile = window.location.protocol === 'file:';
-            const isGoogleLoaded = (typeof google !== 'undefined' && google.accounts && typeof GOOGLE_CLIENT_ID !== 'undefined' && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.trim() !== '');
-
-            if (isGoogleLoaded && !isLocalFile) {
-                try {
-                    triggerRealGoogleSignIn((res) => {
-                        if (res.ok) {
-                            saveSession(res.token, res.role, res.nama, res.email || '');
-                            window.location.href = res.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
-                        } else {
-                            alert('Login gagal: ' + res.error);
-                        }
-                    }, showGoogleModalFallback);
-                    return;
-                } catch (e) {
-                    console.error("Google Sign-In failed, falling back to mock modal:", e);
-                }
+        function openGoogleOAuthDirect() {
+            if (typeof GOOGLE_CLIENT_ID !== 'undefined' && GOOGLE_CLIENT_ID && typeof google !== 'undefined' && google.accounts) {
+                triggerRealGoogleSignIn((res) => {
+                    if (res.ok) {
+                        saveSession(res.token, res.role, res.nama, res.email || '');
+                        window.location.href = res.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
+                    } else {
+                        alert('Login OAuth Gagal: ' + res.error);
+                    }
+                }, () => {
+                    alert('Gagal menginisialisasi Google OAuth. Silakan pilih role di bawah.');
+                });
+            } else {
+                alert('Google OAuth Client ID belum terpasang. Gunakan pilihan role di bawah.');
             }
-            showGoogleModalFallback();
         }
 
-        function showGoogleModalFallback() {
-            const modal = document.getElementById('google-modal');
-            const card = document.getElementById('google-modal-card');
-            const errorMsg = document.getElementById('modal-error-msg');
-            if (errorMsg) errorMsg.classList.add('hidden');
+        async function selectRolePortal(role) {
+            currentSelectedRole = role;
+            const step1 = document.getElementById('step-role-selection');
+            const step2 = document.getElementById('step-role-login');
+            const errorBox = document.getElementById('portal-error-box');
+            if (errorBox) errorBox.classList.add('hidden');
+
+            // Setup Role UI themes
+            const avatar = document.getElementById('portal-role-avatar');
+            const icon = document.getElementById('portal-role-icon');
+            const badge = document.getElementById('portal-role-badge');
+            const title = document.getElementById('portal-role-title');
+            const submitBtn = document.getElementById('btn-role-login-submit');
+
+            if (role === 'admin') {
+                avatar.className = "w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0";
+                icon.textContent = "admin_panel_settings";
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30";
+                badge.textContent = "Management Portal";
+                title.textContent = "Portal Administrator";
+                submitBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer";
+            } else if (role === 'kepsek') {
+                avatar.className = "w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-purple-500/30 shrink-0";
+                icon.textContent = "shield_person";
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30";
+                badge.textContent = "Executive Portal";
+                title.textContent = "Portal Kepala Sekolah";
+                submitBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer";
+            } else if (role === 'guru') {
+                avatar.className = "w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0";
+                icon.textContent = "school";
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30";
+                badge.textContent = "Pengajar Portal";
+                title.textContent = "Portal Guru Pengajar";
+                submitBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer";
+            } else if (role === 'siswa') {
+                avatar.className = "w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30 shrink-0";
+                icon.textContent = "face";
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30";
+                badge.textContent = "Siswa Portal";
+                title.textContent = "Portal Absensi Siswa";
+                submitBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer";
+            }
+
+            // Smooth transition animation
+            step1.classList.remove('opacity-100', 'scale-100');
+            step1.classList.add('opacity-0', 'scale-95');
             
-            if (modal && card) {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                card.classList.remove('scale-95');
-                card.classList.add('scale-100');
+            setTimeout(() => {
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                setTimeout(() => {
+                    step2.classList.remove('opacity-0', 'scale-95');
+                    step2.classList.add('opacity-100', 'scale-100');
+                }, 50);
+            }, 300);
+
+            // Toggle Registered Accounts List visibility (Hidden for Siswa role)
+            const accountsWrapper = document.getElementById('portal-accounts-wrapper');
+            const emailInput = document.getElementById('role-login-email');
+            
+            if (role === 'siswa') {
+                if (accountsWrapper) accountsWrapper.classList.add('hidden');
+                if (emailInput) {
+                    emailInput.value = '';
+                    emailInput.placeholder = 'siswa@sekolah.sch.id';
+                }
+            } else {
+                if (accountsWrapper) accountsWrapper.classList.remove('hidden');
+                if (emailInput) {
+                    emailInput.value = '';
+                    emailInput.placeholder = 'nama@sekolah.sch.id';
+                }
+                loadRoleAccounts(role);
             }
         }
 
-        function closeGoogleModal() {
-            const modal = document.getElementById('google-modal');
-            const card = document.getElementById('google-modal-card');
-            if (modal && card) {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                card.classList.remove('scale-100');
-                card.classList.add('scale-95');
+        function backToRoleSelection() {
+            const step1 = document.getElementById('step-role-selection');
+            const step2 = document.getElementById('step-role-login');
+            currentSelectedRole = null;
+
+            step2.classList.remove('opacity-100', 'scale-100');
+            step2.classList.add('opacity-0', 'scale-95');
+
+            setTimeout(() => {
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+                setTimeout(() => {
+                    step1.classList.remove('opacity-0', 'scale-95');
+                    step1.classList.add('opacity-100', 'scale-100');
+                }, 50);
+            }, 300);
+        }
+
+        async function loadRoleAccounts(targetRole) {
+            const container = document.getElementById('portal-accounts-list');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="flex items-center justify-center py-6 text-slate-400 text-xs gap-2">
+                    <span class="material-symbols-outlined animate-spin text-base">sync</span>
+                    <span>Memuat akun terdaftar dari spreadsheet...</span>
+                </div>
+            `;
+
+            try {
+                const res = await getRegisteredAccounts();
+                const accountsList = (res && Array.isArray(res.data)) ? res.data : [];
+                const filtered = accountsList.filter(acc => (acc.role || '').toLowerCase() === targetRole.toLowerCase());
+
+                if (filtered.length === 0) {
+                    let msg = `Belum ada akun terdaftar untuk role ini di spreadsheet.`;
+                    if (res && res.source === 'fallback') {
+                        msg = `Aplikasi belum menerima data spreadsheet langsung. Pastikan Anda telah melakukan Re-Deploy Web App di Google Apps Script (Deploy > Manage Deployments > Edit > New Version).`;
+                    }
+                    container.innerHTML = `<p class="text-xs text-amber-300/90 text-center py-4 px-3 bg-amber-500/10 rounded-xl border border-amber-500/30 leading-relaxed">${msg}</p>`;
+                    return;
+                }
+
+                let html = '';
+                if (res && res.source === 'fallback') {
+                    html += `
+                        <div class="mb-3 p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-300 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm shrink-0">info</span>
+                            <span>Melihat mode lokal. Re-deploy Apps Script ke versi baru untuk sinkronisasi otomatis.</span>
+                        </div>
+                    `;
+                }
+
+                filtered.forEach(acc => {
+                    const initial = (acc.nama || acc.email || 'U').charAt(0).toUpperCase();
+                    html += `
+                        <button type="button" 
+                                onclick="selectRoleAccount('${(acc.email || '').replace(/'/g, "\\'")}', '${(acc.nama || '').replace(/'/g, "\\'")}')" 
+                                class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-500 transition-all text-left group cursor-pointer active:scale-[0.98]">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-9 h-9 shrink-0 rounded-lg bg-slate-800 border border-slate-700 text-white font-bold flex items-center justify-center text-sm shadow-sm group-hover:border-blue-400 transition-colors">
+                                    ${initial}
+                                </div>
+                                <div class="truncate">
+                                    <p class="text-xs font-bold text-white group-hover:text-blue-300 transition-colors truncate">${acc.nama || acc.email}</p>
+                                    <p class="text-[11px] text-slate-400 font-mono truncate">${acc.email}</p>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-400 group-hover:text-white text-sm group-hover:translate-x-0.5 transition-all shrink-0">arrow_forward</span>
+                        </button>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<p class="text-xs text-rose-400 text-center py-3">Gagal memuat akun. Silakan ketik email di bawah.</p>`;
             }
         }
 
-        function selectGoogleAccount(email, name = '') {
-            doGoogleLogin(email, name);
+        function selectRoleAccount(email, name = '') {
+            const emailInput = document.getElementById('role-login-email');
+            if (emailInput) emailInput.value = email;
+            doRoleLoginSubmit(email, name);
         }
 
-        function handleCustomEmailLogin(e) {
+        function handleRoleFormSubmit(e) {
             e.preventDefault();
-            const emailInput = document.getElementById('custom-google-email');
+            const emailInput = document.getElementById('role-login-email');
             if (emailInput && emailInput.value) {
-                doGoogleLogin(emailInput.value.trim());
+                doRoleLoginSubmit(emailInput.value.trim());
             }
         }
 
-        async function doGoogleLogin(email, name = '') {
-            const submitBtn = document.getElementById('btn-submit-modal');
-            const errorMsg = document.getElementById('modal-error-msg');
-            if (errorMsg) errorMsg.classList.add('hidden');
+        async function doRoleLoginSubmit(email, name = '') {
+            const errorBox = document.getElementById('portal-error-box');
+            const errorMsg = document.getElementById('portal-error-msg');
+            const submitBtn = document.getElementById('btn-role-login-submit');
 
-            let originalText = '';
+            if (errorBox) errorBox.classList.add('hidden');
+            let originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+
             if (submitBtn) {
-                originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> <span>Memproses...</span>`;
                 submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span><span>Memverifikasi Email...</span>`;
             }
 
             try {
-                const res = await mockGoogleLogin(email, name || "Sistem User", "");
+                // Pass currentSelectedRole to enforce strict role validation in backend
+                const res = await mockGoogleLogin(email, name || "User", "", currentSelectedRole);
+                
                 if (res.ok) {
                     saveSession(res.token, res.role, res.nama, email);
-                    closeGoogleModal();
-                    if (res.role === 'siswa') {
-                        window.location.href = 'absen-siswa.html';
-                    } else {
-                        window.location.href = 'dashboard.html';
-                    }
+                    window.location.href = res.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
                 } else {
-                    if (errorMsg) {
-                        errorMsg.textContent = 'Login gagal: ' + (res.error || 'Email tidak terdaftar');
-                        errorMsg.classList.remove('hidden');
+                    if (errorBox && errorMsg) {
+                        errorMsg.textContent = res.error || 'Gagal login. Email tidak cocok atau tidak terdaftar.';
+                        errorBox.classList.remove('hidden');
                     } else {
-                        alert('Login gagal: ' + res.error);
+                        alert('Login Gagal: ' + res.error);
                     }
                 }
             } catch (err) {
-                if (errorMsg) {
-                    errorMsg.textContent = 'Gagal terhubung ke server. Coba lagi.';
-                    errorMsg.classList.remove('hidden');
+                if (errorBox && errorMsg) {
+                    errorMsg.textContent = 'Gagal terhubung ke server Apps Script. Silakan periksa koneksi.';
+                    errorBox.classList.remove('hidden');
                 } else {
-                    alert('Gagal terhubung ke server');
+                    alert('Gagal terhubung ke server.');
                 }
             } finally {
                 if (submitBtn) {
-                    submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
                 }
             }
         }
-
-        // Add a subtle parallax effect to the hero background
-        document.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
-            const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
-            document.querySelector('.bg-education-pattern').style.backgroundPosition = `calc(50% + ${moveX}px) calc(50% + ${moveY}px)`;
-        });
     </script>
-</body></html>
+</body>
+</html>

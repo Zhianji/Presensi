@@ -151,8 +151,43 @@ async function guardPage(requiredRole) {
 }
 
 // ==== GOOGLE IDENTITY SERVICES & MOCK LOGIN ====
-async function mockGoogleLogin(email, name = '', picture = '') {
-  return await apiPost('loginWithGoogle', { email, name, picture });
+async function mockGoogleLogin(email, name = '', picture = '', expectedRole = '') {
+  return await apiPost('loginWithGoogle', { email, name, picture, expectedRole });
+}
+
+async function getRegisteredAccounts() {
+  const LOCAL_ACCOUNTS_KEY = 'cached_registered_accounts';
+  try {
+    const res = await apiPost('getPublicAccounts');
+    if (res && res.ok && Array.isArray(res.data)) {
+      localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(res.data));
+      return { ok: true, source: 'live', data: res.data };
+    } else if (res && res.error) {
+      console.warn("Backend error fetching accounts:", res.error);
+    }
+  } catch (e) {
+    console.warn("Failed to fetch public accounts from backend, checking local cache:", e);
+  }
+  
+  try {
+    const cached = localStorage.getItem(LOCAL_ACCOUNTS_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return { ok: true, source: 'cache', data: parsed };
+      }
+    }
+  } catch (e) {}
+
+  // Fallback default seed (matches setupSheets initial data)
+  return {
+    ok: false,
+    source: 'fallback',
+    error: 'Backend Apps Script belum di-deploy ke versi terbaru. Silakan ikuti petunjuk re-deploy.',
+    data: [
+      { email: 'admin@sekolah.edu', nama: 'Super Admin', role: 'admin' }
+    ]
+  };
 }
 
 function decodeJwtToken(token) {

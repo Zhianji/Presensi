@@ -88,6 +88,9 @@ function doGet(e) {
       case 'ping':
         result = { ok: true, message: 'pong' };
         break;
+      case 'getPublicAccounts':
+        result = getPublicAccounts();
+        break;
       default:
         result = { ok: false, error: 'Action "' + action + '" harus dipanggil lewat POST, bukan GET.' };
     }
@@ -104,7 +107,10 @@ function doPost(e) {
     let result;
     switch (action) {
       case 'loginWithGoogle':
-        result = loginWithGoogle(body.email, body.name, body.picture);
+        result = loginWithGoogle(body.email, body.name, body.picture, body.expectedRole);
+        break;
+      case 'getPublicAccounts':
+        result = getPublicAccounts();
         break;
       case 'getPengaturan':
         result = getPengaturan();
@@ -267,21 +273,33 @@ function savePengaturan(session, settings) {
 }
 
 // ============ AUTH ============
-function loginWithGoogle(email, name, picture) {
+function loginWithGoogle(email, name, picture, expectedRole) {
   if (!email) return { ok: false, error: 'Email tidak valid' };
   
+  const targetEmail = String(email).toLowerCase().trim();
+  const expRole = expectedRole ? String(expectedRole).toLowerCase().trim() : null;
+
   const sheetPengguna = getSheet('Pengguna');
   const rowsPengguna = sheetPengguna.getDataRange().getValues();
   for (let i = 1; i < rowsPengguna.length; i++) {
     const row = rowsPengguna[i];
     const id = row[0];
-    const rowEmail = row[1];
+    const rowEmail = String(row[1] || '').toLowerCase().trim();
     const rowNama = row[3] || name || 'User';
-    const role = row[4] || 'admin';
-    if (String(rowEmail).toLowerCase() === String(email).toLowerCase()) {
-      const token = createSession(id, role, rowNama);
-      logAction(id, rowNama, 'Login', 'Berhasil login sebagai ' + role);
-      return { ok: true, token: token, nama: rowNama, role: role };
+    const actualRole = String(row[4] || 'admin').toLowerCase().trim();
+    
+    if (rowEmail === targetEmail) {
+      if (expRole && expRole !== actualRole) {
+        const actualLabel = actualRole === 'admin' ? 'Administrator' : actualRole === 'kepsek' ? 'Kepala Sekolah' : actualRole === 'guru' ? 'Guru' : actualRole;
+        const expectedLabel = expRole === 'admin' ? 'Administrator' : expRole === 'kepsek' ? 'Kepala Sekolah' : expRole === 'guru' ? 'Guru' : expRole === 'siswa' ? 'Siswa' : expRole;
+        return { 
+          ok: false, 
+          error: 'Akses Ditolak: Akun Anda terdaftar sebagai ' + actualLabel + ', bukan ' + expectedLabel + '. Silakan login melalui portal ' + actualLabel + '.' 
+        };
+      }
+      const token = createSession(id, actualRole, rowNama);
+      logAction(id, rowNama, 'Login', 'Berhasil login sebagai ' + actualRole);
+      return { ok: true, token: token, nama: rowNama, role: actualRole };
     }
   }
 
@@ -289,8 +307,16 @@ function loginWithGoogle(email, name, picture) {
   const rowsSiswa = sheetSiswa.getDataRange().getValues();
   for (let i = 1; i < rowsSiswa.length; i++) {
     const [id, nis, rowNama, kelas, wali, status, rowEmail] = rowsSiswa[i];
-    if (rowEmail && String(rowEmail).toLowerCase() === String(email).toLowerCase()) {
+    const studentEmail = rowEmail ? String(rowEmail).toLowerCase().trim() : '';
+    if (studentEmail && studentEmail === targetEmail) {
       if (status !== 'Aktif') return { ok: false, error: 'Akun siswa tidak aktif' };
+      if (expRole && expRole !== 'siswa') {
+        const expectedLabel = expRole === 'admin' ? 'Administrator' : expRole === 'kepsek' ? 'Kepala Sekolah' : expRole === 'guru' ? 'Guru' : expRole;
+        return { 
+          ok: false, 
+          error: 'Akses Ditolak: Akun Anda terdaftar sebagai Siswa, bukan ' + expectedLabel + '. Silakan login melalui portal Siswa.' 
+        };
+      }
       const token = createSession(id, 'siswa', rowNama);
       logAction(id, rowNama, 'Login', 'Berhasil login sebagai siswa');
       return { ok: true, token: token, nama: rowNama, kelas: kelas, role: 'siswa' };
@@ -298,6 +324,39 @@ function loginWithGoogle(email, name, picture) {
   }
 
   return { ok: false, error: 'Akun dengan email ' + email + ' tidak terdaftar di sistem.' };
+}
+
+function getPublicAccounts() {
+  const accounts = [];
+  
+  try {
+    const sheetPengguna = getSheet('Pengguna');
+    const rowsPengguna = sheetPengguna.getDataRange().getValues();
+    for (let i = 1; i < rowsPengguna.length; i++) {
+      const row = rowsPengguna[i];
+      const email = String(row[1] || '').trim();
+      const nama = String(row[3] || '').trim();
+      const role = String(row[4] || 'admin').trim();
+      if (email) {
+        accounts.push({ email: email, nama: nama || email, role: role });
+      }
+    }
+  } catch (e) {}
+
+  try {
+    const sheetSiswa = getSheet('Siswa');
+    const rowsSiswa = sheetSiswa.getDataRange().getValues();
+    for (let i = 1; i < rowsSiswa.length; i++) {
+      const [id, nis, rowNama, kelas, wali, status, rowEmail] = rowsSiswa[i];
+      const email = String(rowEmail || '').trim();
+      const nama = String(rowNama || '').trim();
+      if (email && String(status).trim() === 'Aktif') {
+        accounts.push({ email: email, nama: nama || email, role: 'siswa', kelas: kelas || '' });
+      }
+    }
+  } catch (e) {}
+
+  return { ok: true, data: accounts };
 }
 
 function createSession(userId, role, nama) {

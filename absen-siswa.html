@@ -1,97 +1,118 @@
 <!DOCTYPE html>
-<html lang="id" class="light">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Siswa - Sistem Presensi Edukasi</title>
+    <title>Portal Siswa - Sistem Presensi Digital (v2.0)</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script src="js/tailwind-config.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        .glass-card {
+            background: rgba(30, 41, 59, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .bg-education-pattern {
-            background-image: linear-gradient(rgba(0, 61, 155, 0.8), rgba(0, 61, 155, 0.85)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-NYDCtrQdmjcv6iesoKgSMOlgYblPTvfBWCMioPy8CKrbA9YG3Ex0TXPl7Y-Fx-MGzSqhgSMNSJ2jczGdvQDtDkVC_f6R7BEVK67jPhYeJKTZEhtAmoPvxccbKkyiBZyKbo-JrqU3pwaXEQCEGM1Ba_39Y603Q_5kOxwNojHvXcKpkgR8n8TiCO--7o5fxH9KeJqhtu-9GMGHKTgZA4XAHl2wzhGvsgf4sHVFrF905f9rzHNDcp7Y');
+            background-image: radial-gradient(circle at 50% 30%, rgba(30, 58, 138, 0.5) 0%, rgba(15, 23, 42, 0.95) 100%), 
+                              url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen bg-surface">
-    <!-- Navbar -->
-    <header class="bg-primary text-white py-4 px-6 shadow-md z-20">
-        <div class="container-max-width mx-auto flex justify-between items-center">
+<body class="flex flex-col min-h-screen bg-[#0f172a] text-slate-100 antialiased">
+    <!-- Ambient Light Effects -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[130px]"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="glass-panel text-white py-4 px-6 sticky top-0 z-30 border-b border-slate-800">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-3xl">school</span>
-                <h1 class="font-title-lg text-title-lg tracking-tight">Portal Siswa</h1>
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-white/20">
+                    <span class="material-symbols-outlined text-white text-2xl">school</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm text-white tracking-tight flex items-center gap-1.5">
+                        Portal Siswa
+                        <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Presensi Mandiri</p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
-                <div class="hidden md:block text-right">
-                    <p class="font-title-md text-sm" id="user-name">Memuat...</p>
-                    <p class="font-label-sm text-xs opacity-80" id="user-class">Memuat...</p>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-white" id="user-name">Memuat...</p>
+                    <p class="text-[10px] text-blue-400 font-semibold uppercase tracking-wider" id="user-class">Memuat...</p>
                 </div>
-                <button onclick="handleLogout()" class="p-2 hover:bg-white/10 rounded-full transition-colors" title="Keluar">
-                    <span class="material-symbols-outlined">logout</span>
+                <button onclick="handleLogout()" class="p-2 hover:bg-slate-800 rounded-xl text-rose-400 hover:text-rose-300 transition-colors" title="Keluar">
+                    <span class="material-symbols-outlined text-xl">logout</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow relative overflow-hidden bg-education-pattern py-10 px-gutter">
-        <div class="absolute inset-0 opacity-10 pointer-events-none">
-            <div class="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-        </div>
-        
-        <div class="container-max-width mx-auto max-w-2xl relative z-10">
+    <main class="flex-grow relative z-10 bg-education-pattern py-10 px-4 flex flex-col justify-center">
+        <div class="max-w-2xl mx-auto w-full">
             <!-- Check-in Card -->
-            <div class="glass-card rounded-xl shadow-2xl p-8 mb-8">
+            <div class="glass-panel rounded-3xl shadow-2xl p-6 sm:p-8 mb-8 border border-white/10">
                 <div class="text-center mb-8">
-                    <p class="text-primary font-title-md mb-1" id="current-date">Senin, 10 Agustus 2024</p>
-                    <h2 class="font-display-md text-2xl text-on-surface">Silakan Lakukan Presensi</h2>
-                    <p class="text-on-surface-variant mt-2 text-sm">Pastikan Anda berada di area sekolah sebelum menekan tombol Hadir.</p>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Hari Ini
+                    </span>
+                    <p class="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-1" id="current-date">Senin, 10 Agustus 2026</p>
+                    <h2 class="text-2xl font-extrabold text-white">Silakan Lakukan Presensi</h2>
+                    <p class="text-slate-400 mt-1.5 text-xs max-w-md mx-auto">Pastikan Anda berada di kelas sebelum menekan tombol rincian mata pelajaran di bawah ini.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Mapel 1 -->
-                    <div class="border border-outline-variant rounded-lg p-5 flex flex-col items-center text-center hover:border-primary transition-colors bg-white">
-                        <span class="material-symbols-outlined text-4xl text-primary mb-3">computer</span>
-                        <h3 class="font-title-md text-lg mb-4">Teknologi Informasi (TIK)</h3>
-                        <button onclick="checkin('TIK')" class="w-full bg-primary text-white py-3 rounded-lg font-title-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md active:scale-95" id="btn-tik">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Mapel 1 (TIK) -->
+                    <div class="glass-card rounded-2xl p-6 flex flex-col items-center text-center hover:border-blue-500/50 transition-all border border-slate-700/60 shadow-lg group">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4 border border-blue-500/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">computer</span>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-4">Teknologi Informasi (TIK)</h3>
+                        <button onclick="checkin('TIK')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold text-xs shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-white/10" id="btn-tik">
                             Hadir TIK
                         </button>
-                        <p class="text-xs text-secondary mt-3" id="status-tik">Belum tercatat</p>
+                        <p class="text-xs text-slate-400 mt-3" id="status-tik">Belum tercatat</p>
                     </div>
 
-                    <!-- Mapel 2 -->
-                    <div class="border border-outline-variant rounded-lg p-5 flex flex-col items-center text-center hover:border-primary transition-colors bg-white">
-                        <span class="material-symbols-outlined text-4xl text-primary mb-3">menu_book</span>
-                        <h3 class="font-title-md text-lg mb-4">KKA</h3>
-                        <button onclick="checkin('KKA')" class="w-full bg-primary text-white py-3 rounded-lg font-title-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md active:scale-95" id="btn-kka">
+                    <!-- Mapel 2 (KKA) -->
+                    <div class="glass-card rounded-2xl p-6 flex flex-col items-center text-center hover:border-indigo-500/50 transition-all border border-slate-700/60 shadow-lg group">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">menu_book</span>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-4">KKA</h3>
+                        <button onclick="checkin('KKA')" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-3 rounded-xl font-semibold text-xs shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-white/10" id="btn-kka">
                             Hadir KKA
                         </button>
-                        <p class="text-xs text-secondary mt-3" id="status-kka">Belum tercatat</p>
+                        <p class="text-xs text-slate-400 mt-3" id="status-kka">Belum tercatat</p>
                     </div>
                 </div>
             </div>
 
             <!-- Riwayat Singkat -->
-            <div class="bg-white rounded-xl shadow-md border border-outline-variant overflow-hidden">
-                <div class="bg-surface-container-low px-6 py-4 border-b border-outline-variant flex justify-between items-center">
-                    <h3 class="font-title-md text-on-surface">Riwayat Presensi Hari Ini</h3>
-                    <button class="text-primary text-sm font-label-md hover:underline flex items-center gap-1" onclick="refreshStatus()">
-                        <span class="material-symbols-outlined text-[18px]">refresh</span> Segarkan
+            <div class="glass-panel rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
+                    <h3 class="font-bold text-xs text-white uppercase tracking-wider">Riwayat Presensi Hari Ini</h3>
+                    <button class="text-blue-400 hover:text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors" onclick="refreshStatus()">
+                        <span class="material-symbols-outlined text-sm">refresh</span> Segarkan
                     </button>
                 </div>
-                <div class="p-6 text-center text-on-surface-variant text-sm" id="riwayat-container">
+                <div class="p-6 text-center text-slate-400 text-xs" id="riwayat-container">
                     <p>Memuat riwayat...</p>
                 </div>
             </div>
@@ -99,23 +120,22 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-surface-container-lowest py-6 px-gutter border-t border-outline-variant">
-        <div class="container-max-width mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <footer class="glass-panel py-5 px-6 border-t border-slate-800 text-xs text-slate-400">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-secondary text-sm">location_city</span>
-                <span class="font-label-md text-label-md text-on-surface-variant">SMA Negeri 1 Edukasi Digital</span>
+                <span class="material-symbols-outlined text-blue-400 text-sm">location_city</span>
+                <span>SMA Negeri 1 Edukasi Digital</span>
             </div>
-            <div class="flex items-center gap-4">
-                <span class="font-label-md text-label-md text-on-surface-variant opacity-60">Portal Siswa v2.0</span>
-                <div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
-                <span class="font-label-md text-label-md text-on-surface-variant">© 2026 Sistem Presensi Digital</span>
+            <div class="flex items-center gap-4 text-slate-500">
+                <span>Portal Siswa v2.0</span>
+                <span>•</span>
+                <span>© 2026 Sistem Presensi Digital</span>
             </div>
         </div>
     </footer>
 
     <script src="js/config.js"></script>
     <script>
-        // Setup Date
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', options);
 
@@ -155,25 +175,37 @@
                         const statusText = document.getElementById(`status-${mapel.toLowerCase()}`);
                         
                         if (status && status !== 'Tercatat') {
-                            // Sudah absen
-                            html += `<div class="flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline-variant"><span class="font-medium">${mapel}</span> <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> ${status}</span></div>`;
-                            btn.disabled = true;
-                            btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Selesai`;
-                            btn.classList.replace('bg-primary', 'bg-green-600');
-                            btn.classList.replace('hover:bg-primary-container', 'hover:bg-green-700');
-                            statusText.textContent = `Tercatat pukul ${status}`;
+                            html += `
+                                <div class="flex justify-between items-center glass-card p-3.5 rounded-xl border border-slate-700/60">
+                                    <span class="font-semibold text-white text-xs">${mapel}</span> 
+                                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
+                                        <span class="material-symbols-outlined text-sm">check_circle</span> ${status}
+                                    </span>
+                                </div>`;
+                            if(btn) {
+                                btn.disabled = true;
+                                btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Selesai`;
+                                btn.className = 'w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold text-xs opacity-90 cursor-not-allowed';
+                            }
+                            if(statusText) statusText.textContent = `Tercatat pukul ${status}`;
                         } else {
-                            html += `<div class="flex justify-between items-center p-3 rounded border border-dashed border-outline-variant"><span class="font-medium">${mapel}</span> <span class="text-secondary text-sm">Belum ada data</span></div>`;
-                            btn.disabled = false;
-                            btn.innerHTML = `Hadir ${mapel}`;
-                            btn.classList.replace('bg-green-600', 'bg-primary');
-                            statusText.textContent = 'Belum tercatat';
+                            html += `
+                                <div class="flex justify-between items-center p-3.5 rounded-xl border border-dashed border-slate-700 text-xs">
+                                    <span class="font-semibold text-slate-300">${mapel}</span> 
+                                    <span class="text-slate-400">Belum ada data</span>
+                                </div>`;
+                            if(btn) {
+                                btn.disabled = false;
+                                btn.innerHTML = `Hadir ${mapel}`;
+                                btn.className = 'w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold text-xs shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-white/10';
+                            }
+                            if(statusText) statusText.textContent = 'Belum tercatat';
                         }
                     });
                     html += '</div>';
                     document.getElementById('riwayat-container').innerHTML = html;
                 } else {
-                    document.getElementById('riwayat-container').innerHTML = `<p class="text-error">Gagal memuat: ${res.error}</p>`;
+                    document.getElementById('riwayat-container').innerHTML = `<p class="text-rose-400">Gagal memuat: ${res.error}</p>`;
                 }
             });
         }
@@ -184,7 +216,6 @@
             window.location.href = 'index.html';
         }
 
-        // Initialize
         document.addEventListener("DOMContentLoaded", async () => {
             const check = await guardPage('siswa');
             if (check) {
