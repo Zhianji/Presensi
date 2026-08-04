@@ -17,14 +17,19 @@ async function apiGet(action, params = {}) {
 }
 
 async function apiPost(action, data = {}, timeoutMs = 35000, maxRetries = 1) {
+  let finalUrl = APPS_SCRIPT_URL.trim();
+  if (!finalUrl.endsWith('/exec') && !finalUrl.endsWith('/dev')) {
+    finalUrl += finalUrl.endsWith('/') ? 'exec' : '/exec';
+  }
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const controller = new AbortController();
     const currentTimeout = attempt > 0 ? 45000 : timeoutMs;
     const timer = setTimeout(() => controller.abort(), currentTimeout);
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
+      const res = await fetch(finalUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action, ...data }),
         signal: controller.signal
       });

@@ -92,7 +92,7 @@ function doGet(e) {
         result = getPublicAccounts();
         break;
       default:
-        result = { ok: false, error: 'Action "' + action + '" harus dipanggil lewat POST, bukan GET.' };
+        result = { ok: false, error: 'Action "' + action + '" harus dipanggil lewat POST, bukan GET. Pastikan URL Apps Script diakhiri dengan /exec' };
     }
     return jsonResponse(result);
   } catch (err) {
