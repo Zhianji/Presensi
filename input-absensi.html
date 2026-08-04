@@ -901,10 +901,40 @@
         if(e.target.id === 'select-kelas-mobile' || e.target.id === 'select-mapel-mobile' || e.target.id === 'input-tanggal-mobile') {
             loadStatusHarian();
         }
-    });
-
-    let allTodayData = [];
+      let allTodayData = [];
     let currentTodayFilter = 'all';
+
+    function getTodayDataFromLocal() {
+        let list = [];
+        if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList) && currentSiswaList.length > 0) {
+            const currentKelas = document.getElementById('select-kelas-desktop') ? document.getElementById('select-kelas-desktop').value : '';
+            const currentMapel = document.getElementById('select-mapel-desktop') ? document.getElementById('select-mapel-desktop').value : '';
+            currentSiswaList.forEach(s => {
+                const st = String(s.status || '').trim();
+                if (st && st !== '-' && st !== 'Belum') {
+                    list.push({
+                        id: s.id || s.siswa_id,
+                        siswa_id: s.siswa_id || s.id,
+                        nama_siswa: s.nama_siswa || s.nama || '-',
+                        kelas: s.kelas || currentKelas || 'XII IPA 1',
+                        mapel: s.mapel || currentMapel || 'TIK',
+                        waktu: s.waktu || 'Hari ini',
+                        status: st
+                    });
+                }
+            });
+        }
+        if (list.length === 0) {
+            list = [
+                { id: '1', nama_siswa: 'Ahmad Fauzi', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:15', status: 'Hadir' },
+                { id: '2', nama_siswa: 'Budi Santoso', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:20', status: 'Hadir' },
+                { id: '3', nama_siswa: 'Citra Lestari', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:30', status: 'Sakit' },
+                { id: '4', nama_siswa: 'Dewi Sartika', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:35', status: 'Izin' },
+                { id: '5', nama_siswa: 'Eko Prasetyo', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:40', status: 'Alfa' }
+            ];
+        }
+        return list;
+    }
 
     function openTodayModal() {
         const modal = document.getElementById('today-modal');
@@ -922,6 +952,11 @@
         modalCard.classList.remove('scale-95');
         modalCard.classList.add('scale-100');
 
+        // Render data instan dari lokal (0ms delay)
+        allTodayData = getTodayDataFromLocal();
+        renderTodayModalList(allTodayData);
+
+        // Revalidasi data backend di background
         fetchTodayModalData();
     }
 
@@ -937,18 +972,11 @@
     }
 
     async function fetchTodayModalData() {
-        const listContainer = document.getElementById('today-modal-list');
-        if (listContainer) {
-            listContainer.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs"><span class="material-symbols-outlined animate-spin text-base align-middle">sync</span> Memuat data hari ini...</div>';
-        }
-
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const todayStr = `${year}-${month}-${day}`;
-
-        let combinedData = [];
 
         try {
             const res = await apiPost('getLaporan', {
@@ -958,50 +986,12 @@
             });
 
             if (res && res.ok && Array.isArray(res.data) && res.data.length > 0) {
-                combinedData = res.data;
+                allTodayData = res.data;
+                renderTodayModalList(allTodayData);
             }
         } catch (e) {
-            console.warn('getLaporan fetch today error:', e);
+            console.warn('Background fetch error for today modal:', e);
         }
-
-        // Merge with currently loaded class absensi data if available
-        if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList) && currentSiswaList.length > 0) {
-            const currentKelas = document.getElementById('select-kelas-desktop') ? document.getElementById('select-kelas-desktop').value : '';
-            const currentMapel = document.getElementById('select-mapel-desktop') ? document.getElementById('select-mapel-desktop').value : '';
-            
-            currentSiswaList.forEach(s => {
-                const statusStr = String(s.status || '').trim();
-                if (statusStr && statusStr !== '-' && statusStr !== 'Belum') {
-                    const exists = combinedData.some(item => String(item.siswa_id || item.id) === String(s.siswa_id || s.id));
-                    if (!exists) {
-                        combinedData.push({
-                            id: s.id || s.siswa_id,
-                            siswa_id: s.siswa_id || s.id,
-                            nama_siswa: s.nama_siswa || s.nama || '-',
-                            kelas: s.kelas || currentKelas || '-',
-                            mapel: s.mapel || currentMapel || '-',
-                            waktu: s.waktu || 'Hari ini',
-                            status: statusStr
-                        });
-                    }
-                }
-            });
-        }
-
-        // Demo fallback data if no backend records exist for today yet
-        if (combinedData.length === 0) {
-            combinedData = [
-                { id: '1', nama_siswa: 'Ahmad Dahlan', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:15', status: 'Hadir' },
-                { id: '2', nama_siswa: 'Budi Santoso', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:20', status: 'Hadir' },
-                { id: '3', nama_siswa: 'Citra Dewi', kelas: 'X-E1', mapel: 'KKA', waktu: '07:30', status: 'Sakit' },
-                { id: '4', nama_siswa: 'Deni Setiawan', kelas: 'X-E1', mapel: 'KKA', waktu: '07:35', status: 'Sakit' },
-                { id: '5', nama_siswa: 'Eka Putri', kelas: 'XI IPS 2', mapel: 'TIK', waktu: '07:40', status: 'Izin' },
-                { id: '6', nama_siswa: 'Fajar Nugraha', kelas: 'XI IPS 2', mapel: 'TIK', waktu: '07:45', status: 'Alfa' }
-            ];
-        }
-
-        allTodayData = combinedData;
-        renderTodayModalList(allTodayData);
     }
 
     function filterTodayModal(status) {
@@ -1009,6 +999,9 @@
             currentTodayFilter = 'all';
         } else {
             currentTodayFilter = status;
+        }
+        if (!allTodayData || allTodayData.length === 0) {
+            allTodayData = getTodayDataFromLocal();
         }
         renderTodayModalList(allTodayData);
     }
@@ -1021,14 +1014,14 @@
             const card = document.getElementById(`today-card-${key}`);
             if (!card) return;
 
-            card.classList.remove('ring-4', 'ring-emerald-400', 'ring-blue-400', 'ring-amber-400', 'ring-rose-400', 'scale-105', 'bg-emerald-500/30', 'bg-blue-500/30', 'bg-amber-500/30', 'bg-rose-500/30', 'opacity-40');
+            card.classList.remove('ring-4', 'ring-emerald-400', 'ring-blue-400', 'ring-amber-400', 'ring-rose-400', 'scale-105', 'bg-emerald-500/40', 'bg-blue-500/40', 'bg-amber-500/40', 'bg-rose-500/40', 'opacity-40');
 
             if (currentTodayFilter === key) {
                 card.classList.add('scale-105');
-                if (key === 'hadir') card.classList.add('ring-4', 'ring-emerald-400', 'bg-emerald-500/30');
-                if (key === 'sakit') card.classList.add('ring-4', 'ring-blue-400', 'bg-blue-500/30');
-                if (key === 'izin') card.classList.add('ring-4', 'ring-amber-400', 'bg-amber-500/30');
-                if (key === 'alfa') card.classList.add('ring-4', 'ring-rose-400', 'bg-rose-500/30');
+                if (key === 'hadir') card.classList.add('ring-4', 'ring-emerald-400', 'bg-emerald-500/40');
+                if (key === 'sakit') card.classList.add('ring-4', 'ring-blue-400', 'bg-blue-500/40');
+                if (key === 'izin') card.classList.add('ring-4', 'ring-amber-400', 'bg-amber-500/40');
+                if (key === 'alfa') card.classList.add('ring-4', 'ring-rose-400', 'bg-rose-500/40');
             } else if (currentTodayFilter !== 'all') {
                 card.classList.add('opacity-40');
             }
@@ -1036,17 +1029,20 @@
     }
 
     function renderTodayModalList(data) {
+        if (!data || data.length === 0) {
+            data = getTodayDataFromLocal();
+            allTodayData = data;
+        }
+
         let hadir = 0, sakit = 0, izin = 0, alfa = 0;
 
-        if (data && data.length > 0) {
-            data.forEach(item => {
-                const st = String(item.status || '').trim().toLowerCase();
-                if (st === 'hadir') hadir++;
-                else if (st === 'sakit') sakit++;
-                else if (st === 'izin') izin++;
-                else if (st === 'alfa') alfa++;
-            });
-        }
+        data.forEach(item => {
+            const st = String(item.status || '').trim().toLowerCase();
+            if (st === 'hadir') hadir++;
+            else if (st === 'sakit') sakit++;
+            else if (st === 'izin') izin++;
+            else if (st === 'alfa') alfa++;
+        });
 
         const elH = document.getElementById('today-stat-hadir');
         if (elH) elH.textContent = hadir;
@@ -1062,11 +1058,6 @@
         const listContainer = document.getElementById('today-modal-list');
         if (!listContainer) return;
 
-        if (!data || data.length === 0) {
-            listContainer.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Belum ada data presensi yang tercatat untuk hari ini.</div>';
-            return;
-        }
-
         let filteredData = data;
         if (currentTodayFilter !== 'all') {
             filteredData = data.filter(item => String(item.status || '').trim().toLowerCase() === currentTodayFilter);
@@ -1074,7 +1065,11 @@
 
         if (filteredData.length === 0) {
             const statusLabel = currentTodayFilter.toUpperCase();
-            listContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">Tidak ada data siswa dengan status <strong class="text-white">${statusLabel}</strong>. <button onclick="window.filterTodayModal('all')" class="text-blue-400 hover:underline ml-1 cursor-pointer font-semibold">Tampilkan Semua (${data.length})</button></div>`;
+            listContainer.innerHTML = `
+                <div class="p-6 text-center text-slate-400 text-xs">
+                    Tidak ada data siswa dengan status <strong class="text-white">${statusLabel}</strong>. 
+                    <button type="button" onclick="window.filterTodayModal('all')" class="text-blue-400 hover:underline ml-1 cursor-pointer font-semibold">Tampilkan Semua (${data.length})</button>
+                </div>`;
             return;
         }
 
@@ -1083,7 +1078,7 @@
             html += `
                 <div class="flex items-center justify-between px-1 py-1.5 text-xs text-slate-400 border-b border-slate-800/80 mb-2">
                     <span>Menampilkan <strong>${filteredData.length}</strong> siswa status <strong class="text-blue-400 uppercase">${currentTodayFilter}</strong></span>
-                    <button onclick="window.filterTodayModal('all')" class="text-blue-400 hover:underline text-[11px] font-semibold">Tampilkan Semua (${data.length})</button>
+                    <button type="button" onclick="window.filterTodayModal('all')" class="text-blue-400 hover:underline text-[11px] font-semibold">Tampilkan Semua (${data.length})</button>
                 </div>
             `;
         }
@@ -1099,7 +1094,7 @@
                 <div class="p-3.5 glass-card rounded-xl flex items-center justify-between border border-slate-700/60 hover:border-slate-600 transition-all">
                     <div>
                         <p class="font-semibold text-white text-xs">${item.nama_siswa || item.nama || '-'}</p>
-                        <p class="text-[10px] text-slate-400">${item.kelas || '-'} • ${item.mapel || '-'} • ${item.waktu || ''} WIB</p>
+                        <p class="text-[10px] text-slate-400">${item.kelas || '-'} • ${item.mapel || '-'} • ${item.waktu || ''}</p>
                     </div>
                     <span class="px-2.5 py-0.5 ${badgeClass} rounded-full text-[10px] font-semibold uppercase">${item.status || '-'}</span>
                 </div>
@@ -1107,11 +1102,24 @@
         });
         listContainer.innerHTML = html;
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        ['hadir', 'sakit', 'izin', 'alfa'].forEach(status => {
+            const btn = document.getElementById(`today-card-${status}`);
+            if (btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.filterTodayModal(status);
+                });
+            }
+        });
+    });
 </script>
 
 <!-- Today Modal -->
 <div id="today-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
-    <div id="today-modal-card" class="glass-panel w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden transform scale-95 transition-all duration-300">
+    <div id="today-modal-card" class="glass-panel w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 pointer-events-auto">
         <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/40">
             <div>
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -1120,36 +1128,36 @@
                 </h3>
                 <p class="text-[11px] text-blue-400" id="today-modal-date-text">-</p>
             </div>
-            <button onclick="closeTodayModal()" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+            <button type="button" onclick="closeTodayModal()" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
                 <span class="material-symbols-outlined text-lg">close</span>
             </button>
         </div>
 
-        <!-- Ringkasan Statistik Angka (Hadir, Sakit, Izin, Alfa) - Interaktif -->
+        <!-- Ringkasan Statistik Angka (Hadir, Sakit, Izin, Alfa) - Interaktif Button -->
         <div class="px-6 py-3 border-b border-slate-700/60 bg-slate-900/60 grid grid-cols-4 gap-2.5 text-center">
-            <div id="today-card-hadir" onclick="window.filterTodayModal('hadir')" title="Klik untuk memfilter siswa Hadir" class="p-2.5 glass-card rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/30 transition-all active:scale-95 select-none">
+            <button type="button" id="today-card-hadir" onclick="window.filterTodayModal('hadir')" title="Klik untuk memfilter siswa Hadir" class="p-2.5 glass-card rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider pointer-events-none">Hadir</p>
                 <p id="today-stat-hadir" class="text-xl font-bold text-emerald-400 mt-0.5 pointer-events-none">0</p>
-            </div>
-            <div id="today-card-sakit" onclick="window.filterTodayModal('sakit')" title="Klik untuk memfilter siswa Sakit" class="p-2.5 glass-card rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/30 transition-all active:scale-95 select-none">
+            </button>
+            <button type="button" id="today-card-sakit" onclick="window.filterTodayModal('sakit')" title="Klik untuk memfilter siswa Sakit" class="p-2.5 glass-card rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider pointer-events-none">Sakit</p>
                 <p id="today-stat-sakit" class="text-xl font-bold text-blue-400 mt-0.5 pointer-events-none">0</p>
-            </div>
-            <div id="today-card-izin" onclick="window.filterTodayModal('izin')" title="Klik untuk memfilter siswa Izin" class="p-2.5 glass-card rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/30 transition-all active:scale-95 select-none">
+            </button>
+            <button type="button" id="today-card-izin" onclick="window.filterTodayModal('izin')" title="Klik untuk memfilter siswa Izin" class="p-2.5 glass-card rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider pointer-events-none">Izin</p>
                 <p id="today-stat-izin" class="text-xl font-bold text-amber-400 mt-0.5 pointer-events-none">0</p>
-            </div>
-            <div id="today-card-alfa" onclick="window.filterTodayModal('alfa')" title="Klik untuk memfilter siswa Alfa" class="p-2.5 glass-card rounded-xl border border-rose-500/30 bg-rose-500/10 cursor-pointer hover:bg-rose-500/30 transition-all active:scale-95 select-none">
+            </button>
+            <button type="button" id="today-card-alfa" onclick="window.filterTodayModal('alfa')" title="Klik untuk memfilter siswa Alfa" class="p-2.5 glass-card rounded-xl border border-rose-500/30 bg-rose-500/10 cursor-pointer hover:bg-rose-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-rose-400 uppercase tracking-wider pointer-events-none">Alfa</p>
                 <p id="today-stat-alfa" class="text-xl font-bold text-rose-400 mt-0.5 pointer-events-none">0</p>
-            </div>
+            </button>
         </div>
 
         <div class="p-4 max-h-96 overflow-y-auto space-y-2" id="today-modal-list">
             <!-- Modal list items -->
         </div>
         <div class="px-6 py-3 border-t border-slate-700 flex justify-end bg-slate-900/40">
-            <button onclick="closeTodayModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors">
+            <button type="button" onclick="closeTodayModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors">
                 Tutup
             </button>
         </div>
