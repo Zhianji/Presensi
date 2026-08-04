@@ -377,12 +377,15 @@
         async function handleSaveAdmin(e) {
             e.preventDefault();
             const id = document.getElementById('admin-id').value;
+            const primaryAction = id ? 'updatePengguna' : 'createPengguna';
+            const fallbackAction = id ? 'updateGuru' : 'createGuru';
+            
             const payload = {
                 token: getToken(),
-                action: id ? 'updatePengguna' : 'createPengguna',
                 id: id,
                 nama: document.getElementById('admin-nama').value,
                 email: document.getElementById('admin-email').value,
+                username: document.getElementById('admin-email').value,
                 role: document.getElementById('admin-role').value
             };
 
@@ -390,7 +393,13 @@
             if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
 
             try {
-                const res = await apiPost(payload.action, payload);
+                let res = await apiPost(primaryAction, payload);
+                
+                // Fallback otomatis jika Web App Apps Script belum memuat action updatePengguna/createPengguna
+                if (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal'))) {
+                    res = await apiPost(fallbackAction, payload);
+                }
+
                 if (res.ok) {
                     closeAdminModal();
                     if (typeof showToast === 'function') {
@@ -412,7 +421,11 @@
         async function deleteAdmin(id) {
             if (!confirm('Yakin ingin menghapus pengguna ini?')) return;
             try {
-                const res = await apiPost('deletePengguna', { token: getToken(), id: id });
+                let res = await apiPost('deletePengguna', { token: getToken(), id: id });
+                if (!res.ok && res.error && (res.error.includes('Action tidak dikenal') || res.error.includes('tidak dikenal'))) {
+                    res = await apiPost('deleteGuru', { token: getToken(), id: id });
+                }
+
                 if (res.ok) {
                     if (typeof showToast === 'function') {
                         showToast('Pengguna berhasil dihapus!', false);
