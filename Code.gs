@@ -177,18 +177,26 @@ function doPost(e) {
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => deleteSiswa(session, body.id));
         break;
       case 'getGuruList':
+      case 'getPengguna':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], () => getGuruList());
         break;
       case 'createGuru':
-        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], () => createGuru(body.username, body.password, body.nama));
+      case 'createPengguna':
+        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) =>
+          createPengguna(session, body.nama, body.email || body.username, body.role, body.password)
+        );
         break;
       case 'updateGuru':
-        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => updateGuru(session, body.id, body.username, body.nama));
+      case 'updatePengguna':
+        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) =>
+          updatePengguna(session, body.id, body.nama, body.email || body.username, body.role)
+        );
         break;
       case 'resetGuruPassword':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => resetGuruPassword(session, body.id, body.password));
         break;
       case 'deleteGuru':
+      case 'deletePengguna':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => deleteGuru(session, body.id));
         break;
       case 'changeOwnPassword':
@@ -334,11 +342,12 @@ function getPublicAccounts() {
     const rowsPengguna = sheetPengguna.getDataRange().getValues();
     for (let i = 1; i < rowsPengguna.length; i++) {
       const row = rowsPengguna[i];
+      const id = String(row[0] || ('user-' + i));
       const email = String(row[1] || '').trim();
       const nama = String(row[3] || '').trim();
       const role = String(row[4] || 'admin').trim();
       if (email) {
-        accounts.push({ email: email, nama: nama || email, role: role });
+        accounts.push({ id: id, email: email, username: email, nama: nama || email, role: role });
       }
     }
   } catch (e) {}
@@ -351,7 +360,7 @@ function getPublicAccounts() {
       const email = String(rowEmail || '').trim();
       const nama = String(rowNama || '').trim();
       if (email && String(status).trim() === 'Aktif') {
-        accounts.push({ email: email, nama: nama || email, role: 'siswa', kelas: kelas || '' });
+        accounts.push({ id: String(id || ('siswa-' + i)), email: email, username: email, nama: nama || email, role: 'siswa', kelas: kelas || '' });
       }
     }
   } catch (e) {}
@@ -1041,11 +1050,19 @@ function getGuruList() {
   const list = [];
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    const id = row[0];
-    const username = row[1];
-    const nama = row[3] || '';
-    const role = row[4] || 'admin';
-    list.push({ id: id, username: username, nama: nama, role: role });
+    const id = String(row[0] || ('user-' + i));
+    const username = String(row[1] || '').trim();
+    const nama = String(row[3] || '').trim();
+    const role = String(row[4] || 'admin').trim();
+    if (id || username) {
+      list.push({
+        id: id,
+        username: username,
+        email: username,
+        nama: nama || username,
+        role: role
+      });
+    }
   }
   return { ok: true, data: list };
 }
@@ -1060,40 +1077,55 @@ function isUsernameTaken(rows, username, excludeId) {
 }
 
 function createGuru(username, password, nama) {
-  username = String(username || '').trim();
+  return createPengguna(null, nama, username, 'admin', password);
+}
+
+function createPengguna(session, nama, email, role, password) {
+  email = String(email || '').trim();
   nama = String(nama || '').trim();
-  password = String(password || '');
-  if (!username || !password || !nama) return { ok: false, error: 'Semua field wajib diisi' };
-  if (password.length < PASSWORD_MIN_LENGTH) {
-    return { ok: false, error: 'Password minimal ' + PASSWORD_MIN_LENGTH + ' karakter' };
-  }
+  role = String(role || 'guru').trim().toLowerCase();
+  password = String(password || '123456');
+
+  if (!email || !nama) return { ok: false, error: 'Nama dan email wajib diisi' };
 
   const sheet = getSheet(SHEET_GURU);
   const rows = sheet.getDataRange().getValues();
-  if (isUsernameTaken(rows, username)) return { ok: false, error: 'Username sudah dipakai' };
+  if (isUsernameTaken(rows, email)) return { ok: false, error: 'Email / Username sudah terdaftar' };
 
   const id = Utilities.getUuid();
-  sheet.appendRow([id, username, makePasswordHash(password), nama, 'admin']);
+  sheet.appendRow([id, email, makePasswordHash(password), nama, role]);
+  if (session) logAction(session.user_id, session.nama, 'Tambah Pengguna', 'Menambahkan pengguna ' + nama + ' (' + email + ') sebagai ' + role);
   return { ok: true, id: id };
 }
 
 function updateGuru(session, id, username, nama) {
-  username = String(username || '').trim();
+  return updatePengguna(session, id, nama, username, 'admin');
+}
+
+function updatePengguna(session, id, nama, email, role) {
+  email = String(email || '').trim();
   nama = String(nama || '').trim();
-  if (!username || !nama) return { ok: false, error: 'Username dan nama wajib diisi' };
+  role = String(role || 'guru').trim().toLowerCase();
+
+  if (!email || !nama) return { ok: false, error: 'Email dan nama wajib diisi' };
 
   const sheet = getSheet(SHEET_GURU);
   const rows = sheet.getDataRange().getValues();
   let targetIndex = -1;
   for (let i = 1; i < rows.length; i++) {
-    if (String(rows[i][0]) === String(id)) { targetIndex = i; break; }
+    if (String(rows[i][0]) === String(id) || String(rows[i][1]).trim().toLowerCase() === email.toLowerCase()) {
+      targetIndex = i;
+      break;
+    }
   }
-  if (targetIndex === -1) return { ok: false, error: 'Akun admin tidak ditemukan' };
-  if (isUsernameTaken(rows, username, id)) return { ok: false, error: 'Username sudah dipakai admin lain' };
+  if (targetIndex === -1) return { ok: false, error: 'Akun tidak ditemukan' };
+  if (isUsernameTaken(rows, email, rows[targetIndex][0])) return { ok: false, error: 'Email / Username sudah dipakai akun lain' };
 
   const r = targetIndex + 1;
-  sheet.getRange(r, 2).setValue(username);
+  sheet.getRange(r, 2).setValue(email);
   sheet.getRange(r, 4).setValue(nama);
+  sheet.getRange(r, 5).setValue(role);
+  if (session) logAction(session.user_id, session.nama, 'Update Pengguna', 'Mengubah data pengguna ' + nama + ' (' + email + ')');
   return { ok: true };
 }
 
@@ -1118,7 +1150,7 @@ function resetGuruPassword(session, id, newPassword) {
 }
 
 function deleteGuru(session, id) {
-  if (String(id) === String(session.user_id)) {
+  if (session && String(id) === String(session.user_id)) {
     return { ok: false, error: 'Tidak bisa menghapus akun sendiri saat sedang login' };
   }
 
@@ -1129,7 +1161,9 @@ function deleteGuru(session, id) {
   }
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(id)) {
+      const targetNama = rows[i][3] || rows[i][1];
       sheet.deleteRow(i + 1);
+      if (session) logAction(session.user_id, session.nama, 'Hapus Pengguna', 'Menghapus pengguna ' + targetNama);
       return { ok: true };
     }
   }

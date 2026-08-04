@@ -282,13 +282,25 @@
                         saveSession(res.token, res.role, res.nama, res.email || '');
                         window.location.href = res.role === 'siswa' ? 'absen-siswa.html' : 'dashboard.html';
                     } else {
-                        alert('Login OAuth Gagal: ' + res.error);
+                        promptGoogleEmailFallback(res.error || 'Email Google ini belum terdaftar di spreadsheet.');
                     }
-                }, () => {
-                    alert('Gagal menginisialisasi Google OAuth. Silakan pilih role di bawah.');
+                }, (reason) => {
+                    promptGoogleEmailFallback(reason);
                 });
             } else {
-                alert('Google OAuth Client ID belum terpasang. Gunakan pilihan role di bawah.');
+                promptGoogleEmailFallback('Google OAuth Client ID belum terpasang atau tidak aktif pada domain ini.');
+            }
+        }
+
+        function promptGoogleEmailFallback(reason) {
+            selectRolePortal('admin');
+            const errorBox = document.getElementById('portal-error-box');
+            const errorMsg = document.getElementById('portal-error-msg');
+            if (errorBox && errorMsg) {
+                errorMsg.innerHTML = `<span class="font-bold text-white block mb-0.5">Google OAuth Mode Simulasi / Direct Login</span>` +
+                    (reason ? `<span class="opacity-90">${reason}</span><br/>` : '') +
+                    `<span class="text-[11px] opacity-80 mt-1 block">Silakan pilih akun terdaftar atau ketikkan email Anda di bawah untuk masuk.</span>`;
+                errorBox.classList.remove('hidden');
             }
         }
 

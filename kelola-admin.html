@@ -57,13 +57,17 @@
                 <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">how_to_reg</span>
                 <span>Input Absen</span>
             </a>
-            <a class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs" href="master-data.html">
-                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">database</span>
+            <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="master-data.html">
+                <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">database</span>
                 <span>Master Data</span>
             </a>
             <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="laporan.html">
                 <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">description</span>
                 <span>Laporan</span>
+            </a>
+            <a class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs" href="kelola-admin.html">
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+                <span>Kelola Admin</span>
             </a>
             <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="notifikasi.html">
                 <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">notifications_active</span>
@@ -94,7 +98,11 @@
             <div class="flex items-center gap-4">
                 <h2 class="text-lg font-bold text-white tracking-tight">Kelola Admin & Pengguna</h2>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <button onclick="loadPengguna(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-xl flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 cursor-pointer" title="Segarkan Data dari Spreadsheet">
+                    <span class="material-symbols-outlined text-base">refresh</span>
+                    <span class="hidden sm:inline">Refresh Data</span>
+                </button>
                 <button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-semibold text-xs transition-all shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer border border-white/10" onclick="openAdminModal()">
                     <span class="material-symbols-outlined text-base">person_add</span> <span>Tambah Pengguna</span>
                 </button>
@@ -139,8 +147,9 @@
                     </li>
                 </ol>
             </nav>
-            <div>
-                <p class="text-xs text-slate-400">Manajemen akun Admin, Guru, dan Kepala Sekolah.</p>
+            <div class="flex justify-between items-center">
+                <p class="text-xs text-slate-400">Manajemen akun Admin, Guru, dan Kepala Sekolah yang terdaftar di spreadsheet.</p>
+                <div id="status-sync-badge" class="hidden text-[11px] font-semibold px-2.5 py-1 rounded-lg border"></div>
             </div>
             
             <div class="glass-panel rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
@@ -156,7 +165,7 @@
                         </thead>
                         <tbody id="pengguna-table" class="divide-y divide-slate-700/40 text-xs text-slate-200">
                             <tr>
-                                <td colspan="4" class="py-6 px-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data...</td>
+                                <td colspan="4" class="py-6 px-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data pengguna dari spreadsheet...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -208,22 +217,104 @@
         let allPengguna = [];
 
         document.addEventListener("DOMContentLoaded", async () => {
-            const check = await guardPage('admin');
+            const check = await guardPage(['admin', 'kepsek']);
             if (!check) return;
             loadPengguna();
         });
 
-        async function loadPengguna() {
+        async function loadPengguna(forceRefresh = false) {
+            const tbody = document.getElementById('pengguna-table');
+            const syncBadge = document.getElementById('status-sync-badge');
+
+            if (forceRefresh) {
+                localStorage.removeItem('cached_registered_accounts');
+            }
+
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 px-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data pengguna dari spreadsheet...</td></tr>`;
+            }
+
+            let res = null;
+
+            // Endpoint 1: getPengguna
             try {
-                const res = await apiPost('getPengguna', { token: getToken() });
-                if (res.ok && res.data) {
-                    allPengguna = res.data;
-                    renderTable(res.data);
-                } else {
-                    renderTable(getMockPengguna());
+                const r = await apiPost('getPengguna', { token: getToken() });
+                if (r && r.ok && Array.isArray(r.data)) res = r;
+            } catch(e) { console.log('[kelola-admin] getPengguna gagal:', e.message); }
+
+            // Endpoint 2: getGuruList
+            if (!res) {
+                try {
+                    const r = await apiPost('getGuruList', { token: getToken() });
+                    if (r && r.ok && Array.isArray(r.data)) res = r;
+                } catch(e) { console.log('[kelola-admin] getGuruList gagal:', e.message); }
+            }
+
+            // Endpoint 3: getPublicAccounts
+            if (!res) {
+                try {
+                    const r = await apiPost('getPublicAccounts');
+                    if (r && r.ok && Array.isArray(r.data)) res = r;
+                } catch(e) { console.log('[kelola-admin] getPublicAccounts gagal:', e.message); }
+            }
+
+            if (res && res.ok && Array.isArray(res.data)) {
+                // Filter hanya role pengelola (admin, guru, kepsek)
+                const list = res.data.filter(a => a.role !== 'siswa').map((u, i) => ({
+                    id: String(u.id || ('user-' + (i + 1))),
+                    nama: u.nama || u.email || u.username || 'User',
+                    email: u.email || u.username || '',
+                    username: u.username || u.email || '',
+                    role: (u.role || 'guru').toLowerCase()
+                }));
+                allPengguna = list;
+                localStorage.setItem('cached_registered_accounts', JSON.stringify(res.data));
+                
+                if (syncBadge) {
+                    syncBadge.className = "text-[11px] font-semibold px-2.5 py-1 rounded-lg border bg-emerald-500/10 text-emerald-400 border-emerald-500/30 flex items-center gap-1";
+                    syncBadge.innerHTML = `<span class="material-symbols-outlined text-sm">cloud_done</span> Terhubung ke Spreadsheet`;
+                    syncBadge.classList.remove('hidden');
                 }
-            } catch(e) {
-                renderTable(getMockPengguna());
+                
+                renderTable(list);
+            } else {
+                // Fallback ke cache lokal jika offline/gagal koneksi
+                const cachedAccounts = localStorage.getItem('cached_registered_accounts');
+                if (cachedAccounts) {
+                    try {
+                        const parsed = JSON.parse(cachedAccounts);
+                        const list = parsed.filter(a => a.role !== 'siswa').map((u, i) => ({
+                            id: String(u.id || ('user-' + (i + 1))),
+                            nama: u.nama || u.email || u.username || 'User',
+                            email: u.email || u.username || '',
+                            username: u.username || u.email || '',
+                            role: (u.role || 'guru').toLowerCase()
+                        }));
+                        if (list.length > 0) {
+                            allPengguna = list;
+                            if (syncBadge) {
+                                syncBadge.className = "text-[11px] font-semibold px-2.5 py-1 rounded-lg border bg-amber-500/10 text-amber-400 border-amber-500/30 flex items-center gap-1";
+                                syncBadge.innerHTML = `<span class="material-symbols-outlined text-sm">cloud_off</span> Data Cache (Offline)`;
+                                syncBadge.classList.remove('hidden');
+                            }
+                            renderTable(list);
+                            return;
+                        }
+                    } catch(e) {}
+                }
+
+                allPengguna = [];
+                if (syncBadge) syncBadge.classList.add('hidden');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-8 px-6 text-center text-slate-400">
+                        <span class="material-symbols-outlined text-3xl text-rose-400 block mb-2">cloud_off</span>
+                        <p class="font-semibold text-slate-300">Gagal memuat data dari spreadsheet.</p>
+                        <p class="text-xs text-slate-400 mt-1 mb-3">Pastikan Web App Apps Script sudah di-deploy ulang dan URL Apps Script di config.js sudah benar.</p>
+                        <button onclick="loadPengguna(true)" class="px-3.5 py-1.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-400 border border-blue-500/40 text-xs font-semibold rounded-lg transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">refresh</span> Coba Lagi
+                        </button>
+                    </td></tr>`;
+                }
             }
         }
 
@@ -251,8 +342,8 @@
                         <td class="py-4 px-6">${roleBadge}</td>
                         <td class="py-4 px-6 text-right">
                             <div class="flex justify-end gap-2">
-                                <button onclick="editAdmin('${u.id}')" class="p-1 text-blue-400 hover:text-blue-300 transition-colors" title="Edit"><span class="material-symbols-outlined text-lg">edit</span></button>
-                                <button onclick="deleteAdmin('${u.id}')" class="p-1 text-rose-400 hover:text-rose-300 transition-colors" title="Hapus"><span class="material-symbols-outlined text-lg">delete</span></button>
+                                <button onclick="editAdmin('${u.id}')" class="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-all cursor-pointer" title="Edit"><span class="material-symbols-outlined text-lg">edit</span></button>
+                                <button onclick="deleteAdmin('${u.id}')" class="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer" title="Hapus"><span class="material-symbols-outlined text-lg">delete</span></button>
                             </div>
                         </td>
                     </tr>
@@ -302,13 +393,17 @@
                 const res = await apiPost(payload.action, payload);
                 if (res.ok) {
                     closeAdminModal();
-                    showToast('Data pengguna berhasil disimpan!', false);
-                    loadPengguna();
+                    if (typeof showToast === 'function') {
+                        showToast('Data pengguna berhasil disimpan!', false);
+                    } else {
+                        alert('Data pengguna berhasil disimpan!');
+                    }
+                    loadPengguna(true);
                 } else {
                     alert('Gagal menyimpan: ' + (res.error || 'Terjadi kesalahan'));
                 }
             } catch(err) {
-                alert('Gagal terhubung ke server');
+                alert('Gagal terhubung ke server: ' + (err.message || 'Terjadi kesalahan koneksi'));
             } finally {
                 if (btn) { btn.disabled = false; btn.textContent = 'Simpan'; }
             }
@@ -319,23 +414,20 @@
             try {
                 const res = await apiPost('deletePengguna', { token: getToken(), id: id });
                 if (res.ok) {
-                    showToast('Pengguna berhasil dihapus!', false);
-                    loadPengguna();
+                    if (typeof showToast === 'function') {
+                        showToast('Pengguna berhasil dihapus!', false);
+                    } else {
+                        alert('Pengguna berhasil dihapus!');
+                    }
+                    loadPengguna(true);
                 } else {
                     alert('Gagal menghapus: ' + (res.error || 'Terjadi kesalahan'));
                 }
             } catch(e) {
-                alert('Terjadi kesalahan koneksi.');
+                alert('Terjadi kesalahan koneksi: ' + (e.message || 'Gagal terhubung ke server'));
             }
         }
 
-        function getMockPengguna() {
-            return [
-                { id: "1", nama: "Administrator Utama", email: "admin@sekolah.sch.id", role: "admin" },
-                { id: "2", nama: "Drs. H. Mulyadi", email: "mulyadi@sekolah.sch.id", role: "kepsek" },
-                { id: "3", nama: "Ibu Sarah SPd", email: "sarah@sekolah.sch.id", role: "guru" }
-            ];
-        }
     </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // ==== KONFIGURASI APLIKASI ====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyX-SAcz2znRmyoPUVVYfUEmRSQI34ihbYu_gPi3Y1P3T8MH6S5-p-GCl32gTk872brAQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUcFNc2m_M8ni_68F6w_Zivso3zuxRDAZokPLkSVEkL0HK7KOYyuQUQSy73hzagGm1OA/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
 const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
@@ -168,7 +168,7 @@ async function getRegisteredAccounts() {
   } catch (e) {
     console.warn("Failed to fetch public accounts from backend, checking local cache:", e);
   }
-  
+
   try {
     const cached = localStorage.getItem(LOCAL_ACCOUNTS_KEY);
     if (cached) {
@@ -179,14 +179,11 @@ async function getRegisteredAccounts() {
     }
   } catch (e) {}
 
-  // Fallback default seed (matches setupSheets initial data)
   return {
     ok: false,
     source: 'fallback',
-    error: 'Backend Apps Script belum di-deploy ke versi terbaru. Silakan ikuti petunjuk re-deploy.',
-    data: [
-      { email: 'admin@sekolah.edu', nama: 'Super Admin', role: 'admin' }
-    ]
+    error: 'Backend Apps Script belum di-deploy atau belum terhubung.',
+    data: []
   };
 }
 
@@ -248,21 +245,24 @@ function triggerRealGoogleSignIn(handleSuccess, fallbackFn) {
                 console.error("GSI UserInfo fetch error:", err);
               }
             }
-            if (fallbackFn) fallbackFn();
+            if (fallbackFn) fallbackFn('Gagal mengambil data profil Google.');
           },
           error_callback: (err) => {
             console.warn("Google OAuth popup error:", err);
-            if (fallbackFn) fallbackFn();
+            const reason = (err && (err.message || err.type)) ? (err.message || err.type) : 'Domain ini belum terdaftar di Google Cloud Console Client ID.';
+            if (fallbackFn) fallbackFn(reason);
           }
         });
         client.requestAccessToken();
         return;
       } catch (e) {
         console.warn("initTokenClient failed, fallback:", e);
+        if (fallbackFn) fallbackFn(e.message || 'Gagal menginisialisasi OAuth Client.');
+        return;
       }
     }
   }
-  if (fallbackFn) fallbackFn();
+  if (fallbackFn) fallbackFn('Google OAuth Client ID belum dikonfigurasi.');
 }
 
 function handleLogout() {
@@ -313,16 +313,16 @@ function setupCommonUI(session) {
     const isActive = currentPage === item.page;
     if (isActive) {
       navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 border-l-4 border-primary transition-all">
-          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
-          <span class="font-label-md text-label-md font-bold">${item.label}</span>
+        <a href="${item.page}" class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs">
+          <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+          <span>${item.label}</span>
         </a>
       `;
     } else {
       navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container px-4 py-3 rounded-lg transition-all scale-95 active:scale-90">
-          <span class="material-symbols-outlined">${item.icon}</span>
-          <span class="font-label-md text-label-md">${item.label}</span>
+        <a href="${item.page}" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group">
+          <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">${item.icon}</span>
+          <span>${item.label}</span>
         </a>
       `;
     }
