@@ -466,37 +466,32 @@
         const tbody = document.getElementById('master-siswa-tbody');
         const mobileList = document.getElementById('master-siswa-mobile-list');
 
+        let hasRenderedInitial = false;
         const cachedSiswa = localStorage.getItem('cache_siswa_list');
         if (cachedSiswa) {
             try {
                 allSiswaList = JSON.parse(cachedSiswa);
                 initKelasDropdowns(allSiswaList);
                 filterSiswaTable();
+                hasRenderedInitial = true;
             } catch (e) {}
-        } else {
-            if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
-            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-slate-400 text-xs">Memuat data...</div>`;
+        }
+
+        if (!hasRenderedInitial) {
+            allSiswaList = getMockSiswaData();
+            initKelasDropdowns(allSiswaList);
+            filterSiswaTable();
         }
 
         try {
             const res = await apiPost('getSiswaList', { token: getToken() });
-            if (res.ok && res.data) {
+            if (res && res.ok && res.data) {
                 allSiswaList = res.data;
                 localStorage.setItem('cache_siswa_list', JSON.stringify(res.data));
                 initKelasDropdowns(res.data);
                 filterSiswaTable();
-            } else if (!cachedSiswa) {
-                allSiswaList = getMockSiswaData();
-                initKelasDropdowns(allSiswaList);
-                filterSiswaTable();
             }
-        } catch (err) {
-            if (!cachedSiswa) {
-                allSiswaList = getMockSiswaData();
-                initKelasDropdowns(allSiswaList);
-                filterSiswaTable();
-            }
-        }
+        } catch (err) {}
     }
 
     function initKelasDropdowns(data) {

@@ -499,6 +499,8 @@
         const tbody = document.getElementById('input-absensi-tbody');
         const mobileList = document.getElementById('student-list');
         
+        let hasRenderedInitial = false;
+
         if (cached) {
             try {
                 currentSiswaList = JSON.parse(cached);
@@ -509,17 +511,56 @@
                 
                 const elInfo = document.getElementById('info-text');
                 if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                hasRenderedInitial = true;
             } catch (e) {
                 console.error('Failed to parse cached status harian:', e);
             }
-        } else {
-            if(tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat data siswa...</td></tr>`;
-            if(mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-slate-400 text-xs">Memuat data...</div>`;
+        }
+
+        if (!hasRenderedInitial) {
+            let initialRoster = [];
+            const cachedSiswaList = localStorage.getItem('cache_siswa_list');
+            if (cachedSiswaList) {
+                try {
+                    const allSiswa = JSON.parse(cachedSiswaList);
+                    if (Array.isArray(allSiswa) && allSiswa.length > 0) {
+                        initialRoster = allSiswa
+                            .filter(s => !kelas || s.kelas === kelas)
+                            .map(s => ({
+                                id: s.id || s.siswa_id,
+                                siswa_id: s.id || s.siswa_id,
+                                nama: s.nama,
+                                kelas: s.kelas,
+                                status: 'Hadir',
+                                keterangan: ''
+                            }));
+                    }
+                } catch(e) {}
+            }
+
+            if (initialRoster.length === 0) {
+                initialRoster = [
+                    { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                    { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
+                    { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
+                    { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
+                    { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" }
+                ];
+            }
+
+            currentSiswaList = initialRoster;
+            renderSiswaTable(initialRoster);
+            const countText = `Menampilkan ${initialRoster.length} Siswa`;
+            const elDesktopText = document.getElementById('total-siswa-text');
+            if(elDesktopText) elDesktopText.textContent = countText;
+
+            const elInfo = document.getElementById('info-text');
+            if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
         }
 
         try {
             const res = await apiPost('getStatusHarian', { token: getToken(), kelas, mapel, tanggal });
-            if (res.ok && res.data) {
+            if (res && res.ok && res.data) {
                 currentSiswaList = res.data;
                 localStorage.setItem(cacheKey, JSON.stringify(res.data));
                 renderSiswaTable(res.data);
@@ -532,37 +573,9 @@
                 if (isManualClick && typeof showToast === 'function') {
                     showToast(`Data presensi ${kelas || 'Semua Kelas'} berhasil dimuat.`);
                 }
-            } else {
-                if (!cached) {
-                    const mockData = [
-                        { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                        { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                        { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
-                        { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
-                        { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" }
-                    ];
-                    currentSiswaList = mockData;
-                    renderSiswaTable(mockData);
-                    const countText = `Menampilkan ${mockData.length} Siswa (Demo Offline)`;
-                    const elDesktopText = document.getElementById('total-siswa-text');
-                    if(elDesktopText) elDesktopText.textContent = countText;
-                }
             }
         } catch (e) {
-            if (!cached) {
-                const mockData = [
-                    { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                    { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                    { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
-                    { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
-                    { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" }
-                ];
-                currentSiswaList = mockData;
-                renderSiswaTable(mockData);
-                const countText = `Menampilkan ${mockData.length} Siswa (Demo Offline)`;
-                const elDesktopText = document.getElementById('total-siswa-text');
-                if(elDesktopText) elDesktopText.textContent = countText;
-            }
+            console.warn("Background fetch getStatusHarian network error:", e);
         } finally {
             if (btnD) {
                 btnD.disabled = false;
