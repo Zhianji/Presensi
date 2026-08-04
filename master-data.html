@@ -52,7 +52,7 @@
                 <button class="material-symbols-outlined text-slate-400 hover:text-white p-2 hover:bg-slate-800/80 rounded-xl transition-colors" onclick="window.location.href='notifikasi.html'">notifications</button>
                 <div class="relative">
                     <button onclick="toggleMobileDropdown('dropdown-mobile-master-data')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-master-data'), 200)" class="flex items-center gap-2 pr-2.5 pl-1 py-1 rounded-full border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700/80 transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <img class="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-400/40" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+                        <img class="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-400/40" data-alt="User Avatar" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true"/>
                         <span class="text-xs font-semibold text-slate-200 user-name-display truncate max-w-[80px]">Admin</span>
                     </button>
                     <div id="dropdown-mobile-master-data" class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
@@ -229,7 +229,7 @@
                                     <p class="text-xs font-bold text-white user-name-display">Admin Utama</p>
                                     <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider user-role-display">Administrator</p>
                                 </div>
-                                <img class="w-9 h-9 rounded-full border-2 border-blue-500/40 object-cover shadow-md group-hover:ring-2 ring-blue-400 transition-all" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXzKPUzrTaQQI7SeQfKhfY5De2NwNsk_lhrYdLbTcApYA-8aGWam49J_fXZRH3gFmbJd1udfK25pqC5qNK4Hqx1hStpCHEr7jsJ_D3Wtjvd26e32RK2PM02D2ie7NX4QIRbYbyw509NMEV0SA6KeHl5dHpEKJEJH3BWNmmqKit57rkcvroyC0osR16Wo_xznWA0Ro1DBeAeGw0Cc4_jzsnDAb0JriuG5avUPVCqeUzmUO3X75U_leo"/>
+                                <img class="w-9 h-9 rounded-full border-2 border-blue-500/40 object-cover shadow-md group-hover:ring-2 ring-blue-400 transition-all" data-alt="User Avatar" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true"/>
                             </button>
                             <div id="dropdown-desktop-master" class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
                                 <a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
@@ -795,6 +795,7 @@
         try {
             const res = await apiPost(payload.action, payload);
             if (res.ok) {
+                invalidateCache('cache_siswa_list');
                 closeSiswaModal();
                 showToast('Data siswa berhasil disimpan!', false);
                 await loadSiswaMasterData();
@@ -813,6 +814,7 @@
         try {
             const res = await apiPost('deleteSiswa', { token: getToken(), id: id });
             if (res.ok) {
+                invalidateCache('cache_siswa_list');
                 showToast('Data siswa berhasil dihapus!', false);
                 await loadSiswaMasterData();
             } else {

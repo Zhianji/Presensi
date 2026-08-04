@@ -27,13 +27,19 @@ async function apiPost(action, data = {}, timeoutMs = 30000) {
       signal: controller.signal
     });
     clearTimeout(timer);
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.warn("Apps Script non-JSON response:", text);
+      return { ok: false, error: "Respon server bukan format JSON yang valid.", raw: text };
+    }
   } catch (err) {
     clearTimeout(timer);
     if (err.name === 'AbortError') {
-      throw new Error(`Koneksi ke Google Apps Script timeout (melewati ${Math.round(timeoutMs/1000)} detik). Silakan coba lagi.`);
+      return { ok: false, error: `Koneksi ke Google Apps Script timeout (${Math.round(timeoutMs/1000)}s). Silakan coba lagi.` };
     }
-    throw err;
+    return { ok: false, error: err.message || 'Gagal terhubung ke server.' };
   }
 }
 
@@ -44,6 +50,10 @@ const CACHE_DURATIONS = {
   cache_kelas_list: 60 * 60 * 1000,
   cache_rekap_bulanan: 10 * 60 * 1000,
   cache_riwayat_siswa: 5 * 60 * 1000,
+  cache_laporan_data: 5 * 60 * 1000,
+  cache_pengaturan: 60 * 60 * 1000,
+  cache_guru_list: 30 * 60 * 1000,
+  cache_log_aktivitas: 5 * 60 * 1000,
 };
 
 function getCached(key) {
@@ -70,17 +80,33 @@ function setCached(key, data) {
 
 function clearAllCache() {
   Object.keys(CACHE_DURATIONS).forEach(k => localStorage.removeItem(k));
+  sessionStorage.removeItem('absensi_verified_session');
+}
+
+function invalidateCache(keys) {
+  if (!keys) {
+    clearAllCache();
+    return;
+  }
+  const keysArr = Array.isArray(keys) ? keys : [keys];
+  keysArr.forEach(k => localStorage.removeItem(k));
 }
 
 async function apiPostCached(action, data, cacheKey, onFresh) {
   const cached = cacheKey ? getCached(cacheKey) : null;
   const freshPromise = apiPost(action, data).then(res => {
-    if (res.ok && cacheKey) setCached(cacheKey, res);
+    if (res && res.ok && cacheKey) setCached(cacheKey, res);
     if (onFresh) onFresh(res);
     return res;
+  }).catch(err => {
+    return cached || { ok: false, error: err.message };
   });
-  if (cached) return cached;
-  return freshPromise;
+
+  if (cached) {
+    freshPromise.catch(() => {});
+    return cached;
+  }
+  return await freshPromise;
 }
 
 // ==== SESSION MANAGEMENT ====
@@ -89,6 +115,7 @@ function saveSession(token, role, nama, email = '') {
   localStorage.setItem(ROLE_KEY, role);
   localStorage.setItem(NAMA_KEY, nama);
   if (email) localStorage.setItem(EMAIL_KEY, email);
+  sessionStorage.removeItem('absensi_verified_session');
 }
 
 function getToken() { return localStorage.getItem(TOKEN_KEY); }
@@ -104,6 +131,14 @@ function clearSession() {
   clearAllCache();
 }
 
+function getAvatarUrl(nama) {
+  const nameStr = nama || getNama() || 'User';
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=3b82f6&color=fff&bold=true`;
+}
+
+const SESSION_CACHE_KEY = 'absensi_verified_session';
+const SESSION_CACHE_DURATION = 10 * 60 * 1000; // 10 menit
+
 /**
  * Jaga halaman: redirect ke login jika belum ada session atau role tidak cocok.
  * requiredRole bisa string ('siswa') atau array (['admin', 'guru', 'kepsek'])
@@ -114,34 +149,64 @@ async function guardPage(requiredRole) {
     window.location.href = 'index.html';
     return null;
   }
+
+  const currentRole = getRole();
+  const currentNama = getNama();
+  const currentEmail = getEmail();
+  let roleMatch = Array.isArray(requiredRole) ? requiredRole.includes(currentRole) : currentRole === requiredRole;
+
+  if (!roleMatch) {
+    clearSession();
+    window.location.href = 'index.html';
+    return null;
+  }
+
+  // Fast-path: Gunakan session tersimpan jika masih berlaku (mencegah request HTTP setiap pindah halaman)
+  try {
+    const rawSession = sessionStorage.getItem(SESSION_CACHE_KEY);
+    if (rawSession) {
+      const { session, token: cachedToken, timestamp } = JSON.parse(rawSession);
+      if (cachedToken === token && (Date.now() - timestamp < SESSION_CACHE_DURATION)) {
+        setupCommonUI(session);
+        // Background revalidation jika session cache sudah berusia > 3 menit
+        if (Date.now() - timestamp > 3 * 60 * 1000) {
+          apiPost('checkSession', { token }).then(check => {
+            if (check && check.ok) {
+              sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({ session: check, token, timestamp: Date.now() }));
+            }
+          }).catch(() => {});
+        }
+        return session;
+      }
+    }
+  } catch (e) {}
+
+  // Network verification jika belum ada cache
   try {
     const check = await apiPost('checkSession', { token });
 
-    let roleMatch = false;
+    let freshRoleMatch = false;
     if (Array.isArray(requiredRole)) {
-      roleMatch = requiredRole.includes(check.role);
+      freshRoleMatch = requiredRole.includes(check.role);
     } else {
-      roleMatch = check.role === requiredRole;
+      freshRoleMatch = check.role === requiredRole;
     }
 
-    if (!check.ok || !roleMatch) {
+    if (!check.ok || !freshRoleMatch) {
       clearSession();
       window.location.href = 'index.html';
       return null;
     }
 
-    // Auto setup UI sidebar & header user details
+    sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({ session: check, token, timestamp: Date.now() }));
     setupCommonUI(check);
-
     return check;
   } catch (e) {
     console.error('Session verification error:', e);
-    // Allow cached local session fallback if network fails temporarily
-    const currentRole = getRole();
-    let roleMatch = Array.isArray(requiredRole) ? requiredRole.includes(currentRole) : currentRole === requiredRole;
     if (currentRole && roleMatch) {
-      setupCommonUI({ role: currentRole, nama: getNama() });
-      return { ok: true, role: currentRole, nama: getNama() };
+      const fallbackSession = { ok: true, role: currentRole, nama: currentNama, email: currentEmail };
+      setupCommonUI(fallbackSession);
+      return fallbackSession;
     } else {
       clearSession();
       window.location.href = 'index.html';
@@ -278,7 +343,13 @@ function handleLogout() {
 function setupCommonUI(session) {
   const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
 
-  // 1. Render User Header Info
+  // 1. Render User Header Info & Avatars
+  const avatarUrl = getAvatarUrl(session.nama);
+  const userAvatars = document.querySelectorAll('img[data-alt="User Avatar"], img.user-avatar, img[src*="googleusercontent"]');
+  userAvatars.forEach(img => {
+    img.src = avatarUrl;
+  });
+
   const userHeaderNames = document.querySelectorAll('.user-name-display, #user-name, p.font-label-md.font-bold');
   userHeaderNames.forEach(el => {
     if (session.nama) el.textContent = session.nama;

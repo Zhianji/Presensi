@@ -147,11 +147,12 @@
             btn.classList.add('opacity-70');
 
             apiPost('checkin', { token: getToken(), mapel: mapel }).then(res => {
-                if (res.ok) {
-                    alert(res.message);
+                if (res && res.ok) {
+                    invalidateCache(['cache_riwayat_siswa', 'cache_laporan_data', 'cache_overview_v2']);
+                    alert(res.message || 'Presensi berhasil dicatat!');
                     refreshStatus();
                 } else {
-                    alert('Error: ' + res.error);
+                    alert('Error: ' + ((res && res.error) || 'Gagal menyimpan presensi.'));
                     btn.innerText = originalText;
                     btn.disabled = false;
                     btn.classList.remove('opacity-70');
@@ -164,50 +165,56 @@
             });
         }
 
-        function refreshStatus() {
-            document.getElementById('riwayat-container').innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Memuat...';
-            apiPost('getAbsensiHariIni', { token: getToken() }).then(res => {
-                if (res.ok) {
-                    let html = '<div class="space-y-3 text-left">';
-                    ['TIK', 'KKA'].forEach(mapel => {
-                        const status = res.status[mapel];
-                        const btn = document.getElementById(`btn-${mapel.toLowerCase()}`);
-                        const statusText = document.getElementById(`status-${mapel.toLowerCase()}`);
-                        
-                        if (status && status !== 'Tercatat') {
-                            html += `
-                                <div class="flex justify-between items-center glass-card p-3.5 rounded-xl border border-slate-700/60">
-                                    <span class="font-semibold text-white text-xs">${mapel}</span> 
-                                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
-                                        <span class="material-symbols-outlined text-sm">check_circle</span> ${status}
-                                    </span>
-                                </div>`;
-                            if(btn) {
-                                btn.disabled = true;
-                                btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Selesai`;
-                                btn.className = 'w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold text-xs opacity-90 cursor-not-allowed';
-                            }
-                            if(statusText) statusText.textContent = `Tercatat pukul ${status}`;
-                        } else {
-                            html += `
-                                <div class="flex justify-between items-center p-3.5 rounded-xl border border-dashed border-slate-700 text-xs">
-                                    <span class="font-semibold text-slate-300">${mapel}</span> 
-                                    <span class="text-slate-400">Belum ada data</span>
-                                </div>`;
-                            if(btn) {
-                                btn.disabled = false;
-                                btn.innerHTML = `Hadir ${mapel}`;
-                                btn.className = 'w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold text-xs shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-white/10';
-                            }
-                            if(statusText) statusText.textContent = 'Belum tercatat';
-                        }
-                    });
-                    html += '</div>';
-                    document.getElementById('riwayat-container').innerHTML = html;
-                } else {
-                    document.getElementById('riwayat-container').innerHTML = `<p class="text-rose-400">Gagal memuat: ${res.error}</p>`;
-                }
+        async function refreshStatus() {
+            const res = await apiPostCached('getAbsensiHariIni', { token: getToken() }, 'cache_riwayat_siswa', (freshRes) => {
+                processAbsensiHariIni(freshRes);
             });
+            if (res) {
+                processAbsensiHariIni(res);
+            }
+        }
+
+        function processAbsensiHariIni(res) {
+            if (res && res.ok && res.status) {
+                let html = '<div class="space-y-3 text-left">';
+                ['TIK', 'KKA'].forEach(mapel => {
+                    const status = res.status[mapel];
+                    const btn = document.getElementById(`btn-${mapel.toLowerCase()}`);
+                    const statusText = document.getElementById(`status-${mapel.toLowerCase()}`);
+                    
+                    if (status && status !== 'Tercatat') {
+                        html += `
+                            <div class="flex justify-between items-center glass-card p-3.5 rounded-xl border border-slate-700/60">
+                                <span class="font-semibold text-white text-xs">${mapel}</span> 
+                                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
+                                    <span class="material-symbols-outlined text-sm">check_circle</span> ${status}
+                                </span>
+                            </div>`;
+                        if(btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Selesai`;
+                            btn.className = 'w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold text-xs opacity-90 cursor-not-allowed';
+                        }
+                        if(statusText) statusText.textContent = `Tercatat pukul ${status}`;
+                    } else {
+                        html += `
+                            <div class="flex justify-between items-center p-3.5 rounded-xl border border-dashed border-slate-700 text-xs">
+                                <span class="font-semibold text-slate-300">${mapel}</span> 
+                                <span class="text-slate-400">Belum ada data</span>
+                            </div>`;
+                        if(btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = `Hadir ${mapel}`;
+                            btn.className = 'w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold text-xs shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-white/10';
+                        }
+                        if(statusText) statusText.textContent = 'Belum tercatat';
+                    }
+                });
+                html += '</div>';
+                document.getElementById('riwayat-container').innerHTML = html;
+            } else {
+                document.getElementById('riwayat-container').innerHTML = `<p class="text-rose-400">Gagal memuat: ${res ? res.error : 'Koneksi lambat'}</p>`;
+            }
         }
 
         function handleLogout() {
