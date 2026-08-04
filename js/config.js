@@ -313,16 +313,16 @@ function setupCommonUI(session) {
     const isActive = currentPage === item.page;
     if (isActive) {
       navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs">
-          <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
-          <span>${item.label}</span>
+        <a href="${item.page}" class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs overflow-hidden transition-all duration-300">
+          <span class="material-symbols-outlined text-lg min-w-[20px] text-center" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+          <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
         </a>
       `;
     } else {
       navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group">
-          <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">${item.icon}</span>
-          <span>${item.label}</span>
+        <a href="${item.page}" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all duration-300 text-xs font-medium group overflow-hidden">
+          <span class="material-symbols-outlined text-lg min-w-[20px] text-center group-hover:text-blue-400 transition-colors">${item.icon}</span>
+          <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
         </a>
       `;
     }
@@ -331,6 +331,92 @@ function setupCommonUI(session) {
   navElements.forEach(el => {
     el.innerHTML = navHtml;
   });
+
+  // Call sidebar toggle setup
+  setupSidebarToggle();
+}
+
+function setupSidebarToggle() {
+    if (document.getElementById('sidebar-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'sidebar-styles';
+    style.innerHTML = `
+        /* Smooth transitions */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
+        main { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Collapsed state */
+        body.sidebar-collapsed #sidebar { width: 5.5rem !important; }
+        body.sidebar-collapsed main { margin-left: 5.5rem !important; }
+        
+        /* Hide texts smoothly */
+        #sidebar h1, #sidebar p, #sidebar .sidebar-text, #sidebar .border-t button span:not(.material-symbols-outlined) { 
+            transition: opacity 0.2s ease, max-width 0.3s ease;
+            white-space: nowrap; 
+            max-width: 200px;
+        }
+        body.sidebar-collapsed #sidebar h1, 
+        body.sidebar-collapsed #sidebar p, 
+        body.sidebar-collapsed #sidebar .sidebar-text,
+        body.sidebar-collapsed #sidebar .border-t button span:not(.material-symbols-outlined) { 
+            opacity: 0; 
+            max-width: 0; 
+            pointer-events: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Enlarge school icon & logo container */
+        #sidebar .w-10.h-10 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        #sidebar .w-10.h-10 span { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body.sidebar-collapsed #sidebar .w-10.h-10 { 
+            width: 3.2rem !important; 
+            height: 3.2rem !important;
+            margin: 0 auto;
+        }
+        body.sidebar-collapsed #sidebar .w-10.h-10 span { 
+            font-size: 2rem !important;
+        }
+        
+        /* Center elements when collapsed */
+        body.sidebar-collapsed #sidebar .border-b { justify-content: center; padding: 1.5rem 0; }
+        body.sidebar-collapsed #sidebar nav a, 
+        body.sidebar-collapsed #sidebar .border-t button { 
+            justify-content: center;
+            padding-left: 0 !important; 
+            padding-right: 0 !important;
+        }
+        /* Mobile handling (hide sidebar completely instead of collapsing) */
+        @media (max-width: 768px) {
+            body.sidebar-collapsed #sidebar { transform: translateX(-100%); width: 16rem !important; }
+            body.sidebar-collapsed main { margin-left: 0 !important; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Inject toggle button into header
+    const headerTitle = document.querySelector('main header .flex.items-center.gap-4');
+    if (headerTitle && !document.getElementById('sidebar-toggle-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'sidebar-toggle-btn';
+        btn.className = 'w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer mr-2';
+        btn.innerHTML = '<span class="material-symbols-outlined text-lg">menu_open</span>';
+        btn.onclick = () => {
+            const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+            btn.querySelector('span').textContent = isCollapsed ? 'menu' : 'menu_open';
+        };
+        headerTitle.insertBefore(btn, headerTitle.firstChild);
+    }
+
+    // Restore state from localStorage
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        document.body.classList.add('sidebar-collapsed');
+        const btnSpan = document.querySelector('#sidebar-toggle-btn span');
+        if (btnSpan) btnSpan.textContent = 'menu';
+    }
 }
 
 // ==== TOAST FEEDBACK HELPER ====
