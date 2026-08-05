@@ -181,7 +181,7 @@
             </div>
 
             <!-- Sticky Bottom Action Bar Mobile -->
-            <div class="fixed bottom-14 left-0 right-0 px-4 py-3 z-40 glass-panel border-t border-slate-700/80 backdrop-blur-xl">
+            <div class="fixed bottom-14 left-0 right-0 px-4 py-3 z-40 glass-panel border-t border-slate-700/80 backdrop-blur-xl md:hidden">
                 <div class="max-w-[1280px] mx-auto flex items-center gap-2.5">
                     <button class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 border border-white/10" onclick="simpanAbsensi()">
                         <span class="material-symbols-outlined text-lg">save</span> Simpan Absensi
@@ -693,10 +693,11 @@
             const rowNo = String(idx + 1).padStart(2, '0');
             const status = s.status || '';
             const initials = s.nama ? s.nama.substring(0, 2).toUpperCase() : 'NA';
-            const sId = s.siswa_id || s.id || ('S' + (idx + 1));
+            const rawSId = s.siswa_id || s.id || ('S' + (idx + 1));
+            const sId = String(rawSId).replace(/[^a-zA-Z0-9_-]/g, '_');
 
             htmlDesktop += `
-                <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-700/30 group" data-siswa-id="${sId}">
+                <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-700/30 group" data-siswa-id="${rawSId}">
                     <td class="px-6 py-4 text-slate-400 font-medium">${rowNo}</td>
                     <td class="px-6 py-4 font-semibold text-white">
                         <div>${s.nama}</div>
@@ -736,7 +737,7 @@
             `;
             
             htmlMobile += `
-                <div class="glass-card border border-slate-700/60 rounded-2xl p-4 flex flex-col gap-3.5 shadow-lg" data-siswa-id="${sId}">
+                <div class="glass-card border border-slate-700/60 rounded-2xl p-4 flex flex-col gap-3.5 shadow-lg" data-siswa-id="${rawSId}">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-md border border-white/10">
                             ${initials}
@@ -769,13 +770,18 @@
     }
 
     function syncAttendanceStatus(sId, statusVal) {
-        const dtRadio = document.querySelector(`input[name="status-${sId}"][value="${statusVal}"]`);
-        const mobRadio = document.querySelector(`input[name="status-mob-${sId}"][value="${statusVal}"]`);
-        if (dtRadio && !dtRadio.checked) dtRadio.checked = true;
-        if (mobRadio && !mobRadio.checked) mobRadio.checked = true;
+        try {
+            const dtRadio = document.querySelector(`input[name="status-${sId}"][value="${statusVal}"]`);
+            const mobRadio = document.querySelector(`input[name="status-mob-${sId}"][value="${statusVal}"]`);
+            if (dtRadio && !dtRadio.checked) dtRadio.checked = true;
+            if (mobRadio && !mobRadio.checked) mobRadio.checked = true;
+        } catch(e) {}
 
         if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
-            const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(sId));
+            const idx = currentSiswaList.findIndex(s => {
+                const curId = String(s.siswa_id || s.id || '');
+                return curId === String(sId) || curId.replace(/[^a-zA-Z0-9_-]/g, '_') === String(sId);
+            });
             if (idx !== -1) {
                 currentSiswaList[idx].status = statusVal;
             }
