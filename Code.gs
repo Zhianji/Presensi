@@ -166,6 +166,7 @@ function doPost(e) {
         );
         break;
       case 'importSiswaBulk':
+      case 'importSiswaCSV':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => importSiswaBulk(session, body.items));
         break;
       case 'updateSiswa':
@@ -175,6 +176,9 @@ function doPost(e) {
         break;
       case 'deleteSiswa':
         result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => deleteSiswa(session, body.id));
+        break;
+      case 'deleteSiswaBatch':
+        result = requireRole(body.token, ['admin', 'guru', 'kepsek'], (session) => deleteSiswaBatch(session, body.ids));
         break;
       case 'getGuruList':
       case 'getPengguna':
@@ -1022,6 +1026,28 @@ function deleteSiswa(session, id) {
     }
   }
   return { ok: false, error: 'Siswa tidak ditemukan' };
+}
+
+function deleteSiswaBatch(session, ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return { ok: false, error: 'Tidak ada ID siswa yang dipilih' };
+  }
+  const sheet = getSheet(SHEET_SISWA);
+  const rows = sheet.getDataRange().getValues();
+  const idsToDelete = new Set(ids.map(id => String(id)));
+
+  let deletedCount = 0;
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (idsToDelete.has(String(rows[i][0]))) {
+      sheet.deleteRow(i + 1);
+      deletedCount++;
+    }
+  }
+
+  if (session && deletedCount > 0) {
+    logAction(session.user_id, session.nama, 'Hapus Siswa Batch', `Menghapus ${deletedCount} siswa`);
+  }
+  return { ok: true, count: deletedCount };
 }
 
 // ============ MANAJEMEN AKUN GURU/ADMIN (guru) ============
