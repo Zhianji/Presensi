@@ -24,15 +24,55 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .custom-radio:checked {
-            background-color: currentColor;
-            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        /* Custom Attendance Segment Pills - High Usability & Color Coded */
+        .status-radio:checked + .status-label-hadir {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            border-color: #34d399 !important;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4) !important;
         }
-        .attendance-radio:checked + label {
-            background-color: #2563eb;
-            color: white;
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        .status-radio:checked + .status-label-hadir span.status-dot {
+            background-color: #ffffff !important;
+        }
+
+        .status-radio:checked + .status-label-sakit {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+            border-color: #60a5fa !important;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4) !important;
+        }
+        .status-radio:checked + .status-label-sakit span.status-dot {
+            background-color: #ffffff !important;
+        }
+
+        .status-radio:checked + .status-label-izin {
+            background-color: #f59e0b !important;
+            color: #ffffff !important;
+            border-color: #fbbf24 !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4) !important;
+        }
+        .status-radio:checked + .status-label-izin span.status-dot {
+            background-color: #ffffff !important;
+        }
+
+        .status-radio:checked + .status-label-alfa {
+            background-color: #f43f5e !important;
+            color: #ffffff !important;
+            border-color: #fb7185 !important;
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4) !important;
+        }
+        .status-radio:checked + .status-label-alfa span.status-dot {
+            background-color: #ffffff !important;
+        }
+
+        .status-label {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            cursor: pointer;
+        }
+        .status-label:hover {
+            background-color: rgba(51, 65, 85, 0.8);
+            border-color: rgba(148, 163, 184, 0.3);
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -663,22 +703,29 @@
                         <div class="text-[11px] text-slate-400 font-normal">${s.kelas}</div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="flex justify-center items-center gap-4">
-                            <label class="flex flex-col items-center gap-1 cursor-pointer group/item">
-                                <input type="radio" name="status-${sId}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="custom-radio w-4 h-4 text-emerald-500 border-slate-600 focus:ring-emerald-500"/>
-                                <span class="text-[10px] text-slate-400 font-semibold uppercase group-hover/item:text-emerald-400">Hadir</span>
+                        <div class="flex justify-center items-center gap-1.5 p-1 bg-slate-900/80 rounded-xl border border-slate-800/80 w-full max-w-xs mx-auto">
+                            <input type="radio" id="h-dt-${sId}" name="status-${sId}" value="Hadir" ${status === 'Hadir' ? 'checked' : ''} class="hidden status-radio status-radio-hadir" onchange="syncAttendanceStatus('${sId}', 'Hadir')"/>
+                            <label for="h-dt-${sId}" class="flex-1 py-1.5 px-2.5 rounded-lg font-bold text-xs text-slate-400 border border-transparent flex items-center justify-center gap-1.5 status-label status-label-hadir">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0 status-dot"></span>
+                                <span>Hadir</span>
                             </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer group/item">
-                                <input type="radio" name="status-${sId}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="custom-radio w-4 h-4 text-blue-500 border-slate-600 focus:ring-blue-500"/>
-                                <span class="text-[10px] text-slate-400 font-semibold uppercase group-hover/item:text-blue-400">Sakit</span>
+
+                            <input type="radio" id="s-dt-${sId}" name="status-${sId}" value="Sakit" ${status === 'Sakit' ? 'checked' : ''} class="hidden status-radio status-radio-sakit" onchange="syncAttendanceStatus('${sId}', 'Sakit')"/>
+                            <label for="s-dt-${sId}" class="flex-1 py-1.5 px-2.5 rounded-lg font-bold text-xs text-slate-400 border border-transparent flex items-center justify-center gap-1.5 status-label status-label-sakit">
+                                <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0 status-dot"></span>
+                                <span>Sakit</span>
                             </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer group/item">
-                                <input type="radio" name="status-${sId}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="custom-radio w-4 h-4 text-amber-500 border-slate-600 focus:ring-amber-500"/>
-                                <span class="text-[10px] text-slate-400 font-semibold uppercase group-hover/item:text-amber-400">Izin</span>
+
+                            <input type="radio" id="i-dt-${sId}" name="status-${sId}" value="Izin" ${status === 'Izin' ? 'checked' : ''} class="hidden status-radio status-radio-izin" onchange="syncAttendanceStatus('${sId}', 'Izin')"/>
+                            <label for="i-dt-${sId}" class="flex-1 py-1.5 px-2.5 rounded-lg font-bold text-xs text-slate-400 border border-transparent flex items-center justify-center gap-1.5 status-label status-label-izin">
+                                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0 status-dot"></span>
+                                <span>Izin</span>
                             </label>
-                            <label class="flex flex-col items-center gap-1 cursor-pointer group/item">
-                                <input type="radio" name="status-${sId}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="custom-radio w-4 h-4 text-rose-500 border-slate-600 focus:ring-rose-500"/>
-                                <span class="text-[10px] text-slate-400 font-semibold uppercase group-hover/item:text-rose-400">Alfa</span>
+
+                            <input type="radio" id="a-dt-${sId}" name="status-${sId}" value="Alfa" ${status === 'Alfa' ? 'checked' : ''} class="hidden status-radio status-radio-alfa" onchange="syncAttendanceStatus('${sId}', 'Alfa')"/>
+                            <label for="a-dt-${sId}" class="flex-1 py-1.5 px-2.5 rounded-lg font-bold text-xs text-slate-400 border border-transparent flex items-center justify-center gap-1.5 status-label status-label-alfa">
+                                <span class="w-2 h-2 rounded-full bg-rose-400 shrink-0 status-dot"></span>
+                                <span>Alfa</span>
                             </label>
                         </div>
                     </td>
@@ -700,18 +747,18 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex bg-slate-800/80 p-1 rounded-xl gap-1 border border-slate-700/80 w-full justify-between">
-                            <input ${status === 'Hadir' ? 'checked' : ''} class="hidden attendance-radio" id="h-${sId}" name="status-mob-${sId}" value="Hadir" type="radio"/>
-                            <label class="w-9 h-9 flex items-center justify-center rounded-lg font-bold text-xs text-slate-300 border border-transparent cursor-pointer transition-all hover:bg-slate-700" for="h-${sId}">H</label>
+                        <div class="flex bg-slate-900/90 p-1.5 rounded-xl gap-1.5 border border-slate-800 w-full justify-between">
+                            <input ${status === 'Hadir' ? 'checked' : ''} class="hidden status-radio status-radio-hadir" id="h-${sId}" name="status-mob-${sId}" value="Hadir" type="radio" onchange="syncAttendanceStatus('${sId}', 'Hadir')"/>
+                            <label class="flex-1 h-10 flex items-center justify-center rounded-lg font-bold text-xs text-slate-400 border border-transparent transition-all status-label status-label-hadir" for="h-${sId}">Hadir</label>
 
-                            <input ${status === 'Sakit' ? 'checked' : ''} class="hidden attendance-radio" id="s-${sId}" name="status-mob-${sId}" value="Sakit" type="radio"/>
-                            <label class="w-9 h-9 flex items-center justify-center rounded-lg font-bold text-xs text-slate-300 border border-transparent cursor-pointer transition-all hover:bg-slate-700" for="s-${sId}">S</label>
+                            <input ${status === 'Sakit' ? 'checked' : ''} class="hidden status-radio status-radio-sakit" id="s-${sId}" name="status-mob-${sId}" value="Sakit" type="radio" onchange="syncAttendanceStatus('${sId}', 'Sakit')"/>
+                            <label class="flex-1 h-10 flex items-center justify-center rounded-lg font-bold text-xs text-slate-400 border border-transparent transition-all status-label status-label-sakit" for="s-${sId}">Sakit</label>
 
-                            <input ${status === 'Izin' ? 'checked' : ''} class="hidden attendance-radio" id="i-${sId}" name="status-mob-${sId}" value="Izin" type="radio"/>
-                            <label class="w-9 h-9 flex items-center justify-center rounded-lg font-bold text-xs text-slate-300 border border-transparent cursor-pointer transition-all hover:bg-slate-700" for="i-${sId}">I</label>
+                            <input ${status === 'Izin' ? 'checked' : ''} class="hidden status-radio status-radio-izin" id="i-${sId}" name="status-mob-${sId}" value="Izin" type="radio" onchange="syncAttendanceStatus('${sId}', 'Izin')"/>
+                            <label class="flex-1 h-10 flex items-center justify-center rounded-lg font-bold text-xs text-slate-400 border border-transparent transition-all status-label status-label-izin" for="i-${sId}">Izin</label>
 
-                            <input ${status === 'Alfa' ? 'checked' : ''} class="hidden attendance-radio" id="a-${sId}" name="status-mob-${sId}" value="Alfa" type="radio"/>
-                            <label class="w-9 h-9 flex items-center justify-center rounded-lg font-bold text-xs text-slate-300 border border-transparent cursor-pointer transition-all hover:bg-slate-700" for="a-${sId}">A</label>
+                            <input ${status === 'Alfa' ? 'checked' : ''} class="hidden status-radio status-radio-alfa" id="a-${sId}" name="status-mob-${sId}" value="Alfa" type="radio" onchange="syncAttendanceStatus('${sId}', 'Alfa')"/>
+                            <label class="flex-1 h-10 flex items-center justify-center rounded-lg font-bold text-xs text-slate-400 border border-transparent transition-all status-label status-label-alfa" for="a-${sId}">Alfa</label>
                         </div>
                     </div>
                 </div>
@@ -721,11 +768,28 @@
         if(mobileList) mobileList.innerHTML = htmlMobile;
     }
 
+    function syncAttendanceStatus(sId, statusVal) {
+        const dtRadio = document.querySelector(`input[name="status-${sId}"][value="${statusVal}"]`);
+        const mobRadio = document.querySelector(`input[name="status-mob-${sId}"][value="${statusVal}"]`);
+        if (dtRadio && !dtRadio.checked) dtRadio.checked = true;
+        if (mobRadio && !mobRadio.checked) mobRadio.checked = true;
+
+        if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
+            const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(sId));
+            if (idx !== -1) {
+                currentSiswaList[idx].status = statusVal;
+            }
+        }
+    }
+
     document.getElementById('markAllBtn').addEventListener('click', function() {
         const radioButtons = document.querySelectorAll('input[type="radio"][value="Hadir"]');
         radioButtons.forEach(radio => {
             radio.checked = true;
         });
+        if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
+            currentSiswaList.forEach(s => s.status = 'Hadir');
+        }
         if (typeof showToast === 'function') {
             showToast('Semua siswa berhasil ditandai Hadir.', false);
         }
