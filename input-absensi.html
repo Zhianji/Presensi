@@ -1138,7 +1138,8 @@
         let hadir = 0, sakit = 0, izin = 0, alfa = 0;
 
         data.forEach(item => {
-            const st = String(item.status || '').trim().toLowerCase();
+            let st = String(item.status || '').trim().toLowerCase();
+            if (st === 'alpa') st = 'alfa';
             if (st === 'hadir') hadir++;
             else if (st === 'sakit') sakit++;
             else if (st === 'izin') izin++;
@@ -1161,7 +1162,11 @@
 
         let filteredData = data;
         if (currentTodayFilter !== 'all') {
-            filteredData = data.filter(item => String(item.status || '').trim().toLowerCase() === currentTodayFilter);
+            filteredData = data.filter(item => {
+                let st = String(item.status || '').trim().toLowerCase();
+                if (st === 'alpa') st = 'alfa';
+                return st === currentTodayFilter;
+            });
         }
 
         if (filteredData.length === 0) {
@@ -1185,7 +1190,8 @@
         }
 
         filteredData.forEach(item => {
-            const st = String(item.status || '').trim().toLowerCase();
+            let st = String(item.status || '').trim().toLowerCase();
+            if (st === 'alpa') st = 'alfa';
             let badgeClass = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
             if (st === 'sakit') badgeClass = 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
             else if (st === 'izin') badgeClass = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
@@ -1236,19 +1242,19 @@
 
         <!-- Ringkasan Statistik Angka (Hadir, Sakit, Izin, Alfa) - Interaktif Button -->
         <div class="px-6 py-3 border-b border-slate-700/60 bg-slate-900/60 grid grid-cols-4 gap-2.5 text-center">
-            <button type="button" id="today-card-hadir" onclick="window.filterTodayModal('hadir')" title="Klik untuk memfilter siswa Hadir" class="p-2.5 glass-card rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
+            <button type="button" id="today-card-hadir" title="Klik untuk memfilter siswa Hadir" class="p-2.5 glass-card rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer hover:bg-emerald-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider pointer-events-none">Hadir</p>
                 <p id="today-stat-hadir" class="text-xl font-bold text-emerald-400 mt-0.5 pointer-events-none">0</p>
             </button>
-            <button type="button" id="today-card-sakit" onclick="window.filterTodayModal('sakit')" title="Klik untuk memfilter siswa Sakit" class="p-2.5 glass-card rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
+            <button type="button" id="today-card-sakit" title="Klik untuk memfilter siswa Sakit" class="p-2.5 glass-card rounded-xl border border-blue-500/30 bg-blue-500/10 cursor-pointer hover:bg-blue-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider pointer-events-none">Sakit</p>
                 <p id="today-stat-sakit" class="text-xl font-bold text-blue-400 mt-0.5 pointer-events-none">0</p>
             </button>
-            <button type="button" id="today-card-izin" onclick="window.filterTodayModal('izin')" title="Klik untuk memfilter siswa Izin" class="p-2.5 glass-card rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
+            <button type="button" id="today-card-izin" title="Klik untuk memfilter siswa Izin" class="p-2.5 glass-card rounded-xl border border-amber-500/30 bg-amber-500/10 cursor-pointer hover:bg-amber-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider pointer-events-none">Izin</p>
                 <p id="today-stat-izin" class="text-xl font-bold text-amber-400 mt-0.5 pointer-events-none">0</p>
             </button>
-            <button type="button" id="today-card-alfa" onclick="window.filterTodayModal('alfa')" title="Klik untuk memfilter siswa Alfa" class="p-2.5 glass-card rounded-xl border border-rose-500/30 bg-rose-500/10 cursor-pointer hover:bg-rose-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
+            <button type="button" id="today-card-alfa" title="Klik untuk memfilter siswa Alfa" class="p-2.5 glass-card rounded-xl border border-rose-500/30 bg-rose-500/10 cursor-pointer hover:bg-rose-500/30 transition-all active:scale-95 select-none w-full text-center outline-none">
                 <p class="text-[10px] font-semibold text-rose-400 uppercase tracking-wider pointer-events-none">Alfa</p>
                 <p id="today-stat-alfa" class="text-xl font-bold text-rose-400 mt-0.5 pointer-events-none">0</p>
             </button>
