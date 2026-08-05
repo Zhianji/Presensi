@@ -248,7 +248,7 @@
                 <div class="flex items-center gap-5">
                     <div class="relative hidden md:block">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-                        <input class="pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs w-64 outline-none transition-all" placeholder="Cari data..." type="text"/>
+                        <input id="desktop-search-input" oninput="handleDesktopSearchInput(this)" class="pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs w-64 outline-none transition-all" placeholder="Cari data..." type="text"/>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="window.location.href='notifikasi.html'" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer">
@@ -489,9 +489,14 @@
             btnM.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Memuat...`;
         }
 
-        const kelas = document.getElementById('select-kelas-desktop').value || (document.getElementById('select-kelas-mobile') ? document.getElementById('select-kelas-mobile').value : '');
-        const mapel = document.getElementById('select-mapel-desktop').value || (document.getElementById('select-mapel-mobile') ? document.getElementById('select-mapel-mobile').value : '');
-        const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
+        const isMob = window.innerWidth < 768;
+        const kEl = (isMob && document.getElementById('select-kelas-mobile')) ? document.getElementById('select-kelas-mobile') : document.getElementById('select-kelas-desktop');
+        const mEl = (isMob && document.getElementById('select-mapel-mobile')) ? document.getElementById('select-mapel-mobile') : document.getElementById('select-mapel-desktop');
+        const tEl = (isMob && document.getElementById('input-tanggal-mobile')) ? document.getElementById('input-tanggal-mobile') : document.getElementById('input-tanggal-desktop');
+
+        const kelas = kEl ? kEl.value : '';
+        const mapel = mEl ? mEl.value : 'TIK';
+        const tanggal = tEl && tEl.value ? tEl.value : new Date().toISOString().split('T')[0];
 
         const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
         const cached = localStorage.getItem(cacheKey);
@@ -916,7 +921,18 @@
         if(e.target.id === 'select-kelas-mobile' || e.target.id === 'select-mapel-mobile' || e.target.id === 'input-tanggal-mobile') {
             loadStatusHarian();
         }
-      let allTodayData = [];
+    });
+
+    function handleDesktopSearchInput(el) {
+        const query = el ? el.value : '';
+        const searchInput = document.getElementById('search-siswa-input');
+        if (searchInput) {
+            searchInput.value = query;
+            handleSearchSiswaInput();
+        }
+    }
+
+    let allTodayData = [];
     let currentTodayFilter = 'all';
 
     function getTodayDataFromLocal() {
