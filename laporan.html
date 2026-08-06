@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="js/tailwind-config.js"></script>
+    <script src="js/logo-sekolah.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-panel {
@@ -31,6 +33,26 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* ==================== LAPORAN CETAK / PDF FORMAL ==================== */
+        #print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area {
+                display: block !important;
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                background: #ffffff;
+                color: #000000;
+                font-family: 'Times New Roman', Times, serif;
+            }
+            body { background: #ffffff !important; }
+            @page { size: A4 portrait; margin: 15mm 14mm; }
+            #print-area table { border-collapse: collapse; }
+            #print-area th, #print-area td { border: 1px solid #000000; }
+        }
     </style>
 </head>
 <body class="bg-[#0f172a] text-slate-100 min-h-screen md:overflow-hidden md:h-screen md:flex antialiased selection:bg-blue-500 selection:text-white">
@@ -150,7 +172,7 @@
                 <button onclick="exportToPDF()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 transition-all border border-white/10">
                     <span class="material-symbols-outlined text-lg">picture_as_pdf</span> Export PDF
                 </button>
-                <button onclick="exportToCSV()" class="flex-1 glass-panel text-slate-200 font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 border border-slate-700/60 active:scale-95 transition-all">
+                <button onclick="exportToExcel()" class="flex-1 glass-panel text-slate-200 font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 border border-slate-700/60 active:scale-95 transition-all">
                     <span class="material-symbols-outlined text-lg text-blue-400">table_chart</span> Excel
                 </button>
             </section>
@@ -325,8 +347,8 @@
                             <button onclick="exportToPDF()" class="flex items-center gap-2 px-5 py-2.5 glass-card text-blue-400 font-semibold text-xs rounded-xl hover:bg-slate-700/60 transition-all cursor-pointer">
                                 <span class="material-symbols-outlined text-base">print</span> Cetak / PDF
                             </button>
-                            <button onclick="exportToCSV()" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs rounded-xl hover:shadow-lg shadow-blue-600/20 transition-all cursor-pointer border border-white/10">
-                                <span class="material-symbols-outlined text-base">table_view</span> Export CSV / Excel
+                            <button onclick="exportToExcel()" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs rounded-xl hover:shadow-lg shadow-blue-600/20 transition-all cursor-pointer border border-white/10">
+                                <span class="material-symbols-outlined text-base">table_view</span> Export Excel
                             </button>
                         </div>
                     </section>
@@ -431,6 +453,65 @@
         </main>
     </div>
 
+    <!-- ==================== AREA CETAK / PDF FORMAL (hanya tampil saat print) ==================== -->
+    <div id="print-area">
+        <div style="display:flex; align-items:center; gap:16px; border-bottom:3px double #000; padding-bottom:8px; margin-bottom:6px;">
+            <img id="print-logo-sekolah" src="img/logo-sekolah.png" alt="Logo Sekolah" style="width:68px; height:68px; object-fit:contain;" onerror="this.onerror=null; this.src=window.LOGO_SEKOLAH_BASE64 || '';" />
+            <div style="text-align:center; flex:1;">
+                <p style="font-size:16px; font-weight:700; margin:0; letter-spacing:0.5px;">PEMERINTAH PROVINSI RIAU</p>
+                <p style="font-size:16px; font-weight:700; margin:0; letter-spacing:0.5px;">DINAS PENDIDIKAN</p>
+                <p style="font-size:19px; font-weight:800; margin:2px 0 0;">SMA NEGERI 2 ENOK</p>
+                <p style="font-size:11px; margin:2px 0 0;">Kabupaten Indragiri Hilir, Provinsi Riau</p>
+            </div>
+            <img id="print-logo-riau" src="img/logo-riau.png" alt="Logo Provinsi Riau" style="width:68px; height:68px; object-fit:contain;" onerror="this.onerror=null; this.src=window.LOGO_RIAU_BASE64 || '';" />
+        </div>
+
+        <div style="text-align:center; margin:14px 0 10px;">
+            <p style="font-size:14px; font-weight:700; text-decoration:underline; margin:0; text-transform:uppercase;">Laporan Rekapitulasi Presensi Siswa</p>
+        </div>
+
+        <table style="width:100%; font-size:11px; margin-bottom:10px;">
+            <tr>
+                <td style="width:70px; border:none;">Periode</td><td style="width:12px; border:none;">:</td><td id="print-periode" style="border:none;"></td>
+                <td style="width:50px; border:none;">Kelas</td><td style="width:12px; border:none;">:</td><td id="print-kelas" style="border:none;"></td>
+            </tr>
+        </table>
+
+        <table style="width:100%; font-size:11px;">
+            <thead>
+                <tr style="background:#e5e7eb;">
+                    <th style="padding:5px;">No</th>
+                    <th style="padding:5px;">Nama Siswa</th>
+                    <th style="padding:5px;">Kelas</th>
+                    <th style="padding:5px;">Hadir</th>
+                    <th style="padding:5px;">Sakit</th>
+                    <th style="padding:5px;">Izin</th>
+                    <th style="padding:5px;">Alfa</th>
+                    <th style="padding:5px;">% Kehadiran</th>
+                </tr>
+            </thead>
+            <tbody id="print-tbody"></tbody>
+        </table>
+
+        <p id="print-summary" style="font-size:11px; margin-top:8px; font-style:italic;"></p>
+
+        <table style="width:100%; font-size:11px; margin-top:40px;">
+            <tr>
+                <td style="width:34%; border:none;"></td>
+                <td style="width:33%; text-align:center; border:none;">
+                    <p style="margin:0 0 4px;">Mengetahui,</p>
+                    <p style="margin:0 0 55px;">Wali Kelas</p>
+                    <p style="margin:0; border-top:1px solid #000; padding-top:2px;">NIP. ..........................</p>
+                </td>
+                <td style="width:33%; text-align:center; border:none;">
+                    <p id="print-tanggal-cetak" style="margin:0 0 4px;"></p>
+                    <p style="margin:0 0 55px;">Kepala Sekolah</p>
+                    <p style="margin:0; border-top:1px solid #000; padding-top:2px;">NIP. ..........................</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 <script src="js/config.js"></script>
 <script>
     let allLaporanData = [];
@@ -492,13 +573,12 @@
         try {
             if (res && res.ok && Array.isArray(res.data)) {
                 allLaporanData = res.data;
-            } else if (!allLaporanData || allLaporanData.length === 0) {
+            } else {
                 allLaporanData = getMockLaporanData();
             }
         } catch (e) {
-            if (!allLaporanData || allLaporanData.length === 0) {
-                allLaporanData = getMockLaporanData();
-            }
+            allLaporanData = getMockLaporanData();
+        }
         }
         applyFilters();
     }
@@ -600,7 +680,8 @@
         });
 
         const listArr = Object.values(studentStats);
-        
+        window.lastListArr = listArr;
+
         let grandHadir = 0, grandTotal = 0;
         listArr.forEach(s => {
             grandHadir += s.hadir;
@@ -677,38 +758,107 @@
         }
     }
 
-    function exportToCSV() {
-        if (!filteredData || filteredData.length === 0) {
-            alert('Tidak ada data untuk diekspor.');
+    const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    function getPeriodeText() {
+        const bd = document.getElementById('filter-bulan-desktop');
+        const td = document.getElementById('filter-tahun-desktop');
+        const tglD = document.getElementById('filter-tanggal-desktop');
+        const bulan = bd ? parseInt(bd.value, 10) : (new Date().getMonth() + 1);
+        const tahun = td ? td.value : new Date().getFullYear();
+        const tgl = tglD ? tglD.value : '';
+        return tgl ? `${tgl} ${BULAN_NAMES[bulan]} ${tahun}` : `${BULAN_NAMES[bulan]} ${tahun}`;
+    }
+
+    function getKelasFilterText() {
+        const kd = document.getElementById('filter-kelas-desktop');
+        const v = kd ? kd.value : '';
+        return v ? v : 'Semua Kelas';
+    }
+
+    function exportToExcel() {
+        const listArr = window.lastListArr || [];
+        if (listArr.length === 0) {
+            alert('Tidak ada data rekap untuk diekspor.');
+            return;
+        }
+        if (typeof XLSX === 'undefined') {
+            alert('Gagal memuat modul Excel. Periksa koneksi internet lalu coba lagi.');
             return;
         }
 
-        let csv = '\uFEFFNo,Nama Siswa,Kelas,Mata Pelajaran,Tanggal,Waktu,Status,Keterangan\n';
-        filteredData.forEach((item, idx) => {
-            const no = idx + 1;
-            const nama = `"${(item.nama_siswa || item.nama || '').replace(/"/g, '""')}"`;
-            const kelas = `"${(item.kelas || '').replace(/"/g, '""')}"`;
-            const mapel = `"${(item.mapel || '-').replace(/"/g, '""')}"`;
-            const tgl = item.tanggal || '-';
-            const waktu = item.waktu || '-';
-            const status = item.status || '-';
-            const ket = `"${(item.keterangan || '-').replace(/"/g, '""')}"`;
+        const periodeText = getPeriodeText();
+        const kelasText = getKelasFilterText();
 
-            csv += `${no},${nama},${kelas},${mapel},${tgl},${waktu},${status},${ket}\n`;
+        const rows = [];
+        rows.push(['SMA NEGERI 2 ENOK']);
+        rows.push(['LAPORAN REKAPITULASI PRESENSI SISWA']);
+        rows.push([`Periode: ${periodeText}`]);
+        rows.push([`Kelas: ${kelasText}`]);
+        rows.push([]);
+        rows.push(['No', 'Nama Siswa', 'Kelas', 'Hadir', 'Sakit', 'Izin', 'Alfa', '% Kehadiran']);
+
+        listArr.forEach((s, idx) => {
+            const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+            rows.push([idx + 1, s.nama, s.kelas, s.hadir, s.sakit, s.izin, s.alfa, `${pct}%`]);
         });
 
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', `Laporan_Presensi_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 10 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 13 }];
+        ws['!merges'] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
+        const fname = `Laporan_Presensi_${periodeText.replace(/\s+/g, '_')}.xlsx`;
+        XLSX.writeFile(wb, fname);
+    }
+
+    function buildPrintArea() {
+        const listArr = window.lastListArr || [];
+
+        document.getElementById('print-periode').textContent = getPeriodeText();
+        document.getElementById('print-kelas').textContent = getKelasFilterText();
+
+        let grandHadir = 0, grandTotal = 0;
+        let rowsHtml = '';
+        listArr.forEach((s, idx) => {
+            const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+            grandHadir += s.hadir;
+            grandTotal += s.total;
+            rowsHtml += `
+                <tr>
+                    <td style="padding:4px; text-align:center;">${idx + 1}</td>
+                    <td style="padding:4px;">${s.nama}</td>
+                    <td style="padding:4px; text-align:center;">${s.kelas}</td>
+                    <td style="padding:4px; text-align:center;">${s.hadir}</td>
+                    <td style="padding:4px; text-align:center;">${s.sakit}</td>
+                    <td style="padding:4px; text-align:center;">${s.izin}</td>
+                    <td style="padding:4px; text-align:center;">${s.alfa}</td>
+                    <td style="padding:4px; text-align:center;">${pct}%</td>
+                </tr>`;
+        });
+        document.getElementById('print-tbody').innerHTML = rowsHtml ||
+            '<tr><td colspan="8" style="padding:12px; text-align:center;">Tidak ada data untuk periode/kelas yang dipilih.</td></tr>';
+
+        const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
+        document.getElementById('print-summary').textContent =
+            `Rata-rata kehadiran: ${overallPct}% dari ${listArr.length} siswa.`;
+
+        const now = new Date();
+        const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('print-tanggal-cetak').textContent = `Enok, ${tglCetak}`;
     }
 
     function exportToPDF() {
+        const listArr = window.lastListArr || [];
+        if (listArr.length === 0) {
+            alert('Tidak ada data untuk dicetak.');
+            return;
+        }
+        buildPrintArea();
         window.print();
     }
 

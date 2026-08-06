@@ -831,7 +831,8 @@
             const checkedRadio = row.querySelector('input[type="radio"]:checked');
             if (!checkedRadio) return;
 
-            const ketInput = document.getElementById(`ket-${siswaId}`);
+            const sId = String(siswaId).replace(/[^a-zA-Z0-9_-]/g, '_');
+            const ketInput = document.getElementById(`ket-${sId}`) || document.getElementById(`ket-${siswaId}`);
             const statusVal = checkedRadio.value;
 
             items.push({
@@ -925,6 +926,9 @@
         radioButtons.forEach(radio => {
             radio.checked = true;
         });
+        if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
+            currentSiswaList.forEach(s => s.status = 'Hadir');
+        }
         if (typeof showToast === 'function') {
             showToast('Semua siswa berhasil ditandai Hadir.', false);
         }
