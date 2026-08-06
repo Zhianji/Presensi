@@ -339,6 +339,14 @@ function loginWithGoogle(email, name, picture, expectedRole) {
 }
 
 function getPublicAccounts() {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get('public_accounts_v2');
+  if (cached) {
+    try {
+      return { ok: true, source: 'cache', data: JSON.parse(cached) };
+    } catch(e) {}
+  }
+
   const accounts = [];
   
   try {
@@ -369,7 +377,11 @@ function getPublicAccounts() {
     }
   } catch (e) {}
 
-  return { ok: true, data: accounts };
+  try {
+    cache.put('public_accounts_v2', JSON.stringify(accounts), 600); // 10 menit
+  } catch(e) {}
+
+  return { ok: true, source: 'live', data: accounts };
 }
 
 function createSession(userId, role, nama) {
@@ -1595,9 +1607,16 @@ function getRiwayatSiswa(session, bulan, tahun) {
   };
 }
 
-// ============ UTIL ============
+let _ssCache = null;
+function getActiveSS() {
+  if (!_ssCache) {
+    _ssCache = SpreadsheetApp.getActiveSpreadsheet();
+  }
+  return _ssCache;
+}
+
 function getSheet(name) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  const sheet = getActiveSS().getSheetByName(name);
   if (!sheet) throw new Error('Sheet "' + name + '" tidak ditemukan. Jalankan setupSheets() dahulu.');
   return sheet;
 }

@@ -16,7 +16,7 @@ async function apiGet(action, params = {}) {
   return res.json();
 }
 
-async function apiPost(action, data = {}, timeoutMs = 35000, maxRetries = 1) {
+async function apiPost(action, data = {}, timeoutMs = 20000, maxRetries = 0) {
   let finalUrl = APPS_SCRIPT_URL.trim();
   if (!finalUrl.endsWith('/exec') && !finalUrl.endsWith('/dev')) {
     finalUrl += finalUrl.endsWith('/') ? 'exec' : '/exec';
@@ -24,7 +24,7 @@ async function apiPost(action, data = {}, timeoutMs = 35000, maxRetries = 1) {
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const controller = new AbortController();
-    const currentTimeout = attempt > 0 ? 45000 : timeoutMs;
+    const currentTimeout = attempt > 0 ? 30000 : timeoutMs;
     const timer = setTimeout(() => controller.abort(), currentTimeout);
     try {
       const res = await fetch(finalUrl, {
