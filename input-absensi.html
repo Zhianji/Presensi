@@ -576,7 +576,7 @@
                                 siswa_id: s.id || s.siswa_id,
                                 nama: s.nama,
                                 kelas: s.kelas,
-                                status: 'Hadir',
+                                status: 'Belum',
                                 keterangan: ''
                             }));
                     }
@@ -584,13 +584,7 @@
             }
 
             if (initialRoster.length === 0) {
-                initialRoster = [
-                    { id: "S001", siswa_id: "S001", nama: "Ahmad Fauzi", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                    { id: "S002", siswa_id: "S002", nama: "Budi Santoso", kelas: kelas || "XII IPA 1", status: "Hadir", keterangan: "" },
-                    { id: "S003", siswa_id: "S003", nama: "Citra Lestari", kelas: kelas || "XII IPA 1", status: "Sakit", keterangan: "Demam" },
-                    { id: "S004", siswa_id: "S004", nama: "Dewi Sartika", kelas: kelas || "XII IPA 1", status: "Izin", keterangan: "Acara Keluarga" },
-                    { id: "S005", siswa_id: "S005", nama: "Eko Prasetyo", kelas: kelas || "XII IPA 1", status: "Alfa", keterangan: "" }
-                ];
+                initialRoster = [];
             }
 
             currentSiswaList = initialRoster;
@@ -1016,27 +1010,18 @@
             const currentMapel = document.getElementById('select-mapel-desktop') ? document.getElementById('select-mapel-desktop').value : '';
             currentSiswaList.forEach(s => {
                 const st = String(s.status || '').trim();
-                if (st && st !== '-' && st !== 'Belum') {
+                if (st && st !== '-' && st !== 'Belum' && st !== 'null' && st !== 'undefined') {
                     list.push({
                         id: s.id || s.siswa_id,
                         siswa_id: s.siswa_id || s.id,
                         nama_siswa: s.nama_siswa || s.nama || '-',
-                        kelas: s.kelas || currentKelas || 'XII IPA 1',
-                        mapel: s.mapel || currentMapel || 'TIK',
+                        kelas: s.kelas || currentKelas || '-',
+                        mapel: s.mapel || currentMapel || '-',
                         waktu: s.waktu || 'Hari ini',
                         status: st
                     });
                 }
             });
-        }
-        if (list.length === 0) {
-            list = [
-                { id: '1', nama_siswa: 'Ahmad Fauzi', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:15', status: 'Hadir' },
-                { id: '2', nama_siswa: 'Budi Santoso', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:20', status: 'Hadir' },
-                { id: '3', nama_siswa: 'Citra Lestari', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:30', status: 'Sakit' },
-                { id: '4', nama_siswa: 'Dewi Sartika', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:35', status: 'Izin' },
-                { id: '5', nama_siswa: 'Eko Prasetyo', kelas: 'XII IPA 1', mapel: 'TIK', waktu: '07:40', status: 'Alfa' }
-            ];
         }
         return list;
     }
@@ -1057,7 +1042,7 @@
         modalCard.classList.remove('scale-95');
         modalCard.classList.add('scale-100');
 
-        // Render data instan dari lokal (0ms delay)
+        // Render data instan dari lokal (jika belum ada yang absen hari ini, list = [])
         allTodayData = getTodayDataFromLocal();
         renderTodayModalList(allTodayData);
 
@@ -1090,7 +1075,7 @@
                 tanggal_selesai: todayStr
             });
 
-            if (res && res.ok && Array.isArray(res.data) && res.data.length > 0) {
+            if (res && res.ok && Array.isArray(res.data)) {
                 allTodayData = res.data;
                 renderTodayModalList(allTodayData);
             }
@@ -1105,7 +1090,7 @@
         } else {
             currentTodayFilter = status;
         }
-        if (!allTodayData || allTodayData.length === 0) {
+        if (!allTodayData) {
             allTodayData = getTodayDataFromLocal();
         }
         renderTodayModalList(allTodayData);
@@ -1134,9 +1119,8 @@
     }
 
     function renderTodayModalList(data) {
-        if (!data || data.length === 0) {
-            data = getTodayDataFromLocal();
-            allTodayData = data;
+        if (!Array.isArray(data)) {
+            data = [];
         }
 
         let hadir = 0, sakit = 0, izin = 0, alfa = 0;
@@ -1163,6 +1147,16 @@
 
         const listContainer = document.getElementById('today-modal-list');
         if (!listContainer) return;
+
+        if (data.length === 0) {
+            listContainer.innerHTML = `
+                <div class="p-8 text-center text-slate-400">
+                    <span class="material-symbols-outlined text-4xl text-slate-600 mb-2 block">event_busy</span>
+                    <p class="text-sm font-semibold text-slate-300">Belum Ada Presensi Hari Ini</p>
+                    <p class="text-xs text-slate-500 mt-1">Belum ada siswa yang melakukan presensi atau dicatat presensinya pada hari ini.</p>
+                </div>`;
+            return;
+        }
 
         let filteredData = data;
         if (currentTodayFilter !== 'all') {

@@ -708,9 +708,7 @@
                 }
             }
 
-            if (todayData.length === 0 && allDashboardAbsensi.length > 0) {
-                todayData = allDashboardAbsensi.slice(0, 30);
-            }
+            // Removing incorrect fallback slicing from previous days
 
             if (todayData.length === 0) {
                 if (typeof showToast === 'function') {
