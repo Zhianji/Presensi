@@ -852,6 +852,7 @@
     <script src="js/config.js"></script>
     <script>
         let allLaporanData = [];
+        let allSiswaList = [];
         let filteredData = [];
 
         document.addEventListener("DOMContentLoaded", async () => {
@@ -869,7 +870,7 @@
             }
 
             initFilterOptions();
-            await loadLaporanData();
+            await Promise.all([loadLaporanData(), loadSiswaMasterData()]);
 
             // Fetch latest system settings from server to sync logo & kop
             try {
@@ -952,6 +953,27 @@
             }
         }
 
+        async function loadSiswaMasterData() {
+            try {
+                if (typeof apiPostCached === 'function' && typeof getToken === 'function') {
+                    const res = await apiPostCached('getSiswaList', { token: getToken() }, 'cache_siswa_list', (freshRes) => {
+                        if (freshRes && freshRes.ok && Array.isArray(freshRes.data)) {
+                            allSiswaList = freshRes.data;
+                            populateClassDropdowns(allLaporanData);
+                            applyFilters();
+                        }
+                    });
+                    if (res && res.ok && Array.isArray(res.data)) {
+                        allSiswaList = res.data;
+                        populateClassDropdowns(allLaporanData);
+                        applyFilters();
+                    }
+                }
+            } catch (e) {
+                console.warn("Gagal memuat master data siswa:", e);
+            }
+        }
+
         function processLaporanResponse(res) {
             try {
                 if (res && res.ok && Array.isArray(res.data)) {
@@ -974,8 +996,14 @@
         }
 
         function populateClassDropdowns(data) {
-            if (!Array.isArray(data) || !data.length) return;
-            const classes = [...new Set(data.map(item => item.kelas).filter(Boolean))].sort();
+            let classSet = new Set();
+            if (allSiswaList && allSiswaList.length) {
+                allSiswaList.forEach(s => { if (s.kelas) classSet.add(s.kelas); });
+            }
+            if (Array.isArray(data) && data.length) {
+                data.forEach(item => { if (item.kelas) classSet.add(item.kelas); });
+            }
+            const classes = [...classSet].sort();
             if (!classes.length) return;
 
             let optionsHtml = '<option value="">Semua Kelas</option>';
@@ -1108,22 +1136,45 @@
             const listArr = Object.values(studentStats);
             window.lastListArr = listArr;
 
-            let grandHadir = 0, grandTotal = 0;
-            listArr.forEach(s => {
-                grandHadir += s.hadir;
-                grandTotal += s.total;
-            });
-            const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
+            // Hitung rata-rata kehadiran: total siswa yang melakukan absensi / total keseluruhan siswa di kelas
+            const km = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
+            const kd = document.getElementById('filter-kelas-desktop') ? document.getElementById('filter-kelas-desktop').value : '';
+            const selectedClass = kd || km || '';
+
+            let totalClassSiswa = 0;
+            if (allSiswaList && allSiswaList.length > 0) {
+                if (selectedClass) {
+                    totalClassSiswa = allSiswaList.filter(s => String(s.kelas || '').trim().toLowerCase() === selectedClass.trim().toLowerCase()).length;
+                } else {
+                    totalClassSiswa = allSiswaList.length;
+                }
+            }
+
+            // Fallback jika data master siswa belum ada/termuat
+            if (totalClassSiswa === 0) {
+                totalClassSiswa = listArr.length;
+            }
+
+            const siswaAbsensiCount = listArr.length;
+            window.lastTotalClassSiswa = totalClassSiswa;
+            window.lastSiswaAbsensiCount = siswaAbsensiCount;
+
+            const overallPct = totalClassSiswa > 0 ? Math.min(100, parseFloat(((siswaAbsensiCount / totalClassSiswa) * 100).toFixed(1))) : '0';
+            window.lastOverallPct = overallPct;
 
             const elAvgD = document.getElementById('avg-persen-desktop');
             if (elAvgD) elAvgD.textContent = `${overallPct}%`;
             const elAvgM = document.getElementById('avg-persen-mobile');
             if (elAvgM) elAvgM.textContent = `${overallPct}%`;
 
+            const subtext = totalClassSiswa > 0 
+                ? `Berdasarkan ${siswaAbsensiCount} dari ${totalClassSiswa} siswa${selectedClass ? ' kelas' : ''}.`
+                : `Berdasarkan data dari ${siswaAbsensiCount} siswa.`;
+
             const elTotD = document.getElementById('total-siswa-desktop');
-            if (elTotD) elTotD.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
+            if (elTotD) elTotD.textContent = subtext;
             const elTotM = document.getElementById('total-siswa-mobile');
-            if (elTotM) elTotM.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
+            if (elTotM) elTotM.textContent = subtext;
 
             const countInfo = document.getElementById('laporan-count-info');
             if (countInfo) countInfo.textContent = `Menampilkan ${listArr.length} data siswa`;
@@ -1182,6 +1233,7 @@
                     mList.innerHTML = html;
                 }
             }
+            buildPrintArea();
         }
 
         const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -1200,6 +1252,27 @@
             const kd = document.getElementById('filter-kelas-desktop');
             const v = kd ? kd.value : '';
             return v ? v : 'Semua Kelas';
+        }
+
+        function getMapelText() {
+            if (Array.isArray(filteredData) && filteredData.length > 0) {
+                const mapels = [...new Set(filteredData.map(item => item.mapel).filter(Boolean))];
+                if (mapels.length > 0) {
+                    return mapels.join(' / ');
+                }
+            }
+            const km = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
+            const kd = document.getElementById('filter-kelas-desktop') ? document.getElementById('filter-kelas-desktop').value : '';
+            const selectedClass = kd || km || '';
+            if (selectedClass && Array.isArray(allLaporanData) && allLaporanData.length > 0) {
+                const classItems = allLaporanData.filter(item => String(item.kelas || '').trim().toLowerCase() === selectedClass.trim().toLowerCase());
+                const classMapels = [...new Set(classItems.map(item => item.mapel).filter(Boolean))];
+                if (classMapels.length > 0) {
+                    return classMapels.join(' / ');
+                }
+            }
+            const settings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
+            return settings.mata_pelajaran || settings.mapel || 'Informatika / TIK';
         }
 
         let modalLogoBase64 = '';
@@ -1228,27 +1301,30 @@
             const modalEmail = document.getElementById('modal-email');
             if (modalEmail) modalEmail.value = s.email_sekolah || 'smanegeriduaenok@ymail.com';
 
-            const modalKepsek = document.getElementById('modal-nama-kepsek');
+            const modalTa = document.getElementById('modal-ta');
+            if (modalTa) modalTa.value = s.tahun_ajaran || '2025/2026';
+
+            const modalKepsek = document.getElementById('modal-nama-kepsek') || document.getElementById('modal-kepsek');
             if (modalKepsek) modalKepsek.value = s.nama_kepsek || 'Drs. H. Ahmad Dahlan, M.Pd';
 
             const modalNipKepsek = document.getElementById('modal-nip-kepsek');
             if (modalNipKepsek) modalNipKepsek.value = s.nip_kepsek || '19680512 199403 1 004';
-            
-            const modalGuruInput = document.getElementById('modal-nama-guru');
-            if (modalGuruInput) {
-                modalGuruInput.value = s.nama_guru !== undefined ? s.nama_guru : '';
-                modalGuruInput.placeholder = user?.nama ? `Otomatis: ${user.nama}` : 'Nama Guru';
-            }
+
+            const userNama = user?.nama || (typeof getNama === 'function' ? getNama() : '') || '';
+            const userNip = user?.nip || (typeof localStorage !== 'undefined' ? (localStorage.getItem('user_nip') || '') : '') || '';
+
+            const modalGuru = document.getElementById('modal-nama-guru') || document.getElementById('modal-guru');
+            if (modalGuru) modalGuru.value = (userNama && userNama.trim() !== '') ? userNama : (s.nama_guru || '');
 
             const modalNipGuru = document.getElementById('modal-nip-guru');
-            if (modalNipGuru) modalNipGuru.value = s.nip_guru || (user?.nip || '-');
+            if (modalNipGuru) modalNipGuru.value = (userNip && userNip !== '-' && userNip.trim() !== '') ? userNip : (s.nip_guru || '');
 
             const modalMapel = document.getElementById('modal-mapel');
             if (modalMapel) modalMapel.value = s.mata_pelajaran || s.mapel || '';
 
-            modalLogoBase64 = s.logo_sekolah || '';
-            const logoPrev = document.getElementById('modal-logo-preview');
-            if (logoPrev) logoPrev.src = modalLogoBase64 || 'img/logo-sekolah.png';
+            const previewLogo = document.getElementById('modal-preview-logo') || document.getElementById('modal-logo-preview');
+            modalLogoBase64 = s.logo_sekolah || window.LOGO_SEKOLAH_BASE64 || 'img/logo-sekolah.png';
+            if (previewLogo) previewLogo.src = modalLogoBase64;
 
             const modal = document.getElementById('modal-custom-laporan');
             if (modal) modal.classList.remove('hidden');
@@ -1259,48 +1335,45 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        async function handleModalLogoUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Ukuran logo terlalu besar. Maksimal 5MB.');
-                return;
-            }
-            try {
-                modalLogoBase64 = await compressLogoImage(file, 300, 0.85);
-                const logoPrev = document.getElementById('modal-logo-preview');
-                if (logoPrev) logoPrev.src = modalLogoBase64;
-            } catch (err) {
-                alert('Gagal memproses file logo: ' + (err.message || err));
+        function handleLogoUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran file logo terlalu besar. Maksimal 2MB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    modalLogoBase64 = e.target.result;
+                    const previewLogo = document.getElementById('modal-preview-logo') || document.getElementById('modal-logo-preview');
+                    if (previewLogo) previewLogo.src = modalLogoBase64;
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        function resetModalLogo() {
-            modalLogoBase64 = '';
-            const logoPrev = document.getElementById('modal-logo-preview');
-            if (logoPrev) logoPrev.src = 'img/logo-sekolah.png';
-            const inp = document.getElementById('modal-input-logo');
-            if (inp) inp.value = '';
-        }
-
-        function saveModalCustomLaporan() {
-            const dinas = document.getElementById('modal-dinas')?.value || 'DINAS PENDIDIKAN PROVINSI RIAU';
-            const sekolah = document.getElementById('modal-sekolah')?.value || 'SMA NEGERI 2 ENOK';
-            const nss = document.getElementById('modal-nss')?.value || '302090502016';
-            const npsn = document.getElementById('modal-npsn')?.value || '10402057';
-            const email = document.getElementById('modal-email')?.value || 'smanegeriduaenok@ymail.com';
-            const kepsek = document.getElementById('modal-nama-kepsek')?.value || 'Drs. H. Ahmad Dahlan, M.Pd';
-            const nipKepsek = document.getElementById('modal-nip-kepsek')?.value || '19680512 199403 1 004';
-            const guru = document.getElementById('modal-nama-guru')?.value;
-            const nipGuru = document.getElementById('modal-nip-guru')?.value || '-';
+        function saveCustomLaporanSettings() {
+            const dinas = document.getElementById('modal-dinas')?.value || '';
+            const sekolah = document.getElementById('modal-sekolah')?.value || '';
+            const nss = document.getElementById('modal-nss')?.value || '';
+            const npsn = document.getElementById('modal-npsn')?.value || '';
+            const email = document.getElementById('modal-email')?.value || '';
+            const ta = document.getElementById('modal-ta')?.value || '';
+            const kepsek = (document.getElementById('modal-nama-kepsek') || document.getElementById('modal-kepsek'))?.value || '';
+            const nipKepsek = document.getElementById('modal-nip-kepsek')?.value || '';
+            const guru = (document.getElementById('modal-nama-guru') || document.getElementById('modal-guru'))?.value || '';
+            const nipGuru = document.getElementById('modal-nip-guru')?.value || '';
             const mapel = document.getElementById('modal-mapel')?.value || 'Informatika / TIK';
 
+            const currentSettings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
             const updated = {
+                ...currentSettings,
                 dinas_pendidikan: dinas,
                 nama_sekolah: sekolah,
                 nss: nss,
                 npsn: npsn,
                 email_sekolah: email,
+                tahun_ajaran: ta,
                 nama_kepsek: kepsek,
                 nip_kepsek: nipKepsek,
                 nama_guru: guru,
@@ -1311,7 +1384,6 @@
 
             saveSystemSettingsLocal(updated);
             
-            // Persist to server in background if possible
             try {
                 if (typeof apiPost === 'function' && typeof getToken === 'function') {
                     apiPost('savePengaturan', { token: getToken(), settings: updated });
@@ -1355,6 +1427,7 @@
 
             const periodeText = getPeriodeText();
             const kelasText = getKelasFilterText();
+            const mapelText = getMapelText();
             const now = new Date();
             const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -1363,7 +1436,7 @@
             rows.push([sekolah.toUpperCase()]);
             rows.push([`NSS: ${nss} | NPSN: ${npsn} | Email: ${email}`]);
             rows.push(['LAPORAN REKAPITULASI PRESENSI SISWA']);
-            rows.push([`Tahun Ajaran: ${ta} | Periode: ${periodeText} | Kelas: ${kelasText}`]);
+            rows.push([`Tahun Ajaran: ${ta} | Periode: ${periodeText} | Kelas: ${kelasText} | Mapel: ${mapelText}`]);
             rows.push([]);
             rows.push(['No', 'Nama Siswa', 'Kelas', 'Hadir', 'Sakit', 'Izin', 'Alfa', '% Kehadiran']);
 
@@ -1432,7 +1505,7 @@
 
             const elMapel = document.getElementById('print-mapel');
             if (elMapel) {
-                elMapel.textContent = settings.mata_pelajaran || settings.mapel || 'Informatika / TIK';
+                elMapel.textContent = getMapelText();
             }
 
             let grandHadir = 0, grandTotal = 0;
@@ -1456,9 +1529,11 @@
             document.getElementById('print-tbody').innerHTML = rowsHtml ||
                 '<tr><td colspan="8" style="padding:12px; text-align:center;">Tidak ada data untuk periode/kelas yang dipilih.</td></tr>';
 
-            const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
+            const totalClassSiswa = window.lastTotalClassSiswa || listArr.length;
+            const siswaAbsensiCount = window.lastSiswaAbsensiCount !== undefined ? window.lastSiswaAbsensiCount : listArr.length;
+            const overallPct = window.lastOverallPct !== undefined ? window.lastOverallPct : (totalClassSiswa > 0 ? ((siswaAbsensiCount / totalClassSiswa) * 100).toFixed(1) : '0');
             document.getElementById('print-summary').textContent =
-                `Rata-rata kehadiran: ${overallPct}% dari ${listArr.length} siswa.`;
+                `Rata-rata kehadiran: ${overallPct}% (${siswaAbsensiCount} dari ${totalClassSiswa} siswa).`;
 
             const now = new Date();
             const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
