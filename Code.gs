@@ -274,10 +274,17 @@ function savePengaturan(session, settings) {
   if (session.role !== 'admin' && session.role !== 'kepsek') return { ok: false, error: 'Akses ditolak' };
   const sheet = getSheet('Pengaturan');
   const rows = sheet.getDataRange().getValues();
+  const existingRowMap = {};
   for(let i=1; i<rows.length; i++) {
-    const key = rows[i][0];
+    existingRowMap[rows[i][0]] = i + 1;
+  }
+  for(let key in settings) {
     if (settings[key] !== undefined) {
-      sheet.getRange(i+1, 2).setValue(settings[key]);
+      if (existingRowMap[key]) {
+        sheet.getRange(existingRowMap[key], 2).setValue(settings[key]);
+      } else {
+        sheet.appendRow([key, settings[key]]);
+      }
     }
   }
   logAction(session.user_id, session.nama, 'Update Pengaturan', 'Mengubah pengaturan sistem');

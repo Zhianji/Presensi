@@ -101,7 +101,36 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button class="material-symbols-outlined text-slate-400 hover:text-white p-2 hover:bg-slate-800/80 rounded-xl transition-colors" onclick="window.location.href='notifikasi.html'">notifications</button>
+                <div class="relative">
+                    <button onclick="toggleMobileDropdown('dropdown-notif-mobile-input')" onblur="setTimeout(() => closeMobileDropdown('dropdown-notif-mobile-input'), 250)" class="material-symbols-outlined text-slate-400 hover:text-white p-2 hover:bg-slate-800/80 rounded-xl transition-colors cursor-pointer relative focus:outline-none">
+                        notifications
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    </button>
+                    <div id="dropdown-notif-mobile-input" class="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-800/50">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-400 text-base">notifications</span>
+                                <span class="text-xs font-bold text-white tracking-tight">Notifikasi</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-semibold border border-blue-500/30">3 Baru</span>
+                        </div>
+                        <div class="divide-y divide-slate-800/60 max-h-64 overflow-y-auto">
+                            <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                <p class="text-xs font-semibold text-white">Rekapitulasi Absensi Hari Ini</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Beberapa kelas telah menyelesaikan rekap presensi.</p>
+                                <span class="text-[10px] text-slate-500 mt-1 block">10m lalu</span>
+                            </a>
+                            <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                <p class="text-xs font-semibold text-white">Pembaruan Sistem v2.0</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Fitur manajemen data presensi diperbarui.</p>
+                                <span class="text-[10px] text-slate-500 mt-1 block">1j lalu</span>
+                            </a>
+                        </div>
+                        <a href="notifikasi.html" class="block p-3 text-center text-xs font-semibold text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border-t border-slate-800 transition-colors">
+                            Lihat Semua Notifikasi →
+                        </a>
+                    </div>
+                </div>
                 <div class="relative">
                     <button onclick="toggleMobileDropdown('dropdown-mobile-input-absensi')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-input-absensi'), 200)" class="flex items-center gap-2 pr-2.5 pl-1 py-1 rounded-full border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700/80 transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <img class="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-400/40" data-alt="User Avatar" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true"/>
@@ -252,22 +281,6 @@
                     <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">description</span>
                     <span>Laporan</span>
                 </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="kelola-admin.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">admin_panel_settings</span>
-                    <span>Kelola Admin</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="notifikasi.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">notifications_active</span>
-                    <span>Notifikasi</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="pengaturan.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">settings</span>
-                    <span>Pengaturan</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="log-aktivitas.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">history_edu</span>
-                    <span>Log Aktivitas</span>
-                </a>
             </nav>
             
             <div class="p-4 border-t border-slate-800">
@@ -285,15 +298,64 @@
                 <div class="flex items-center gap-4">
                     <h2 class="text-lg font-bold text-white tracking-tight">Input Absensi</h2>
                 </div>
-                <div class="flex items-center gap-5">
-                    <div class="relative hidden md:block">
-                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-                        <input id="desktop-search-input" oninput="handleDesktopSearchInput(this)" class="pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs w-64 outline-none transition-all" placeholder="Cari data..." type="text"/>
+                <div class="flex items-center gap-4">
+                    <div class="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="font-semibold text-white header-ta-display">TA 2025/2026</span>
+                        <span class="text-slate-600">•</span>
+                        <span class="text-blue-400 font-medium header-semester-display">Semester Ganjil</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="window.location.href='notifikasi.html'" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer">
-                            <span class="material-symbols-outlined text-lg">notifications</span>
-                        </button>
+                        <div class="relative">
+                            <button onclick="toggleMobileDropdown('dropdown-notif-desktop-input')" onblur="setTimeout(() => closeMobileDropdown('dropdown-notif-desktop-input'), 250)" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer relative focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="material-symbols-outlined text-lg">notifications</span>
+                                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            </button>
+                            <div id="dropdown-notif-desktop-input" class="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                                <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-800/50">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-blue-400 text-base">notifications</span>
+                                        <span class="text-xs font-bold text-white tracking-tight">Notifikasi</span>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-semibold border border-blue-500/30">3 Baru</span>
+                                </div>
+                                <div class="divide-y divide-slate-800/60 max-h-72 overflow-y-auto">
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Rekapitulasi Absensi Hari Ini</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Beberapa kelas telah menyelesaikan rekap presensi.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">10m lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Pembaruan Sistem v2.0</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Fitur manajemen data presensi diperbarui.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">1j lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Laporan Siap Diunduh</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Laporan bulanan presensi siap diakses.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">2j lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <a href="notifikasi.html" class="block p-3 text-center text-xs font-semibold text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border-t border-slate-800 transition-colors">
+                                    Lihat Semua Notifikasi →
+                                </a>
+                            </div>
+                        </div>
                         <div class="h-6 w-[1px] bg-slate-800 mx-1"></div>
                         <div class="relative">
                             <button onclick="toggleMobileDropdown('dropdown-desktop-input')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-input'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
@@ -504,7 +566,7 @@
         }
         
         if (!classList.length) {
-            classList = ["X-E1", "X-E2", "X-E3", "X-E4", "X-E5", "X-E6", "XII IPA 1", "XII IPA 2", "XI IPS 1", "XI IPS 2", "X-1"];
+            classList = ["X-E1", "X-E2", "X-E3", "X-E4", "X-E5", "X-E6"];
         }
         
         let optionsHtml = `<option value="">Semua Kelas</option>`;

@@ -1,5 +1,5 @@
 // ==== KONFIGURASI APLIKASI ====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUcFNc2m_M8ni_68F6w_Zivso3zuxRDAZokPLkSVEkL0HK7KOYyuQUQSy73hzagGm1OA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxn8nxwiU5qpKJOdrHh2iicnpmYZP_VlXs8i5JCZxbtWQ28mK91YaCMpOtf89hwkBLUHA/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
 const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
@@ -137,6 +137,27 @@ function getRole() { return localStorage.getItem(ROLE_KEY); }
 function getNama() { return localStorage.getItem(NAMA_KEY); }
 function getEmail() { return localStorage.getItem(EMAIL_KEY); }
 
+function getCurrentUser() {
+  try {
+    const userStr = localStorage.getItem('user_session');
+    if (userStr) {
+      const parsed = JSON.parse(userStr);
+      if (parsed && (parsed.nama || parsed.role)) return parsed;
+    }
+  } catch (e) {}
+
+  const token = getToken();
+  const role = getRole();
+  const nama = getNama();
+  const email = getEmail();
+  const nip = localStorage.getItem('user_nip') || '-';
+
+  if (token || nama) {
+    return { token, role, nama, email, nip };
+  }
+  return null;
+}
+
 function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ROLE_KEY);
@@ -208,8 +229,8 @@ async function guardPage(requiredRole) {
 
     if (!check || !check.ok) {
       const isTimeoutOrConnError = check && check.error && (
-        check.error.includes('timeout') || 
-        check.error.includes('terhubung') || 
+        check.error.includes('timeout') ||
+        check.error.includes('terhubung') ||
         check.error.includes('Failed to fetch')
       );
       if (isTimeoutOrConnError || (token && (token.startsWith('fallback_token_') || token.startsWith('local_token_')))) {
@@ -255,8 +276,8 @@ async function mockGoogleLogin(email, name = '', picture = '', expectedRole = ''
 
   // Check if failure is due to network timeout or connection error to Google Apps Script
   const isNetworkOrTimeout = res && res.error && (
-    res.error.includes('timeout') || 
-    res.error.includes('terhubung') || 
+    res.error.includes('timeout') ||
+    res.error.includes('terhubung') ||
     res.error.includes('Failed to fetch') ||
     res.error.includes('NetworkError')
   );
@@ -447,10 +468,14 @@ function handleLogout() {
 
 // ==== COMMON UI RENDERING ====
 function setupCommonUI(session) {
+  if (!session) session = {};
   const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
 
+  const role = session.role || getRole() || '';
+  const nama = session.nama || getNama() || '';
+
   // 1. Render User Header Info & Avatars
-  const avatarUrl = getAvatarUrl(session.nama);
+  const avatarUrl = getAvatarUrl(nama);
   const userAvatars = document.querySelectorAll('img[data-alt="User Avatar"], img.user-avatar, img[src*="googleusercontent"]');
   userAvatars.forEach(img => {
     img.src = avatarUrl;
@@ -458,60 +483,164 @@ function setupCommonUI(session) {
 
   const userHeaderNames = document.querySelectorAll('.user-name-display, #user-name, p.font-label-md.font-bold');
   userHeaderNames.forEach(el => {
-    if (session.nama) el.textContent = session.nama;
+    if (nama) el.textContent = nama;
   });
 
   const userHeaderRoles = document.querySelectorAll('.user-role-display, #user-role');
   userHeaderRoles.forEach(el => {
-    if (session.role) el.textContent = session.role.toUpperCase();
+    if (role) el.textContent = role.toUpperCase();
   });
 
   // 2. Render Sidebar Navigation & Active States
   const navElements = document.querySelectorAll('aside nav');
-  if (!navElements.length) return;
+  if (navElements.length) {
+    const menuItems = [
+      { page: 'dashboard.html', label: 'Beranda', icon: 'dashboard', roles: ['admin', 'guru', 'kepsek'] },
+      { page: 'input-absensi.html', label: 'Input Absen', icon: 'how_to_reg', roles: ['admin', 'guru', 'kepsek'] },
+      { page: 'master-data.html', label: 'Master Data', icon: 'database', roles: ['admin', 'guru', 'kepsek'] },
+      { page: 'laporan.html', label: 'Laporan', icon: 'description', roles: ['admin', 'guru', 'kepsek'] },
+      { page: 'kelola-admin.html', label: 'Kelola Admin', icon: 'admin_panel_settings', roles: ['admin', 'kepsek'] },
+      { page: 'pengaturan.html', label: 'Pengaturan', icon: 'settings', roles: ['admin', 'kepsek'] },
+      { page: 'log-aktivitas.html', label: 'Log Aktivitas', icon: 'history_edu', roles: ['admin', 'kepsek'] },
+    ];
 
-  const role = session.role || getRole();
+    let navHtml = '';
+    menuItems.forEach(item => {
+      if (role && !item.roles.includes(role)) return;
 
-  const menuItems = [
-    { page: 'dashboard.html', label: 'Beranda', icon: 'dashboard', roles: ['admin', 'guru', 'kepsek'] },
-    { page: 'input-absensi.html', label: 'Input Absen', icon: 'how_to_reg', roles: ['admin', 'guru', 'kepsek'] },
-    { page: 'master-data.html', label: 'Master Data', icon: 'database', roles: ['admin', 'guru', 'kepsek'] },
-    { page: 'laporan.html', label: 'Laporan', icon: 'description', roles: ['admin', 'guru', 'kepsek'] },
-    { page: 'kelola-admin.html', label: 'Kelola Admin', icon: 'admin_panel_settings', roles: ['admin', 'kepsek'] },
-    { page: 'notifikasi.html', label: 'Notifikasi', icon: 'notifications_active', roles: ['admin', 'guru', 'kepsek', 'siswa'] },
-    { page: 'pengaturan.html', label: 'Pengaturan', icon: 'settings', roles: ['admin', 'kepsek'] },
-    { page: 'log-aktivitas.html', label: 'Log Aktivitas', icon: 'history_edu', roles: ['admin', 'kepsek'] },
-  ];
+      const isActive = currentPage === item.page;
+      if (isActive) {
+        navHtml += `
+          <a href="${item.page}" class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs overflow-hidden transition-all duration-300">
+            <span class="material-symbols-outlined text-lg min-w-[20px] text-center" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+            <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
+          </a>
+        `;
+      } else {
+        navHtml += `
+          <a href="${item.page}" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all duration-300 text-xs font-medium group overflow-hidden">
+            <span class="material-symbols-outlined text-lg min-w-[20px] text-center group-hover:text-blue-400 transition-colors">${item.icon}</span>
+            <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
+          </a>
+        `;
+      }
+    });
 
-  let navHtml = '';
-  menuItems.forEach(item => {
-    if (!item.roles.includes(role)) return;
+    navElements.forEach(el => {
+      el.innerHTML = navHtml;
+    });
+  }
 
-    const isActive = currentPage === item.page;
-    if (isActive) {
-      navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs overflow-hidden transition-all duration-300">
-          <span class="material-symbols-outlined text-lg min-w-[20px] text-center" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
-          <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
-        </a>
-      `;
-    } else {
-      navHtml += `
-        <a href="${item.page}" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all duration-300 text-xs font-medium group overflow-hidden">
-          <span class="material-symbols-outlined text-lg min-w-[20px] text-center group-hover:text-blue-400 transition-colors">${item.icon}</span>
-          <span class="sidebar-text whitespace-nowrap transition-all duration-300">${item.label}</span>
-        </a>
-      `;
-    }
-  });
+  // 3. Filter restricted links outside sidebar (like profile dropdowns & mobile bottom nav)
+  if (role && role !== 'admin' && role !== 'kepsek') {
+    const restrictedPages = ['kelola-admin.html', 'pengaturan.html', 'log-aktivitas.html'];
+    restrictedPages.forEach(p => {
+      document.querySelectorAll(`a[href="${p}"]`).forEach(el => {
+        if (!el.closest('aside nav')) {
+          el.style.display = 'none';
+        }
+      });
+    });
+  }
 
-  navElements.forEach(el => {
-    el.innerHTML = navHtml;
-  });
+  // 4. Update Header Settings Badges (TA & Semester)
+  updateHeaderSettingsBadge();
 
   // Call sidebar toggle setup
   setupSidebarToggle();
 }
+
+// ==== SYSTEM SETTINGS MANAGEMENT ====
+const SYSTEM_SETTINGS_KEY = 'app_system_settings';
+const DEFAULT_SETTINGS = {
+  tahun_ajaran: '2025/2026',
+  semester: 'Ganjil',
+  nama_sekolah: 'SMA NEGERI 2 ENOK',
+  dinas_pendidikan: 'DINAS PENDIDIKAN PROVINSI RIAU',
+  nss: '302090502016',
+  npsn: '10402057',
+  email_sekolah: 'smanegeriduaenok@ymail.com',
+  nama_kepsek: 'Drs. H. Ahmad Dahlan, M.Pd',
+  nip_kepsek: '19680512 199403 1 004',
+  nip_guru: '-',
+  logo_sekolah: '',
+  jam_masuk: '07:00',
+  batas_waktu_input: '07:30',
+  jam_pulang: '15:00',
+  jam_operasional_active: true
+};
+
+function getSystemSettings() {
+  try {
+    const raw = localStorage.getItem(SYSTEM_SETTINGS_KEY);
+    if (raw) {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    }
+  } catch (e) {}
+  return { ...DEFAULT_SETTINGS };
+}
+
+function saveSystemSettingsLocal(settings) {
+  try {
+    const current = getSystemSettings();
+    const updated = { ...current, ...settings };
+    localStorage.setItem(SYSTEM_SETTINGS_KEY, JSON.stringify(updated));
+    updateHeaderSettingsBadge(updated);
+    return updated;
+  } catch (e) {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function updateHeaderSettingsBadge(settings) {
+  const s = settings || getSystemSettings();
+
+  // 1. Update Tahun Ajaran badges
+  const taElements = document.querySelectorAll('.header-ta-display');
+  taElements.forEach(el => {
+    el.textContent = `TA ${s.tahun_ajaran || '2025/2026'}`;
+  });
+
+  // 2. Update Semester badges
+  const semesterElements = document.querySelectorAll('.header-semester-display');
+  semesterElements.forEach(el => {
+    el.textContent = `Semester ${s.semester || 'Ganjil'}`;
+  });
+
+  // 3. Update School Name displays (Headers, Profile Banners, and Footers)
+  const schoolName = s.nama_sekolah || 'SMA Negeri 1 Edukasi Digital';
+  const schoolElements = document.querySelectorAll('.user-school-display, #school-name-display, .school-name-text');
+  schoolElements.forEach(el => {
+    el.textContent = schoolName;
+  });
+
+  // Update footer school name dynamically
+  document.querySelectorAll('footer p').forEach(el => {
+    const txt = el.textContent || '';
+    if (txt.includes('•')) {
+      const parts = txt.split('•');
+      el.textContent = `${parts[0].trim()} • ${schoolName}`;
+    }
+  });
+}
+
+// Immediately run UI setup on script load for 0ms latency
+(function autoInitUI() {
+  const run = () => {
+    const role = getRole();
+    const nama = getNama();
+    if (role || nama) {
+      setupCommonUI({ role, nama });
+    } else {
+      updateHeaderSettingsBadge();
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
 
 function setupSidebarToggle() {
     if (document.getElementById('sidebar-styles')) return;
@@ -522,47 +651,47 @@ function setupSidebarToggle() {
         /* Smooth transitions */
         #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
         main { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
+
         /* Collapsed state */
         body.sidebar-collapsed #sidebar { width: 5.5rem !important; }
         body.sidebar-collapsed main { margin-left: 5.5rem !important; }
-        
+
         /* Hide texts smoothly */
-        #sidebar h1, #sidebar p, #sidebar .sidebar-text, #sidebar .border-t button span:not(.material-symbols-outlined) { 
+        #sidebar h1, #sidebar p, #sidebar .sidebar-text, #sidebar .border-t button span:not(.material-symbols-outlined) {
             transition: opacity 0.2s ease, max-width 0.3s ease;
-            white-space: nowrap; 
+            white-space: nowrap;
             max-width: 200px;
         }
-        body.sidebar-collapsed #sidebar h1, 
-        body.sidebar-collapsed #sidebar p, 
+        body.sidebar-collapsed #sidebar h1,
+        body.sidebar-collapsed #sidebar p,
         body.sidebar-collapsed #sidebar .sidebar-text,
-        body.sidebar-collapsed #sidebar .border-t button span:not(.material-symbols-outlined) { 
-            opacity: 0; 
-            max-width: 0; 
+        body.sidebar-collapsed #sidebar .border-t button span:not(.material-symbols-outlined) {
+            opacity: 0;
+            max-width: 0;
             pointer-events: none;
             margin: 0;
             padding: 0;
         }
-        
+
         /* Enlarge school icon & logo container */
         #sidebar .w-10.h-10 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         #sidebar .w-10.h-10 span { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        body.sidebar-collapsed #sidebar .w-10.h-10 { 
-            width: 3.2rem !important; 
+
+        body.sidebar-collapsed #sidebar .w-10.h-10 {
+            width: 3.2rem !important;
             height: 3.2rem !important;
             margin: 0 auto;
         }
-        body.sidebar-collapsed #sidebar .w-10.h-10 span { 
+        body.sidebar-collapsed #sidebar .w-10.h-10 span {
             font-size: 2rem !important;
         }
-        
+
         /* Center elements when collapsed */
         body.sidebar-collapsed #sidebar .border-b { justify-content: center; padding: 1.5rem 0; }
-        body.sidebar-collapsed #sidebar nav a, 
-        body.sidebar-collapsed #sidebar .border-t button { 
+        body.sidebar-collapsed #sidebar nav a,
+        body.sidebar-collapsed #sidebar .border-t button {
             justify-content: center;
-            padding-left: 0 !important; 
+            padding-left: 0 !important;
             padding-right: 0 !important;
         }
         /* Mobile handling (hide sidebar completely instead of collapsing) */
@@ -670,7 +799,7 @@ function toggleMobileDropdown(id) {
     if (el) {
         if (el.classList.contains('opacity-0')) {
             el.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-            el.classList.add('opacity-100', 'scale-100');
+            el.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
             // Try to populate user data if available in localStorage
             const userStr = localStorage.getItem('user_session');
             if (userStr) {
@@ -692,6 +821,50 @@ function closeMobileDropdown(id) {
     const el = document.getElementById(id);
     if (el) {
         el.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        el.classList.remove('opacity-100', 'scale-100');
+        el.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
     }
 }
+
+/**
+ * Kompres dan resize file logo menjadi Base64 Data URL ringan (< 30KB).
+ * Mencegah error batas 50.000 karakter per cell di Google Sheets & mempercepat render cetak PDF.
+ */
+function compressLogoImage(file, maxDimension = 300, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return reject(new Error('File yang dipilih bukan format gambar yang valid.'));
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Gagal membaca file gambar.'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Format gambar tidak dapat dimuat.'));
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/png', quality);
+        resolve(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+

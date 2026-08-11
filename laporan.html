@@ -1,96 +1,212 @@
 <!DOCTYPE html>
 <html class="dark" lang="id">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Rekap & Laporan - Sistem Presensi Digital (v2.0)</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-    <link rel="alternate icon" type="image/x-icon" href="favicon.ico"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="js/tailwind-config.js"></script>
     <script src="js/logo-sekolah.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         .glass-panel {
             background: rgba(30, 41, 59, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
         .glass-card {
             background: rgba(30, 41, 59, 0.55);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* ==================== LAPORAN CETAK / PDF FORMAL ==================== */
-        #print-area { display: none; }
+        #print-area {
+            display: none;
+        }
+
         @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+            body > *:not(#print-area) {
+                display: none !important;
+            }
+
             #print-area {
                 display: block !important;
-                position: absolute;
-                left: 0; top: 0;
-                width: 100%;
-                background: #ffffff;
-                color: #000000;
+                position: relative !important;
+                left: auto !important;
+                top: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                color: #000000 !important;
                 font-family: 'Times New Roman', Times, serif;
             }
-            body { background: #ffffff !important; }
-            @page { size: A4 portrait; margin: 15mm 14mm; }
-            #print-area table { border-collapse: collapse; }
-            #print-area th, #print-area td { border: 1px solid #000000; }
+
+            #print-area * {
+                visibility: visible !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 15mm 14mm;
+            }
+
+            #print-area table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            #print-area th,
+            #print-area td {
+                border: 1px solid #000000;
+            }
+
+            #print-area tr {
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
-<body class="bg-[#0f172a] text-slate-100 min-h-screen md:overflow-hidden md:h-screen md:flex antialiased selection:bg-blue-500 selection:text-white">
+
+<body
+    class="bg-[#0f172a] text-slate-100 min-h-screen md:overflow-hidden md:h-screen md:flex antialiased selection:bg-blue-500 selection:text-white">
 
     <!-- MOBILE VIEW CONTAINER -->
     <div class="block md:hidden w-full pb-24">
         <!-- Top Navigation Bar -->
-        <header class="flex justify-between items-center px-4 py-3.5 w-full sticky top-0 z-50 glass-panel border-b border-slate-800">
+        <header
+            class="flex justify-between items-center px-4 py-3.5 w-full sticky top-0 z-50 glass-panel border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-white/20">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-white/20">
                     <span class="material-symbols-outlined text-white text-xl">description</span>
                 </div>
                 <div>
                     <span class="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
                         Laporan
-                        <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
+                        <span
+                            class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
                     </span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button class="material-symbols-outlined text-slate-400 hover:text-white p-2 hover:bg-slate-800/80 rounded-xl transition-colors" onclick="window.location.href='notifikasi.html'">notifications</button>
                 <div class="relative">
-                    <button onclick="toggleMobileDropdown('dropdown-mobile-laporan')" onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-laporan'), 200)" class="flex items-center gap-2 pr-2.5 pl-1 py-1 rounded-full border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700/80 transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <img class="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-400/40" data-alt="User Avatar" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true"/>
-                        <span class="text-xs font-semibold text-slate-200 user-name-display truncate max-w-[80px]">Admin</span>
+                    <button onclick="toggleMobileDropdown('dropdown-notif-mobile-laporan')"
+                        onblur="setTimeout(() => closeMobileDropdown('dropdown-notif-mobile-laporan'), 250)"
+                        class="material-symbols-outlined text-slate-400 hover:text-white p-2 hover:bg-slate-800/80 rounded-xl transition-colors cursor-pointer relative focus:outline-none">
+                        notifications
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
                     </button>
-                    <div id="dropdown-mobile-laporan" class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
-                        <div class="px-4 py-3 border-b border-slate-700/60 bg-slate-900/50">
-                            <p class="text-xs font-bold text-white user-name-display truncate" id="dropdown-mobile-laporan-name">Pengguna</p>
-                            <p class="text-[10px] text-blue-400 uppercase tracking-wider font-semibold mt-0.5 user-role-display" id="dropdown-mobile-laporan-role">Role</p>
+                    <div id="dropdown-notif-mobile-laporan"
+                        class="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                        <div
+                            class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-800/50">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-400 text-base">notifications</span>
+                                <span class="text-xs font-bold text-white tracking-tight">Notifikasi</span>
+                            </div>
+                            <span
+                                class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-semibold border border-blue-500/30">3
+                                Baru</span>
                         </div>
-                        <a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                        <div class="divide-y divide-slate-800/60 max-h-64 overflow-y-auto">
+                            <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                <p class="text-xs font-semibold text-white">Rekapitulasi Absensi Hari Ini</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Beberapa kelas telah menyelesaikan rekap
+                                    presensi.</p>
+                                <span class="text-[10px] text-slate-500 mt-1 block">10m lalu</span>
+                            </a>
+                            <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                <p class="text-xs font-semibold text-white">Pembaruan Sistem v2.0</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Fitur manajemen data presensi diperbarui.
+                                </p>
+                                <span class="text-[10px] text-slate-500 mt-1 block">1j lalu</span>
+                            </a>
+                        </div>
+                        <a href="notifikasi.html"
+                            class="block p-3 text-center text-xs font-semibold text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border-t border-slate-800 transition-colors">
+                            Lihat Semua Notifikasi →
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <button onclick="toggleMobileDropdown('dropdown-mobile-laporan')"
+                        onblur="setTimeout(() => closeMobileDropdown('dropdown-mobile-laporan'), 200)"
+                        class="flex items-center gap-2 pr-2.5 pl-1 py-1 rounded-full border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700/80 transition-colors overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <img class="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-400/40"
+                            data-alt="User Avatar"
+                            src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true" />
+                        <span
+                            class="text-xs font-semibold text-slate-200 user-name-display truncate max-w-[80px]">Admin</span>
+                    </button>
+                    <div id="dropdown-mobile-laporan"
+                        class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                        <div class="px-4 py-3 border-b border-slate-700/60 bg-slate-900/50">
+                            <p class="text-xs font-bold text-white user-name-display truncate"
+                                id="dropdown-mobile-laporan-name">Pengguna</p>
+                            <p class="text-[10px] text-blue-400 uppercase tracking-wider font-semibold mt-0.5 user-role-display"
+                                id="dropdown-mobile-laporan-role">Role</p>
+                        </div>
+                        <a href="master-data.html"
+                            class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
                             <span class="material-symbols-outlined text-[18px]">database</span> Master Data
                         </a>
-                        <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                        <a href="pengaturan.html"
+                            class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
                             <span class="material-symbols-outlined text-[18px]">account_circle</span> Profil
                         </a>
-                        <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-t border-slate-700/60">
+                        <button onclick="handleLogout()"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-t border-slate-700/60">
                             <span class="material-symbols-outlined text-[18px]">logout</span> Keluar
                         </button>
                     </div>
@@ -113,7 +229,8 @@
                         <span class="text-xs font-bold text-white">Periode</span>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <select id="filter-bulan-mobile" onchange="syncFilterMobile()" class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
+                        <select id="filter-bulan-mobile" onchange="syncFilterMobile(true)"
+                            class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
                             <option value="1">Januari</option>
                             <option value="2">Februari</option>
                             <option value="3">Maret</option>
@@ -127,12 +244,14 @@
                             <option value="11">November</option>
                             <option value="12">Desember</option>
                         </select>
-                        <select id="filter-tahun-mobile" onchange="syncFilterMobile()" class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
+                        <select id="filter-tahun-mobile" onchange="syncFilterMobile(true)"
+                            class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
                             <option value="2024">2024</option>
                             <option value="2025">2025</option>
                             <option value="2026">2026</option>
                         </select>
-                        <select id="filter-tanggal-mobile" onchange="syncFilterMobile()" class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
+                        <select id="filter-tanggal-mobile" onchange="syncFilterMobile()"
+                            class="bg-slate-800 border border-slate-700 rounded-xl p-2 text-xs text-white outline-none">
                             <option value="">Semua Tgl</option>
                         </select>
                     </div>
@@ -142,7 +261,8 @@
                         <span class="material-symbols-outlined text-lg">school</span>
                         <span class="text-xs font-bold text-white">Filter Kelas</span>
                     </div>
-                    <select id="filter-kelas-mobile" onchange="syncFilterMobile()" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+                    <select id="filter-kelas-mobile" onchange="syncFilterMobile()"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
                         <option value="">Semua Kelas</option>
                     </select>
                 </div>
@@ -150,15 +270,18 @@
 
             <!-- Key Metric Card Mobile -->
             <section>
-                <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl p-5 shadow-xl relative overflow-hidden border border-white/10">
+                <div
+                    class="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl p-5 shadow-xl relative overflow-hidden border border-white/10">
                     <div class="absolute -right-4 -top-4 opacity-10">
                         <span class="material-symbols-outlined text-[100px]">analytics</span>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <span class="text-[10px] uppercase font-bold tracking-widest text-blue-200">Rata-rata Kehadiran</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-blue-200">Rata-rata
+                            Kehadiran</span>
                         <div class="flex items-baseline gap-2">
                             <span id="avg-persen-mobile" class="text-3xl font-extrabold text-white">0%</span>
-                            <span class="bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
+                            <span
+                                class="bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
                                 <span class="material-symbols-outlined text-[12px]">trending_up</span> +2.4%
                             </span>
                         </div>
@@ -169,10 +292,12 @@
 
             <!-- Export Actions Mobile -->
             <section class="flex gap-3">
-                <button onclick="exportToPDF()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 transition-all border border-white/10">
+                <button onclick="exportToPDF()"
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 transition-all border border-white/10">
                     <span class="material-symbols-outlined text-lg">picture_as_pdf</span> Export PDF
                 </button>
-                <button onclick="exportToExcel()" class="flex-1 glass-panel text-slate-200 font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 border border-slate-700/60 active:scale-95 transition-all">
+                <button onclick="exportToExcel()"
+                    class="flex-1 glass-panel text-slate-200 font-semibold text-xs py-3.5 rounded-xl flex items-center justify-center gap-2 border border-slate-700/60 active:scale-95 transition-all">
                     <span class="material-symbols-outlined text-lg text-blue-400">table_chart</span> Excel
                 </button>
             </section>
@@ -184,23 +309,28 @@
                     <span class="text-[11px] text-slate-400">Terurut: Persentase Tertinggi</span>
                 </div>
                 <div id="laporan-mobile-list" class="space-y-3"></div>
-                <button onclick="document.getElementById('filter-kelas-mobile').value=''; syncFilterMobile(); window.scrollTo({top: 0, behavior: 'smooth'});" class="w-full py-3 text-blue-400 font-semibold text-xs border border-dashed border-blue-500/40 rounded-xl hover:bg-blue-500/10 transition-colors">
+                <button
+                    onclick="document.getElementById('filter-kelas-mobile').value=''; syncFilterMobile(); window.scrollTo({top: 0, behavior: 'smooth'});"
+                    class="w-full py-3 text-blue-400 font-semibold text-xs border border-dashed border-blue-500/40 rounded-xl hover:bg-blue-500/10 transition-colors">
                     <span id="see-all-mobile-label">Lihat Semua Siswa</span>
                 </button>
             </section>
         </main>
 
         <!-- Bottom Navigation Bar Mobile -->
-        <nav class="fixed bottom-0 left-0 right-0 glass-panel flex justify-around items-center px-2 py-2.5 z-50 md:hidden border-t border-slate-700/80 backdrop-blur-xl">
+        <nav
+            class="fixed bottom-0 left-0 right-0 glass-panel flex justify-around items-center px-2 py-2.5 z-50 md:hidden border-t border-slate-700/80 backdrop-blur-xl">
             <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="dashboard.html">
                 <span class="material-symbols-outlined text-xl">dashboard</span>
                 <span class="text-[10px]">Beranda</span>
             </a>
-            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="input-absensi.html">
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200"
+                href="input-absensi.html">
                 <span class="material-symbols-outlined text-xl">how_to_reg</span>
                 <span class="text-[10px]">Absen</span>
             </a>
-            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="master-data.html">
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200"
+                href="master-data.html">
                 <span class="material-symbols-outlined text-xl">database</span>
                 <span class="text-[10px]">Master</span>
             </a>
@@ -208,7 +338,8 @@
                 <span class="material-symbols-outlined text-xl">description</span>
                 <span class="text-[10px]">Laporan</span>
             </a>
-            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200" href="pengaturan.html">
+            <a class="flex flex-col items-center gap-0.5 p-1 text-slate-400 hover:text-slate-200"
+                href="pengaturan.html">
                 <span class="material-symbols-outlined text-xl">settings</span>
                 <span class="text-[10px]">Setting</span>
             </a>
@@ -218,57 +349,54 @@
     <!-- DESKTOP VIEW -->
     <div class="hidden md:flex w-full h-screen">
         <!-- SideNavBar -->
-        <aside id="sidebar" class="flex flex-col h-full w-64 fixed left-0 top-0 z-50 bg-slate-900/90 border-r border-slate-800 backdrop-blur-xl transition-all duration-300">
+        <aside id="sidebar"
+            class="flex flex-col h-full w-64 fixed left-0 top-0 z-50 bg-slate-900/90 border-r border-slate-800 backdrop-blur-xl transition-all duration-300">
             <div class="px-6 py-6 flex items-center gap-3.5 border-b border-slate-800">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-white/20">
+                <div
+                    class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-white/20">
                     <span class="material-symbols-outlined text-white text-2xl">school</span>
                 </div>
                 <div>
                     <h1 class="font-bold text-sm text-white tracking-tight flex items-center gap-1.5">
                         Absen Digital
-                        <span class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
+                        <span
+                            class="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-semibold border border-blue-400/30">v2.0</span>
                     </h1>
                     <p class="text-xs text-slate-400">Admin Panel</p>
                 </div>
             </div>
-            
+
             <nav class="flex-1 overflow-y-auto no-scrollbar py-5 px-3 space-y-1.5">
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="dashboard.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">dashboard</span>
+                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group"
+                    href="dashboard.html">
+                    <span
+                        class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">dashboard</span>
                     <span>Beranda</span>
                 </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="input-absensi.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">how_to_reg</span>
+                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group"
+                    href="input-absensi.html">
+                    <span
+                        class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">how_to_reg</span>
                     <span>Input Absen</span>
                 </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="master-data.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">database</span>
+                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group"
+                    href="master-data.html">
+                    <span
+                        class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">database</span>
                     <span>Master Data</span>
                 </a>
-                <a class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs" href="laporan.html">
-                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">description</span>
+                <a class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-4 py-3 shadow-lg shadow-blue-600/20 border border-white/10 font-semibold text-xs"
+                    href="laporan.html">
+                    <span class="material-symbols-outlined text-lg"
+                        style="font-variation-settings: 'FILL' 1;">description</span>
                     <span>Laporan</span>
                 </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="kelola-admin.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">admin_panel_settings</span>
-                    <span>Kelola Admin</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="notifikasi.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">notifications_active</span>
-                    <span>Notifikasi</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="pengaturan.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">settings</span>
-                    <span>Pengaturan</span>
-                </a>
-                <a class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 px-4 py-3 rounded-xl transition-all text-xs font-medium group" href="log-aktivitas.html">
-                    <span class="material-symbols-outlined text-lg group-hover:text-blue-400 transition-colors">history_edu</span>
-                    <span>Log Aktivitas</span>
-                </a>
             </nav>
-            
+
             <div class="p-4 border-t border-slate-800">
-                <button class="w-full flex items-center gap-3 text-rose-400 hover:bg-rose-500/10 px-4 py-3 rounded-xl transition-all text-xs font-medium" onclick="handleLogout()">
+                <button
+                    class="w-full flex items-center gap-3 text-rose-400 hover:bg-rose-500/10 px-4 py-3 rounded-xl transition-all text-xs font-medium"
+                    onclick="handleLogout()">
                     <span class="material-symbols-outlined text-lg">logout</span>
                     <span>Keluar Portal</span>
                 </button>
@@ -278,36 +406,110 @@
         <!-- Main Content Area -->
         <main class="flex-1 ml-64 h-full flex flex-col overflow-hidden transition-all duration-300">
             <!-- TopNavBar -->
-            <header class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 glass-panel border-b border-slate-800">
+            <header
+                class="flex justify-between items-center px-8 py-4 sticky top-0 z-40 glass-panel border-b border-slate-800">
                 <div class="flex items-center gap-4">
                     <h2 class="text-lg font-bold text-white tracking-tight">Sistem Presensi Digital</h2>
                 </div>
-                <div class="flex items-center gap-5">
-                    <div class="hidden md:flex items-center bg-slate-800/80 rounded-full px-4 py-1.5 w-64 border border-slate-700/80 focus-within:border-blue-500 transition-all">
-                        <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
-                        <input id="search-input" oninput="handleSearchInput()" class="bg-transparent border-none focus:ring-0 text-xs text-white placeholder-slate-400 w-full ml-2 outline-none" placeholder="Cari laporan..." type="text"/>
+                <div class="flex items-center gap-4">
+                    <div
+                        class="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="font-semibold text-white header-ta-display">TA 2025/2026</span>
+                        <span class="text-slate-600">•</span>
+                        <span class="text-blue-400 font-medium header-semester-display">Semester Ganjil</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="window.location.href='notifikasi.html'" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer">
-                            <span class="material-symbols-outlined text-lg">notifications</span>
-                        </button>
+                        <div class="relative">
+                            <button onclick="toggleMobileDropdown('dropdown-notif-desktop-laporan')"
+                                onblur="setTimeout(() => closeMobileDropdown('dropdown-notif-desktop-laporan'), 250)"
+                                class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition-colors cursor-pointer relative focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="material-symbols-outlined text-lg">notifications</span>
+                                <span
+                                    class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            </button>
+                            <div id="dropdown-notif-desktop-laporan"
+                                class="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                                <div
+                                    class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-800/50">
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="material-symbols-outlined text-blue-400 text-base">notifications</span>
+                                        <span class="text-xs font-bold text-white tracking-tight">Notifikasi</span>
+                                    </div>
+                                    <span
+                                        class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-semibold border border-blue-500/30">3
+                                        Baru</span>
+                                </div>
+                                <div class="divide-y divide-slate-800/60 max-h-72 overflow-y-auto">
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Rekapitulasi Absensi Hari
+                                                    Ini</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Beberapa kelas
+                                                    telah menyelesaikan rekap presensi.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">10m lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Pembaruan Sistem v2.0</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Fitur
+                                                    manajemen data presensi diperbarui.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">1j lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="notifikasi.html" class="block p-3 hover:bg-slate-800/60 transition-colors">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+                                            <div>
+                                                <p class="text-xs font-semibold text-white">Laporan Siap Diunduh</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Laporan
+                                                    bulanan presensi siap diakses.</p>
+                                                <span class="text-[10px] text-slate-500 mt-1 block">2j lalu</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <a href="notifikasi.html"
+                                    class="block p-3 text-center text-xs font-semibold text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border-t border-slate-800 transition-colors">
+                                    Lihat Semua Notifikasi →
+                                </a>
+                            </div>
+                        </div>
                         <div class="h-6 w-[1px] bg-slate-800 mx-1"></div>
                         <div class="relative">
-                            <button onclick="toggleMobileDropdown('dropdown-desktop-laporan')" onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-laporan'), 200)" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+                            <button onclick="toggleMobileDropdown('dropdown-desktop-laporan')"
+                                onblur="setTimeout(() => closeMobileDropdown('dropdown-desktop-laporan'), 200)"
+                                class="flex items-center gap-3 cursor-pointer group focus:outline-none">
                                 <div class="text-right hidden md:block">
                                     <p class="text-xs font-bold text-white user-name-display">Admin Utama</p>
-                                    <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider user-role-display">Administrator</p>
+                                    <p
+                                        class="text-[10px] font-semibold text-blue-400 uppercase tracking-wider user-role-display">
+                                        Administrator</p>
                                 </div>
-                                <img class="w-9 h-9 rounded-full border-2 border-blue-500/40 object-cover shadow-md group-hover:ring-2 ring-blue-400 transition-all" data-alt="User Avatar" src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true"/>
+                                <img class="w-9 h-9 rounded-full border-2 border-blue-500/40 object-cover shadow-md group-hover:ring-2 ring-blue-400 transition-all"
+                                    data-alt="User Avatar"
+                                    src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff&bold=true" />
                             </button>
-                            <div id="dropdown-desktop-laporan" class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
-                                <a href="master-data.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                            <div id="dropdown-desktop-laporan"
+                                class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 pointer-events-none">
+                                <a href="master-data.html"
+                                    class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">database</span> Master Data
                                 </a>
-                                <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
+                                <a href="pengaturan.html"
+                                    class="flex items-center gap-3 px-4 py-3 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-white transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">account_circle</span> Profil
                                 </a>
-                                <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-t border-slate-700/60">
+                                <button onclick="handleLogout()"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors text-left border-t border-slate-700/60">
                                     <span class="material-symbols-outlined text-[18px]">logout</span> Keluar
                                 </button>
                             </div>
@@ -323,13 +525,15 @@
                     <nav aria-label="Breadcrumb" class="flex text-xs text-slate-400">
                         <ol class="inline-flex items-center space-x-2">
                             <li class="inline-flex items-center">
-                                <a class="inline-flex items-center hover:text-blue-400 transition-colors" href="dashboard.html">
+                                <a class="inline-flex items-center hover:text-blue-400 transition-colors"
+                                    href="dashboard.html">
                                     <span class="material-symbols-outlined text-sm mr-1.5">home</span> Beranda
                                 </a>
                             </li>
                             <li>
                                 <div class="flex items-center">
-                                    <span class="material-symbols-outlined text-sm mx-1 text-slate-600">chevron_right</span>
+                                    <span
+                                        class="material-symbols-outlined text-sm mx-1 text-slate-600">chevron_right</span>
                                     <span class="text-slate-200 font-semibold">Laporan</span>
                                 </div>
                             </li>
@@ -340,14 +544,21 @@
                     <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div>
                             <h3 class="text-2xl font-bold text-white tracking-tight">Rekap & Laporan</h3>
-                            <p class="text-xs text-slate-400 mt-1">Pantau tingkat kehadiran siswa dan ekspor data administratif.</p>
+                            <p class="text-xs text-slate-400 mt-1">Pantau tingkat kehadiran siswa dan ekspor data
+                                administratif.</p>
                         </div>
                         <!-- Action Bar -->
-                        <div class="flex items-center gap-3">
-                            <button onclick="exportToPDF()" class="flex items-center gap-2 px-5 py-2.5 glass-card text-blue-400 font-semibold text-xs rounded-xl hover:bg-slate-700/60 transition-all cursor-pointer">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="btn-custom-kop" onclick="openModalCustomLaporan()"
+                                class="hidden flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 text-teal-300 border border-teal-500/30 font-semibold text-xs rounded-xl transition-all cursor-pointer">
+                                <span class="material-symbols-outlined text-base">tune</span> Pengaturan Kop & TTD
+                            </button>
+                            <button onclick="exportToPDF()"
+                                class="flex items-center gap-2 px-5 py-2.5 glass-card text-blue-400 font-semibold text-xs rounded-xl hover:bg-slate-700/60 transition-all cursor-pointer">
                                 <span class="material-symbols-outlined text-base">print</span> Cetak / PDF
                             </button>
-                            <button onclick="exportToExcel()" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs rounded-xl hover:shadow-lg shadow-blue-600/20 transition-all cursor-pointer border border-white/10">
+                            <button onclick="exportToExcel()"
+                                class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs rounded-xl hover:shadow-lg shadow-blue-600/20 transition-all cursor-pointer border border-white/10">
                                 <span class="material-symbols-outlined text-base">table_view</span> Export Excel
                             </button>
                         </div>
@@ -356,15 +567,18 @@
                     <!-- Filter & Charts Grid -->
                     <div class="grid grid-cols-12 gap-6">
                         <!-- Filter Section Desktop -->
-                        <div class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col gap-5">
+                        <div
+                            class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col gap-5">
                             <div class="flex items-center gap-2 text-blue-400">
                                 <span class="material-symbols-outlined">filter_alt</span>
                                 <h4 class="text-sm font-bold text-white">Filter Laporan</h4>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div class="flex flex-col gap-1.5">
-                                    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Bulan</label>
-                                    <select id="filter-bulan-desktop" onchange="syncFilterDesktop()" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label
+                                        class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Bulan</label>
+                                    <select id="filter-bulan-desktop" onchange="syncFilterDesktop(true)"
+                                        class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
                                         <option value="1">Januari</option>
                                         <option value="2">Februari</option>
                                         <option value="3">Maret</option>
@@ -380,22 +594,28 @@
                                     </select>
                                 </div>
                                 <div class="flex flex-col gap-1.5">
-                                    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Tahun</label>
-                                    <select id="filter-tahun-desktop" onchange="syncFilterDesktop()" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label
+                                        class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Tahun</label>
+                                    <select id="filter-tahun-desktop" onchange="syncFilterDesktop(true)"
+                                        class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
                                         <option value="2024">2024</option>
                                         <option value="2025">2025</option>
                                         <option value="2026">2026</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-col gap-1.5">
-                                    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Tanggal</label>
-                                    <select id="filter-tanggal-desktop" onchange="syncFilterDesktop()" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label
+                                        class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Tanggal</label>
+                                    <select id="filter-tanggal-desktop" onchange="syncFilterDesktop()"
+                                        class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
                                         <option value="">Semua Tanggal</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-col gap-1.5">
-                                    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Kelas</label>
-                                    <select id="filter-kelas-desktop" onchange="syncFilterDesktop()" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <label
+                                        class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Kelas</label>
+                                    <select id="filter-kelas-desktop" onchange="syncFilterDesktop()"
+                                        class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none">
                                         <option value="">Semua Kelas</option>
                                     </select>
                                 </div>
@@ -403,28 +623,33 @@
                         </div>
 
                         <!-- Summary Card Desktop -->
-                        <div class="col-span-12 lg:col-span-4 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl p-6 shadow-xl flex flex-col justify-between border border-white/10 relative overflow-hidden">
+                        <div
+                            class="col-span-12 lg:col-span-4 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-2xl p-6 shadow-xl flex flex-col justify-between border border-white/10 relative overflow-hidden">
                             <div class="absolute -right-4 -top-4 opacity-10">
                                 <span class="material-symbols-outlined text-[120px]">analytics</span>
                             </div>
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Rata-rata Kehadiran</span>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Rata-rata
+                                    Kehadiran</span>
                                 <h3 id="avg-persen-desktop" class="text-3xl font-extrabold text-white mt-1">0%</h3>
                             </div>
-                            <p id="total-siswa-desktop" class="text-xs text-blue-100 mt-4">Berdasarkan data dari 0 siswa.</p>
+                            <p id="total-siswa-desktop" class="text-xs text-blue-100 mt-4">Berdasarkan data dari 0
+                                siswa.</p>
                         </div>
                     </div>
 
                     <!-- Table Data Desktop -->
                     <div class="glass-panel rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
+                        <div
+                            class="px-6 py-4 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
                             <h3 class="text-sm font-bold text-white">Rekapitulasi Kehadiran Siswa</h3>
                             <span id="laporan-count-info" class="text-xs text-slate-400">Menampilkan 0 data</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-900/50 border-b border-slate-700/60 text-slate-400 text-[11px] font-semibold uppercase tracking-wider">
+                                    <tr
+                                        class="bg-slate-900/50 border-b border-slate-700/60 text-slate-400 text-[11px] font-semibold uppercase tracking-wider">
                                         <th class="px-6 py-3.5">No</th>
                                         <th class="px-6 py-3.5">Nama Siswa</th>
                                         <th class="px-6 py-3.5">Kelas</th>
@@ -437,7 +662,9 @@
                                 </thead>
                                 <tbody id="laporan-tbody" class="divide-y divide-slate-700/40 text-xs text-slate-200">
                                     <tr>
-                                        <td colspan="8" class="px-6 py-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat laporan presensi...</td>
+                                        <td colspan="8" class="px-6 py-6 text-center text-slate-400"><span
+                                                class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span>
+                                            Memuat laporan presensi...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -453,27 +680,131 @@
         </main>
     </div>
 
+    <!-- ==================== MODAL CUSTOMIZE KOP & TTD LAPORAN ==================== -->
+    <div id="modal-custom-laporan" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden animate-fade-in p-4">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-2 text-teal-400">
+                    <span class="material-symbols-outlined">tune</span>
+                    <h3 class="text-sm font-bold text-white tracking-tight">Pengaturan Kop Surat & TTD Laporan</h3>
+                </div>
+                <button onclick="closeModalCustomLaporan()" class="text-slate-400 hover:text-white transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-5 flex-1">
+                <p class="text-xs text-slate-400">Sesuaikan identitas Kop Surat, Logo, dan Penandatangan secara cepat sebelum mencetak atau mengekspor laporan.</p>
+
+                <!-- Logo Section -->
+                <div class="space-y-2 p-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                    <label class="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-blue-400 text-base">upload_file</span> Logo Sekolah (Kop Laporan)
+                    </label>
+                    <div class="flex items-center gap-4">
+                        <img id="modal-logo-preview" src="img/logo-sekolah.png" class="w-14 h-14 object-contain rounded-lg bg-slate-900 p-1 border border-slate-700" onerror="this.onerror=null; this.src='img/logo-sekolah.png';"/>
+                        <div class="space-y-1.5">
+                            <label class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-sm">file_upload</span> Pilih Logo Baru
+                                <input type="file" id="modal-input-logo" accept="image/*" onchange="handleModalLogoUpload(event)" class="hidden"/>
+                            </label>
+                            <button type="button" onclick="resetModalLogo()" class="text-[11px] text-rose-400 hover:underline block">Gunakan Logo Standar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">Dinas Pendidikan</label>
+                        <input id="modal-dinas" type="text" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">Nama Sekolah</label>
+                        <input id="modal-sekolah" type="text" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">NSS</label>
+                        <input id="modal-nss" type="text" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">NPSN</label>
+                        <input id="modal-npsn" type="text" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">Mata Pelajaran (Header Cetak)</label>
+                        <input id="modal-mapel" type="text" placeholder="Contoh: Informatika / TIK" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 space-y-1">
+                        <label class="text-xs font-semibold text-slate-300">Email Sekolah</label>
+                        <input id="modal-email" type="email" class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"/>
+                    </div>
+                </div>
+
+                <!-- TTD Penandatangan -->
+                <div class="pt-3 border-t border-slate-800 space-y-3">
+                    <span class="text-xs font-bold text-slate-200 block">Penandatangan Dokumen (TTD)</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2 p-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                            <span class="text-[11px] font-bold text-blue-400 block">Kepala Sekolah</span>
+                            <input id="modal-nama-kepsek" type="text" placeholder="Nama Kepsek" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"/>
+                            <input id="modal-nip-kepsek" type="text" placeholder="NIP Kepsek" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"/>
+                        </div>
+                        <div class="space-y-2 p-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                            <span class="text-[11px] font-bold text-emerald-400 block">Guru / Wali Kelas</span>
+                            <input id="modal-nama-guru" type="text" placeholder="Nama Guru (Otomatis dari User)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"/>
+                            <input id="modal-nip-guru" type="text" placeholder="NIP Guru" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-slate-800 flex items-center justify-between bg-slate-900/80">
+                <a href="pengaturan.html" class="text-xs text-slate-400 hover:text-blue-400 underline">Buka Pengaturan Lengkap →</a>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeModalCustomLaporan()" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-800 rounded-xl transition-all cursor-pointer">Batal</button>
+                    <button type="button" onclick="saveModalCustomLaporan()" class="px-5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg transition-all cursor-pointer">Simpan & Terapkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== AREA CETAK / PDF FORMAL (hanya tampil saat print) ==================== -->
     <div id="print-area">
-        <div style="display:flex; align-items:center; gap:16px; border-bottom:3px double #000; padding-bottom:8px; margin-bottom:6px;">
-            <img id="print-logo-sekolah" src="img/logo-sekolah.png" alt="Logo Sekolah" style="width:68px; height:68px; object-fit:contain;" onerror="this.onerror=null; this.src=window.LOGO_SEKOLAH_BASE64 || '';" />
+        <div
+            style="display:flex; align-items:center; gap:16px; border-bottom:3px double #000; padding-bottom:8px; margin-bottom:12px;">
+            <img id="print-logo-riau" src="img/logo-riau.png" alt="Logo Provinsi Riau"
+                style="width:85px; height:85px; object-fit:contain;"
+                onerror="this.onerror=null; this.src=window.LOGO_RIAU_BASE64 || '';" />
             <div style="text-align:center; flex:1;">
-                <p style="font-size:16px; font-weight:700; margin:0; letter-spacing:0.5px;">PEMERINTAH PROVINSI RIAU</p>
-                <p style="font-size:16px; font-weight:700; margin:0; letter-spacing:0.5px;">DINAS PENDIDIKAN</p>
-                <p style="font-size:19px; font-weight:800; margin:2px 0 0;">SMA NEGERI 2 ENOK</p>
-                <p style="font-size:11px; margin:2px 0 0;">Kabupaten Indragiri Hilir, Provinsi Riau</p>
+                <p style="font-size:16pt; font-weight:700; margin:0; letter-spacing:0.5px; line-height:1.2;" id="print-dinas-pendidikan">DINAS PENDIDIKAN PROVINSI RIAU</p>
+                <p style="font-size:26pt; font-weight:800; margin:2px 0 0; line-height:1.2;" id="print-nama-sekolah">SMA NEGERI 2 ENOK</p>
+                <p style="font-size:7pt; font-weight:400; margin:2px 0 0; line-height:1.3;" id="print-meta-sekolah">NSS : 302090502016 &nbsp;&nbsp;&nbsp;&nbsp; NPSN: 10402057 &nbsp;&nbsp;&nbsp;&nbsp; Email : smanegeriduaenok@ymail.com</p>
             </div>
-            <img id="print-logo-riau" src="img/logo-riau.png" alt="Logo Provinsi Riau" style="width:68px; height:68px; object-fit:contain;" onerror="this.onerror=null; this.src=window.LOGO_RIAU_BASE64 || '';" />
+            <img id="print-logo-sekolah" src="img/logo-sekolah.png" alt="Logo Sekolah"
+                style="width:85px; height:85px; object-fit:contain;"
+                onerror="this.onerror=null; this.src=window.LOGO_SEKOLAH_BASE64 || '';" />
         </div>
 
         <div style="text-align:center; margin:14px 0 10px;">
-            <p style="font-size:14px; font-weight:700; text-decoration:underline; margin:0; text-transform:uppercase;">Laporan Rekapitulasi Presensi Siswa</p>
+            <p style="font-size:14px; font-weight:700; text-decoration:underline; margin:0; text-transform:uppercase;">
+                Laporan Rekapitulasi Presensi Siswa</p>
+            <p id="print-ta-subtitle" style="font-size:10pt; font-weight:600; margin:2px 0 0; text-align:center;">TA.2026 / 2027</p>
         </div>
 
-        <table style="width:100%; font-size:11px; margin-bottom:10px;">
+        <table style="width:100%; font-size:11px; margin-bottom:10px; border-collapse:collapse;">
             <tr>
-                <td style="width:70px; border:none;">Periode</td><td style="width:12px; border:none;">:</td><td id="print-periode" style="border:none;"></td>
-                <td style="width:50px; border:none;">Kelas</td><td style="width:12px; border:none;">:</td><td id="print-kelas" style="border:none;"></td>
+                <td style="width:70px; border:none; padding:2px 0;">Periode</td>
+                <td style="width:12px; border:none; padding:2px 0;">:</td>
+                <td id="print-periode" style="border:none; padding:2px 0; font-weight:600;"></td>
+                <td style="text-align:right; border:none; padding:2px 0;">
+                    Mata Pelajaran : <span id="print-mapel" style="font-weight:600;">Informatika / TIK</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:70px; border:none; padding:2px 0;">Kelas</td>
+                <td style="width:12px; border:none; padding:2px 0;">:</td>
+                <td id="print-kelas" style="border:none; padding:2px 0; font-weight:600;"></td>
+                <td style="text-align:right; border:none; padding:2px 0;"></td>
             </tr>
         </table>
 
@@ -495,227 +826,322 @@
 
         <p id="print-summary" style="font-size:11px; margin-top:8px; font-style:italic;"></p>
 
-        <table style="width:100%; font-size:11px; margin-top:40px;">
+        <table style="width:100%; font-size:11px; margin-top:35px; margin-bottom:14px; border-collapse:collapse;">
             <tr>
-                <td style="width:34%; border:none;"></td>
-                <td style="width:33%; text-align:center; border:none;">
-                    <p style="margin:0 0 4px;">Mengetahui,</p>
-                    <p style="margin:0 0 55px;">Wali Kelas</p>
-                    <p style="margin:0; border-top:1px solid #000; padding-top:2px;">NIP. ..........................</p>
+                <td style="width:50%; text-align:left; border:none; padding:0;">Mengetahui,</td>
+                <td id="print-tanggal-cetak" style="width:50%; text-align:right; border:none; padding:0;">Enok,</td>
+            </tr>
+        </table>
+
+        <table style="width:100%; font-size:11px; border-collapse:collapse;">
+            <tr>
+                <td style="width:50%; text-align:center; vertical-align:top; border:none; padding:0;">
+                    <p style="margin:0 0 55px;">Guru,</p>
+                    <p id="print-nama-guru" style="margin:0; font-weight:700; text-decoration:underline;">..........................................</p>
+                    <p style="margin:2px 0 0;">NIP. <span id="print-nip-guru">....................................</span></p>
                 </td>
-                <td style="width:33%; text-align:center; border:none;">
-                    <p id="print-tanggal-cetak" style="margin:0 0 4px;"></p>
-                    <p style="margin:0 0 55px;">Kepala Sekolah</p>
-                    <p style="margin:0; border-top:1px solid #000; padding-top:2px;">NIP. ..........................</p>
+                <td style="width:50%; text-align:center; vertical-align:top; border:none; padding:0;">
+                    <p style="margin:0 0 55px;">Kepala Sekolah,</p>
+                    <p id="print-nama-kepsek" style="margin:0; font-weight:700; text-decoration:underline;">..........................................</p>
+                    <p style="margin:2px 0 0;">NIP. <span id="print-nip-kepsek">....................................</span></p>
                 </td>
             </tr>
         </table>
     </div>
 
-<script src="js/config.js"></script>
-<script>
-    let allLaporanData = [];
-    let filteredData = [];
+    <script src="js/config.js"></script>
+    <script>
+        let allLaporanData = [];
+        let filteredData = [];
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        const check = await guardPage(['admin', 'guru', 'kepsek']);
-        if (!check) return;
+        document.addEventListener("DOMContentLoaded", async () => {
+            const check = await guardPage(['admin', 'guru', 'kepsek']);
+            if (!check) return;
 
-        initFilterOptions();
-        await loadLaporanData();
-    });
-
-    function initFilterOptions() {
-        const now = new Date();
-        const m = now.getMonth() + 1;
-        const y = now.getFullYear();
-
-        const bm = document.getElementById('filter-bulan-mobile');
-        const bd = document.getElementById('filter-bulan-desktop');
-        if (bm) bm.value = String(m);
-        if (bd) bd.value = String(m);
-
-        const tm = document.getElementById('filter-tahun-mobile');
-        const td = document.getElementById('filter-tahun-desktop');
-        if (tm) tm.value = String(y);
-        if (td) td.value = String(y);
-
-        updateTanggalOptions();
-    }
-
-    function updateTanggalOptions() {
-        const bm = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '1';
-        const tm = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : '2026';
-        
-        const daysInMonth = new Date(parseInt(tm), parseInt(bm), 0).getDate();
-        let optionsHtml = '<option value="">Semua Tgl</option>';
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dayStr = String(i).padStart(2, '0');
-            optionsHtml += `<option value="${dayStr}">${dayStr}</option>`;
-        }
-
-        const tglM = document.getElementById('filter-tanggal-mobile');
-        const tglD = document.getElementById('filter-tanggal-desktop');
-        if (tglM) tglM.innerHTML = optionsHtml;
-        if (tglD) tglD.innerHTML = optionsHtml.replace('Semua Tgl', 'Semua Tanggal');
-    }
-
-    async function loadLaporanData() {
-        const res = await apiPostCached('getLaporan', { token: getToken() }, 'cache_laporan_data', (freshRes) => {
-            processLaporanResponse(freshRes);
-        });
-        if (res) {
-            processLaporanResponse(res);
-        }
-    }
-
-    function processLaporanResponse(res) {
-        try {
-            if (res && res.ok && Array.isArray(res.data)) {
-                allLaporanData = res.data;
-            } else {
-                allLaporanData = getMockLaporanData();
+            const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+            const btnKop = document.getElementById('btn-custom-kop');
+            if (btnKop) {
+                if (user && (user.role === 'admin' || user.role === 'kepsek')) {
+                    btnKop.classList.remove('hidden');
+                } else {
+                    btnKop.classList.add('hidden');
+                }
             }
-        } catch (e) {
-            allLaporanData = getMockLaporanData();
-        }
-        }
-        applyFilters();
-    }
 
-    function syncFilterMobile() {
-        const bm = document.getElementById('filter-bulan-mobile').value;
-        const tm = document.getElementById('filter-tahun-mobile').value;
-        const tglM = document.getElementById('filter-tanggal-mobile').value;
-        const km = document.getElementById('filter-kelas-mobile').value;
+            initFilterOptions();
+            await loadLaporanData();
 
-        const bd = document.getElementById('filter-bulan-desktop');
-        const td = document.getElementById('filter-tahun-desktop');
-        const tglD = document.getElementById('filter-tanggal-desktop');
-        const kd = document.getElementById('filter-kelas-desktop');
+            // Fetch latest system settings from server to sync logo & kop
+            try {
+                if (typeof apiPostCached === 'function' && typeof getToken === 'function') {
+                    apiPostCached('getPengaturan', { token: getToken() }, 'cache_pengaturan', (freshRes) => {
+                        if (freshRes && freshRes.ok && freshRes.data) {
+                            saveSystemSettingsLocal(freshRes.data);
+                            buildPrintArea();
+                        }
+                    }).then(res => {
+                        if (res && res.ok && res.data) {
+                            saveSystemSettingsLocal(res.data);
+                            buildPrintArea();
+                        }
+                    }).catch(() => {});
+                }
+            } catch (e) {}
 
-        if (bd) bd.value = bm;
-        if (td) td.value = tm;
-        if (tglD) tglD.value = tglM;
-        if (kd) kd.value = km;
-
-        applyFilters();
-    }
-
-    function syncFilterDesktop() {
-        const bd = document.getElementById('filter-bulan-desktop').value;
-        const td = document.getElementById('filter-tahun-desktop').value;
-        const tglD = document.getElementById('filter-tanggal-desktop').value;
-        const kd = document.getElementById('filter-kelas-desktop').value;
-
-        const bm = document.getElementById('filter-bulan-mobile');
-        const tm = document.getElementById('filter-tahun-mobile');
-        const tglM = document.getElementById('filter-tanggal-mobile');
-        const km = document.getElementById('filter-kelas-mobile');
-
-        if (bm) bm.value = bd;
-        if (tm) tm.value = td;
-        if (tglM) tglM.value = tglD;
-        if (km) km.value = kd;
-
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const bm = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '1';
-        const tm = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : '2026';
-        const tglM = document.getElementById('filter-tanggal-mobile') ? document.getElementById('filter-tanggal-mobile').value : '';
-        const km = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
-
-        const targetPrefix = `${tm}-${String(bm).padStart(2, '0')}${tglM ? '-' + String(tglM).padStart(2, '0') : ''}`;
-
-        filteredData = allLaporanData.filter(item => {
-            let matchDate = true;
-            if (item.tanggal) {
-                matchDate = item.tanggal.startsWith(targetPrefix);
-            }
-            let matchClass = true;
-            if (km) {
-                matchClass = String(item.kelas || '').toLowerCase() === km.toLowerCase();
-            }
-            return matchDate && matchClass;
+            buildPrintArea();
+            window.addEventListener('beforeprint', buildPrintArea);
         });
 
-        renderLaporanViews(filteredData);
-    }
+        function initFilterOptions() {
+            const now = new Date();
+            const m = now.getMonth() + 1;
+            const y = now.getFullYear();
 
-    function handleSearchInput() {
-        const query = document.getElementById('search-input').value.toLowerCase().trim();
-        if (!query) {
+            const bm = document.getElementById('filter-bulan-mobile');
+            const bd = document.getElementById('filter-bulan-desktop');
+            if (bm) bm.value = String(m);
+            if (bd) bd.value = String(m);
+
+            const tm = document.getElementById('filter-tahun-mobile');
+            const td = document.getElementById('filter-tahun-desktop');
+            if (tm) tm.value = String(y);
+            if (td) td.value = String(y);
+
+            updateTanggalOptions("");
+        }
+
+        function updateTanggalOptions(selectedDay) {
+            const bm = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : '1';
+            const tm = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : String(new Date().getFullYear());
+
+            const daysInMonth = new Date(parseInt(tm), parseInt(bm), 0).getDate();
+            let optionsHtml = '<option value="">Semua Tgl</option>';
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = String(i).padStart(2, '0');
+                optionsHtml += `<option value="${dayStr}">${dayStr}</option>`;
+            }
+
+            const tglM = document.getElementById('filter-tanggal-mobile');
+            const tglD = document.getElementById('filter-tanggal-desktop');
+            if (tglM) {
+                const prevVal = selectedDay !== undefined ? selectedDay : tglM.value;
+                tglM.innerHTML = optionsHtml;
+                if (prevVal && parseInt(prevVal) <= daysInMonth) {
+                    tglM.value = prevVal;
+                } else {
+                    tglM.value = "";
+                }
+            }
+            if (tglD) {
+                const prevVal = selectedDay !== undefined ? selectedDay : tglD.value;
+                tglD.innerHTML = optionsHtml.replace('Semua Tgl', 'Semua Tanggal');
+                if (prevVal && parseInt(prevVal) <= daysInMonth) {
+                    tglD.value = prevVal;
+                } else {
+                    tglD.value = "";
+                }
+            }
+        }
+
+        async function loadLaporanData() {
+            const res = await apiPostCached('getLaporan', { token: getToken() }, 'cache_laporan_data', (freshRes) => {
+                processLaporanResponse(freshRes);
+            });
+            if (res) {
+                processLaporanResponse(res);
+            }
+        }
+
+        function processLaporanResponse(res) {
+            try {
+                if (res && res.ok && Array.isArray(res.data)) {
+                    allLaporanData = res.data;
+                } else if (res && res.ok && res.laporan && Array.isArray(res.laporan.data)) {
+                    allLaporanData = res.laporan.data;
+                } else if (res && Array.isArray(res)) {
+                    allLaporanData = res;
+                } else {
+                    console.warn("Data laporan dari spreadsheet kosong atau tidak valid.");
+                    allLaporanData = [];
+                }
+            } catch (e) {
+                console.error("Error processing laporan response:", e);
+                allLaporanData = [];
+            }
+
+            populateClassDropdowns(allLaporanData);
             applyFilters();
-            return;
         }
 
-        const searched = filteredData.filter(item => 
-            String(item.nama_siswa || item.nama || '').toLowerCase().includes(query) ||
-            String(item.kelas || '').toLowerCase().includes(query)
-        );
+        function populateClassDropdowns(data) {
+            if (!Array.isArray(data) || !data.length) return;
+            const classes = [...new Set(data.map(item => item.kelas).filter(Boolean))].sort();
+            if (!classes.length) return;
 
-        renderLaporanViews(searched);
-    }
+            let optionsHtml = '<option value="">Semua Kelas</option>';
+            classes.forEach(c => {
+                optionsHtml += `<option value="${c}">${c}</option>`;
+            });
 
-    function renderLaporanViews(data) {
-        // Process summary stats per student
-        const studentStats = {};
-        data.forEach(item => {
-            const key = item.siswa_id || item.nama || 'unknown';
-            if (!studentStats[key]) {
-                studentStats[key] = {
-                    nama: item.nama_siswa || item.nama || '-',
-                    kelas: item.kelas || '-',
-                    hadir: 0, sakit: 0, izin: 0, alfa: 0, total: 0
-                };
+            const km = document.getElementById('filter-kelas-mobile');
+            const kd = document.getElementById('filter-kelas-desktop');
+            if (km) {
+                const currentVal = km.value;
+                km.innerHTML = optionsHtml;
+                if (currentVal) km.value = currentVal;
             }
-            const st = String(item.status || '').toLowerCase();
-            studentStats[key].total++;
-            if (st === 'hadir') studentStats[key].hadir++;
-            else if (st === 'sakit') studentStats[key].sakit++;
-            else if (st === 'izin') studentStats[key].izin++;
-            else if (st === 'alfa') studentStats[key].alfa++;
-        });
+            if (kd) {
+                const currentVal = kd.value;
+                kd.innerHTML = optionsHtml;
+                if (currentVal) kd.value = currentVal;
+            }
+        }
 
-        const listArr = Object.values(studentStats);
-        window.lastListArr = listArr;
-
-        let grandHadir = 0, grandTotal = 0;
-        listArr.forEach(s => {
-            grandHadir += s.hadir;
-            grandTotal += s.total;
-        });
-        const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
-
-        const elAvgD = document.getElementById('avg-persen-desktop');
-        if (elAvgD) elAvgD.textContent = `${overallPct}%`;
-        const elAvgM = document.getElementById('avg-persen-mobile');
-        if (elAvgM) elAvgM.textContent = `${overallPct}%`;
-
-        const elTotD = document.getElementById('total-siswa-desktop');
-        if (elTotD) elTotD.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
-        const elTotM = document.getElementById('total-siswa-mobile');
-        if (elTotM) elTotM.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
-
-        const countInfo = document.getElementById('laporan-count-info');
-        if (countInfo) countInfo.textContent = `Menampilkan ${listArr.length} data siswa`;
-
-        // Render Desktop Table
-        const tbody = document.getElementById('laporan-tbody');
-        if (tbody) {
-            if (listArr.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-6 text-center text-slate-400">Tidak ada data rekapitulasi untuk filter yang dipilih.</td></tr>`;
+        function syncFilterMobile(resetDate = false) {
+            if (resetDate) {
+                updateTanggalOptions("");
             } else {
-                let html = '';
-                listArr.forEach((s, idx) => {
-                    const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
-                    let pctClass = 'text-emerald-400 bg-emerald-500/20 border border-emerald-500/30';
-                    if (pct < 75) pctClass = 'text-rose-400 bg-rose-500/20 border border-rose-500/30';
-                    else if (pct < 85) pctClass = 'text-amber-400 bg-amber-500/20 border border-amber-500/30';
+                updateTanggalOptions();
+            }
 
-                    html += `
+            const bm = document.getElementById('filter-bulan-mobile').value;
+            const tm = document.getElementById('filter-tahun-mobile').value;
+            const tglM = document.getElementById('filter-tanggal-mobile').value;
+            const km = document.getElementById('filter-kelas-mobile').value;
+
+            const bd = document.getElementById('filter-bulan-desktop');
+            const td = document.getElementById('filter-tahun-desktop');
+            const tglD = document.getElementById('filter-tanggal-desktop');
+            const kd = document.getElementById('filter-kelas-desktop');
+
+            if (bd) bd.value = bm;
+            if (td) td.value = tm;
+            if (tglD) tglD.value = tglM;
+            if (kd) kd.value = km;
+
+            applyFilters();
+        }
+
+        function syncFilterDesktop(resetDate = false) {
+            if (resetDate) {
+                updateTanggalOptions("");
+            } else {
+                updateTanggalOptions();
+            }
+
+            const bd = document.getElementById('filter-bulan-desktop').value;
+            const td = document.getElementById('filter-tahun-desktop').value;
+            const tglD = document.getElementById('filter-tanggal-desktop').value;
+            const kd = document.getElementById('filter-kelas-desktop').value;
+
+            const bm = document.getElementById('filter-bulan-mobile');
+            const tm = document.getElementById('filter-tahun-mobile');
+            const tglM = document.getElementById('filter-tanggal-mobile');
+            const km = document.getElementById('filter-kelas-mobile');
+
+            if (bm) bm.value = bd;
+            if (tm) tm.value = td;
+            if (tglM) tglM.value = tglD;
+            if (km) km.value = kd;
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const bm = document.getElementById('filter-bulan-mobile') ? document.getElementById('filter-bulan-mobile').value : String(new Date().getMonth() + 1);
+            const tm = document.getElementById('filter-tahun-mobile') ? document.getElementById('filter-tahun-mobile').value : String(new Date().getFullYear());
+            const tglM = document.getElementById('filter-tanggal-mobile') ? document.getElementById('filter-tanggal-mobile').value : '';
+            const km = document.getElementById('filter-kelas-mobile') ? document.getElementById('filter-kelas-mobile').value : '';
+
+            const targetPrefix = `${tm}-${String(bm).padStart(2, '0')}${tglM ? '-' + String(tglM).padStart(2, '0') : ''}`;
+
+            filteredData = allLaporanData.filter(item => {
+                let matchDate = true;
+                if (item.tanggal) {
+                    matchDate = item.tanggal.startsWith(targetPrefix);
+                }
+                let matchClass = true;
+                if (km) {
+                    matchClass = String(item.kelas || '').toLowerCase() === km.toLowerCase();
+                }
+                return matchDate && matchClass;
+            });
+
+            renderLaporanViews(filteredData);
+        }
+
+        function handleSearchInput() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            if (!query) {
+                applyFilters();
+                return;
+            }
+
+            const searched = filteredData.filter(item =>
+                String(item.nama_siswa || item.nama || '').toLowerCase().includes(query) ||
+                String(item.kelas || '').toLowerCase().includes(query)
+            );
+
+            renderLaporanViews(searched);
+        }
+
+        function renderLaporanViews(data) {
+            // Process summary stats per student
+            const studentStats = {};
+            data.forEach(item => {
+                const key = item.siswa_id || item.nama || 'unknown';
+                if (!studentStats[key]) {
+                    studentStats[key] = {
+                        nama: item.nama_siswa || item.nama || '-',
+                        kelas: item.kelas || '-',
+                        hadir: 0, sakit: 0, izin: 0, alfa: 0, total: 0
+                    };
+                }
+                const st = String(item.status || '').toLowerCase();
+                studentStats[key].total++;
+                if (st === 'hadir') studentStats[key].hadir++;
+                else if (st === 'sakit') studentStats[key].sakit++;
+                else if (st === 'izin') studentStats[key].izin++;
+                else if (st === 'alfa') studentStats[key].alfa++;
+            });
+
+            const listArr = Object.values(studentStats);
+            window.lastListArr = listArr;
+
+            let grandHadir = 0, grandTotal = 0;
+            listArr.forEach(s => {
+                grandHadir += s.hadir;
+                grandTotal += s.total;
+            });
+            const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
+
+            const elAvgD = document.getElementById('avg-persen-desktop');
+            if (elAvgD) elAvgD.textContent = `${overallPct}%`;
+            const elAvgM = document.getElementById('avg-persen-mobile');
+            if (elAvgM) elAvgM.textContent = `${overallPct}%`;
+
+            const elTotD = document.getElementById('total-siswa-desktop');
+            if (elTotD) elTotD.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
+            const elTotM = document.getElementById('total-siswa-mobile');
+            if (elTotM) elTotM.textContent = `Berdasarkan data dari ${listArr.length} siswa.`;
+
+            const countInfo = document.getElementById('laporan-count-info');
+            if (countInfo) countInfo.textContent = `Menampilkan ${listArr.length} data siswa`;
+
+            // Render Desktop Table
+            const tbody = document.getElementById('laporan-tbody');
+            if (tbody) {
+                if (listArr.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-6 text-center text-slate-400">Tidak ada data rekapitulasi untuk filter yang dipilih.</td></tr>`;
+                } else {
+                    let html = '';
+                    listArr.forEach((s, idx) => {
+                        const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+                        let pctClass = 'text-emerald-400 bg-emerald-500/20 border border-emerald-500/30';
+                        if (pct < 75) pctClass = 'text-rose-400 bg-rose-500/20 border border-rose-500/30';
+                        else if (pct < 85) pctClass = 'text-amber-400 bg-amber-500/20 border border-amber-500/30';
+
+                        html += `
                         <tr class="hover:bg-slate-800/50 transition-colors border-b border-slate-700/30">
                             <td class="px-6 py-4 text-slate-400 font-medium">${idx + 1}</td>
                             <td class="px-6 py-4 font-semibold text-white">${s.nama}</td>
@@ -729,21 +1155,21 @@
                             </td>
                         </tr>
                     `;
-                });
-                tbody.innerHTML = html;
+                    });
+                    tbody.innerHTML = html;
+                }
             }
-        }
 
-        // Render Mobile List
-        const mList = document.getElementById('laporan-mobile-list');
-        if (mList) {
-            if (listArr.length === 0) {
-                mList.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">Tidak ada data rekapitulasi.</div>`;
-            } else {
-                let html = '';
-                listArr.forEach(s => {
-                    const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
-                    html += `
+            // Render Mobile List
+            const mList = document.getElementById('laporan-mobile-list');
+            if (mList) {
+                if (listArr.length === 0) {
+                    mList.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">Tidak ada data rekapitulasi.</div>`;
+                } else {
+                    let html = '';
+                    listArr.forEach(s => {
+                        const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+                        html += `
                         <div class="p-4 glass-card rounded-2xl flex items-center justify-between border border-slate-700/60 shadow-lg">
                             <div>
                                 <p class="font-semibold text-white text-xs">${s.nama}</p>
@@ -752,83 +1178,270 @@
                             <span class="px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-bold">${pct}%</span>
                         </div>
                     `;
-                });
-                mList.innerHTML = html;
+                    });
+                    mList.innerHTML = html;
+                }
             }
         }
-    }
 
-    const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const BULAN_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-    function getPeriodeText() {
-        const bd = document.getElementById('filter-bulan-desktop');
-        const td = document.getElementById('filter-tahun-desktop');
-        const tglD = document.getElementById('filter-tanggal-desktop');
-        const bulan = bd ? parseInt(bd.value, 10) : (new Date().getMonth() + 1);
-        const tahun = td ? td.value : new Date().getFullYear();
-        const tgl = tglD ? tglD.value : '';
-        return tgl ? `${tgl} ${BULAN_NAMES[bulan]} ${tahun}` : `${BULAN_NAMES[bulan]} ${tahun}`;
-    }
-
-    function getKelasFilterText() {
-        const kd = document.getElementById('filter-kelas-desktop');
-        const v = kd ? kd.value : '';
-        return v ? v : 'Semua Kelas';
-    }
-
-    function exportToExcel() {
-        const listArr = window.lastListArr || [];
-        if (listArr.length === 0) {
-            alert('Tidak ada data rekap untuk diekspor.');
-            return;
-        }
-        if (typeof XLSX === 'undefined') {
-            alert('Gagal memuat modul Excel. Periksa koneksi internet lalu coba lagi.');
-            return;
+        function getPeriodeText() {
+            const bd = document.getElementById('filter-bulan-desktop');
+            const td = document.getElementById('filter-tahun-desktop');
+            const tglD = document.getElementById('filter-tanggal-desktop');
+            const bulan = bd ? parseInt(bd.value, 10) : (new Date().getMonth() + 1);
+            const tahun = td ? td.value : new Date().getFullYear();
+            const tgl = tglD ? tglD.value : '';
+            return tgl ? `${tgl} ${BULAN_NAMES[bulan]} ${tahun}` : `${BULAN_NAMES[bulan]} ${tahun}`;
         }
 
-        const periodeText = getPeriodeText();
-        const kelasText = getKelasFilterText();
+        function getKelasFilterText() {
+            const kd = document.getElementById('filter-kelas-desktop');
+            const v = kd ? kd.value : '';
+            return v ? v : 'Semua Kelas';
+        }
 
-        const rows = [];
-        rows.push(['SMA NEGERI 2 ENOK']);
-        rows.push(['LAPORAN REKAPITULASI PRESENSI SISWA']);
-        rows.push([`Periode: ${periodeText}`]);
-        rows.push([`Kelas: ${kelasText}`]);
-        rows.push([]);
-        rows.push(['No', 'Nama Siswa', 'Kelas', 'Hadir', 'Sakit', 'Izin', 'Alfa', '% Kehadiran']);
+        let modalLogoBase64 = '';
 
-        listArr.forEach((s, idx) => {
-            const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
-            rows.push([idx + 1, s.nama, s.kelas, s.hadir, s.sakit, s.izin, s.alfa, `${pct}%`]);
-        });
+        function openModalCustomLaporan() {
+            const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+            if (!user || (user.role !== 'admin' && user.role !== 'kepsek')) {
+                alert('Akses Ditolak: Fitur Pengaturan Kop & TTD Laporan hanya dapat diakses oleh Administrator atau Kepala Sekolah.');
+                return;
+            }
 
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 10 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 13 }];
-        ws['!merges'] = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-            { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }
-        ];
+            const s = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
-        const fname = `Laporan_Presensi_${periodeText.replace(/\s+/g, '_')}.xlsx`;
-        XLSX.writeFile(wb, fname);
-    }
+            const modalDinas = document.getElementById('modal-dinas');
+            if (modalDinas) modalDinas.value = s.dinas_pendidikan || 'DINAS PENDIDIKAN PROVINSI RIAU';
 
-    function buildPrintArea() {
-        const listArr = window.lastListArr || [];
+            const modalSekolah = document.getElementById('modal-sekolah');
+            if (modalSekolah) modalSekolah.value = s.nama_sekolah || 'SMA NEGERI 2 ENOK';
 
-        document.getElementById('print-periode').textContent = getPeriodeText();
-        document.getElementById('print-kelas').textContent = getKelasFilterText();
+            const modalNss = document.getElementById('modal-nss');
+            if (modalNss) modalNss.value = s.nss || '302090502016';
 
-        let grandHadir = 0, grandTotal = 0;
-        let rowsHtml = '';
-        listArr.forEach((s, idx) => {
-            const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
-            grandHadir += s.hadir;
-            grandTotal += s.total;
-            rowsHtml += `
+            const modalNpsn = document.getElementById('modal-npsn');
+            if (modalNpsn) modalNpsn.value = s.npsn || '10402057';
+
+            const modalEmail = document.getElementById('modal-email');
+            if (modalEmail) modalEmail.value = s.email_sekolah || 'smanegeriduaenok@ymail.com';
+
+            const modalKepsek = document.getElementById('modal-nama-kepsek');
+            if (modalKepsek) modalKepsek.value = s.nama_kepsek || 'Drs. H. Ahmad Dahlan, M.Pd';
+
+            const modalNipKepsek = document.getElementById('modal-nip-kepsek');
+            if (modalNipKepsek) modalNipKepsek.value = s.nip_kepsek || '19680512 199403 1 004';
+            
+            const modalGuruInput = document.getElementById('modal-nama-guru');
+            if (modalGuruInput) {
+                modalGuruInput.value = s.nama_guru !== undefined ? s.nama_guru : '';
+                modalGuruInput.placeholder = user?.nama ? `Otomatis: ${user.nama}` : 'Nama Guru';
+            }
+
+            const modalNipGuru = document.getElementById('modal-nip-guru');
+            if (modalNipGuru) modalNipGuru.value = s.nip_guru || (user?.nip || '-');
+
+            const modalMapel = document.getElementById('modal-mapel');
+            if (modalMapel) modalMapel.value = s.mata_pelajaran || s.mapel || '';
+
+            modalLogoBase64 = s.logo_sekolah || '';
+            const logoPrev = document.getElementById('modal-logo-preview');
+            if (logoPrev) logoPrev.src = modalLogoBase64 || 'img/logo-sekolah.png';
+
+            const modal = document.getElementById('modal-custom-laporan');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeModalCustomLaporan() {
+            const modal = document.getElementById('modal-custom-laporan');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleModalLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran logo terlalu besar. Maksimal 5MB.');
+                return;
+            }
+            try {
+                modalLogoBase64 = await compressLogoImage(file, 300, 0.85);
+                const logoPrev = document.getElementById('modal-logo-preview');
+                if (logoPrev) logoPrev.src = modalLogoBase64;
+            } catch (err) {
+                alert('Gagal memproses file logo: ' + (err.message || err));
+            }
+        }
+
+        function resetModalLogo() {
+            modalLogoBase64 = '';
+            const logoPrev = document.getElementById('modal-logo-preview');
+            if (logoPrev) logoPrev.src = 'img/logo-sekolah.png';
+            const inp = document.getElementById('modal-input-logo');
+            if (inp) inp.value = '';
+        }
+
+        function saveModalCustomLaporan() {
+            const dinas = document.getElementById('modal-dinas')?.value || 'DINAS PENDIDIKAN PROVINSI RIAU';
+            const sekolah = document.getElementById('modal-sekolah')?.value || 'SMA NEGERI 2 ENOK';
+            const nss = document.getElementById('modal-nss')?.value || '302090502016';
+            const npsn = document.getElementById('modal-npsn')?.value || '10402057';
+            const email = document.getElementById('modal-email')?.value || 'smanegeriduaenok@ymail.com';
+            const kepsek = document.getElementById('modal-nama-kepsek')?.value || 'Drs. H. Ahmad Dahlan, M.Pd';
+            const nipKepsek = document.getElementById('modal-nip-kepsek')?.value || '19680512 199403 1 004';
+            const guru = document.getElementById('modal-nama-guru')?.value;
+            const nipGuru = document.getElementById('modal-nip-guru')?.value || '-';
+            const mapel = document.getElementById('modal-mapel')?.value || 'Informatika / TIK';
+
+            const updated = {
+                dinas_pendidikan: dinas,
+                nama_sekolah: sekolah,
+                nss: nss,
+                npsn: npsn,
+                email_sekolah: email,
+                nama_kepsek: kepsek,
+                nip_kepsek: nipKepsek,
+                nama_guru: guru,
+                nip_guru: nipGuru,
+                mata_pelajaran: mapel,
+                logo_sekolah: modalLogoBase64
+            };
+
+            saveSystemSettingsLocal(updated);
+            
+            // Persist to server in background if possible
+            try {
+                if (typeof apiPost === 'function' && typeof getToken === 'function') {
+                    apiPost('savePengaturan', { token: getToken(), settings: updated });
+                }
+            } catch(e) {}
+
+            closeModalCustomLaporan();
+            buildPrintArea();
+            alert('Pengaturan Kop & TTD Laporan berhasil diperbarui!');
+        }
+
+        function exportToExcel() {
+            const listArr = window.lastListArr || [];
+            if (listArr.length === 0) {
+                alert('Tidak ada data rekap untuk diekspor.');
+                return;
+            }
+            if (typeof XLSX === 'undefined') {
+                alert('Gagal memuat modul Excel. Periksa koneksi internet lalu coba lagi.');
+                return;
+            }
+
+            const settings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
+            const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+
+            const dinas = settings.dinas_pendidikan || 'DINAS PENDIDIKAN PROVINSI RIAU';
+            const sekolah = settings.nama_sekolah || 'SMA NEGERI 2 ENOK';
+            const nss = settings.nss || '302090502016';
+            const npsn = settings.npsn || '10402057';
+            const email = settings.email_sekolah || 'smanegeriduaenok@ymail.com';
+            const ta = settings.tahun_ajaran || '2025/2026';
+
+            const userNama = user?.nama || (typeof getNama === 'function' ? getNama() : '') || '';
+            const userNip = user?.nip || (typeof localStorage !== 'undefined' ? (localStorage.getItem('user_nip') || '') : '') || '';
+
+            const customGuruNama = settings.nama_guru;
+            const guruNama = (userNama && userNama.trim() !== '') ? userNama : ((customGuruNama && customGuruNama.trim() !== '') ? customGuruNama : '..........................................');
+            const guruNip = (userNip && userNip !== '-' && userNip.trim() !== '') ? userNip : ((settings.nip_guru && settings.nip_guru !== '-') ? settings.nip_guru : '-');
+            const kepsekNama = settings.nama_kepsek || 'Drs. H. Ahmad Dahlan, M.Pd';
+            const kepsekNip = settings.nip_kepsek || '19680512 199403 1 004';
+
+            const periodeText = getPeriodeText();
+            const kelasText = getKelasFilterText();
+            const now = new Date();
+            const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            const rows = [];
+            rows.push([dinas.toUpperCase()]);
+            rows.push([sekolah.toUpperCase()]);
+            rows.push([`NSS: ${nss} | NPSN: ${npsn} | Email: ${email}`]);
+            rows.push(['LAPORAN REKAPITULASI PRESENSI SISWA']);
+            rows.push([`Tahun Ajaran: ${ta} | Periode: ${periodeText} | Kelas: ${kelasText}`]);
+            rows.push([]);
+            rows.push(['No', 'Nama Siswa', 'Kelas', 'Hadir', 'Sakit', 'Izin', 'Alfa', '% Kehadiran']);
+
+            listArr.forEach((s, idx) => {
+                const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+                rows.push([idx + 1, s.nama, s.kelas, s.hadir, s.sakit, s.izin, s.alfa, `${pct}%`]);
+            });
+
+            rows.push([]);
+            rows.push(['', '', '', '', '', '', 'Enok, ' + tglCetak]);
+            rows.push(['Guru Mata Pelajaran / Wali Kelas', '', '', '', '', '', 'Kepala Sekolah']);
+            rows.push([]);
+            rows.push([]);
+            rows.push([guruNama, '', '', '', '', '', kepsekNama]);
+            rows.push([`NIP. ${guruNip}`, '', '', '', '', '', `NIP. ${kepsekNip}`]);
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 10 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 13 }];
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+                { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
+            const fname = `Laporan_Presensi_${periodeText.replace(/\s+/g, '_')}.xlsx`;
+            XLSX.writeFile(wb, fname);
+        }
+
+        function buildPrintArea() {
+            const listArr = window.lastListArr || [];
+            const settings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
+            const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+
+            // Kop Logo & Headers
+            const printLogoSekolah = document.getElementById('print-logo-sekolah');
+            if (printLogoSekolah) {
+                printLogoSekolah.src = settings.logo_sekolah || window.LOGO_SEKOLAH_BASE64 || 'img/logo-sekolah.png';
+            }
+
+            const elDinas = document.getElementById('print-dinas-pendidikan');
+            if (elDinas) elDinas.textContent = settings.dinas_pendidikan || 'DINAS PENDIDIKAN PROVINSI RIAU';
+
+            const elSekolah = document.getElementById('print-nama-sekolah');
+            if (elSekolah) elSekolah.textContent = settings.nama_sekolah || 'SMA NEGERI 2 ENOK';
+
+            const elMeta = document.getElementById('print-meta-sekolah');
+            if (elMeta) {
+                const nss = settings.nss || '302090502016';
+                const npsn = settings.npsn || '10402057';
+                const email = settings.email_sekolah || 'smanegeriduaenok@ymail.com';
+                elMeta.innerHTML = `NSS : ${nss} &nbsp;&nbsp;&nbsp;&nbsp; NPSN: ${npsn} &nbsp;&nbsp;&nbsp;&nbsp; Email : ${email}`;
+            }
+
+            const activeTa = settings.tahun_ajaran || '2025/2026';
+            const taElem = document.getElementById('print-ta-subtitle');
+            if (taElem) {
+                taElem.textContent = activeTa.toLowerCase().includes('ta') ? activeTa : `TA.${activeTa}`;
+            }
+
+            document.getElementById('print-periode').textContent = getPeriodeText();
+            document.getElementById('print-kelas').textContent = getKelasFilterText();
+
+            const elMapel = document.getElementById('print-mapel');
+            if (elMapel) {
+                elMapel.textContent = settings.mata_pelajaran || settings.mapel || 'Informatika / TIK';
+            }
+
+            let grandHadir = 0, grandTotal = 0;
+            let rowsHtml = '';
+            listArr.forEach((s, idx) => {
+                const pct = s.total > 0 ? Math.round((s.hadir / s.total) * 100) : 0;
+                grandHadir += s.hadir;
+                grandTotal += s.total;
+                rowsHtml += `
                 <tr>
                     <td style="padding:4px; text-align:center;">${idx + 1}</td>
                     <td style="padding:4px;">${s.nama}</td>
@@ -839,38 +1452,69 @@
                     <td style="padding:4px; text-align:center;">${s.alfa}</td>
                     <td style="padding:4px; text-align:center;">${pct}%</td>
                 </tr>`;
-        });
-        document.getElementById('print-tbody').innerHTML = rowsHtml ||
-            '<tr><td colspan="8" style="padding:12px; text-align:center;">Tidak ada data untuk periode/kelas yang dipilih.</td></tr>';
+            });
+            document.getElementById('print-tbody').innerHTML = rowsHtml ||
+                '<tr><td colspan="8" style="padding:12px; text-align:center;">Tidak ada data untuk periode/kelas yang dipilih.</td></tr>';
 
-        const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
-        document.getElementById('print-summary').textContent =
-            `Rata-rata kehadiran: ${overallPct}% dari ${listArr.length} siswa.`;
+            const overallPct = grandTotal > 0 ? ((grandHadir / grandTotal) * 100).toFixed(1) : '0';
+            document.getElementById('print-summary').textContent =
+                `Rata-rata kehadiran: ${overallPct}% dari ${listArr.length} siswa.`;
 
-        const now = new Date();
-        const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('print-tanggal-cetak').textContent = `Enok, ${tglCetak}`;
-    }
+            const now = new Date();
+            const tglCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            const elTgl = document.getElementById('print-tanggal-cetak');
+            if (elTgl) elTgl.textContent = `Enok, ${tglCetak}`;
 
-    function exportToPDF() {
-        const listArr = window.lastListArr || [];
-        if (listArr.length === 0) {
-            alert('Tidak ada data untuk dicetak.');
-            return;
+            const userNama = user?.nama || (typeof getNama === 'function' ? getNama() : '') || '';
+            const userNip = user?.nip || (typeof localStorage !== 'undefined' ? (localStorage.getItem('user_nip') || '') : '') || '';
+
+            const customGuruNama = settings.nama_guru;
+            const guruNama = (userNama && userNama.trim() !== '') ? userNama : ((customGuruNama && customGuruNama.trim() !== '') ? customGuruNama : '..........................................');
+            const guruNip = (userNip && userNip !== '-' && userNip.trim() !== '') ? userNip : ((settings.nip_guru && settings.nip_guru !== '-') ? settings.nip_guru : '....................................');
+
+            const elNamaGuru = document.getElementById('print-nama-guru');
+            const elNipGuru = document.getElementById('print-nip-guru');
+            if (elNamaGuru) elNamaGuru.textContent = guruNama;
+            if (elNipGuru) elNipGuru.textContent = guruNip;
+
+            const elNamaKepsek = document.getElementById('print-nama-kepsek');
+            const elNipKepsek = document.getElementById('print-nip-kepsek');
+            if (elNamaKepsek) elNamaKepsek.textContent = settings.nama_kepsek || 'Drs. H. Ahmad Dahlan, M.Pd';
+            if (elNipKepsek) elNipKepsek.textContent = settings.nip_kepsek || '19680512 199403 1 004';
         }
-        buildPrintArea();
-        window.print();
-    }
 
-    function getMockLaporanData() {
-        return [
-            { id: "L001", nama_siswa: "Ahmad Fauzi", kelas: "XII IPA 1", status: "Hadir", tanggal: "2026-10-27", waktu: "07:15" },
-            { id: "L002", nama_siswa: "Budi Santoso", kelas: "XII IPA 1", status: "Hadir", tanggal: "2026-10-27", waktu: "07:20" },
-            { id: "L003", nama_siswa: "Citra Lestari", kelas: "XII IPA 1", status: "Sakit", tanggal: "2026-10-27", waktu: "07:30" },
-            { id: "L004", nama_siswa: "Dewi Sartika", kelas: "XII IPA 1", status: "Izin", tanggal: "2026-10-27", waktu: "07:45" },
-            { id: "L005", nama_siswa: "Eko Prasetyo", kelas: "XII IPA 1", status: "Alfa", tanggal: "2026-10-27", waktu: "-" }
-        ];
-    }
-</script>
+        async function exportToPDF() {
+            const listArr = window.lastListArr || [];
+            if (listArr.length === 0) {
+                alert('Tidak ada data untuk dicetak.');
+                return;
+            }
+            buildPrintArea();
+
+            const printLogoSekolah = document.getElementById('print-logo-sekolah');
+            if (printLogoSekolah && printLogoSekolah.src) {
+                if ('decode' in printLogoSekolah) {
+                    try {
+                        await printLogoSekolah.decode();
+                    } catch (e) {}
+                }
+            }
+
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
+        function getMockLaporanData() {
+            return [
+                { id: "L001", nama_siswa: "Ahmad Fauzi", kelas: "X-E1", status: "Hadir", tanggal: "2026-10-27", waktu: "07:15" },
+                { id: "L002", nama_siswa: "Budi Santoso", kelas: "X-E1", status: "Hadir", tanggal: "2026-10-27", waktu: "07:20" },
+                { id: "L003", nama_siswa: "Citra Lestari", kelas: "X-E1", status: "Sakit", tanggal: "2026-10-27", waktu: "07:30" },
+                { id: "L004", nama_siswa: "Dewi Sartika", kelas: "X-E1", status: "Izin", tanggal: "2026-10-27", waktu: "07:45" },
+                { id: "L005", nama_siswa: "Eko Prasetyo", kelas: "X-E1", status: "Alfa", tanggal: "2026-10-27", waktu: "-" }
+            ];
+        }
+    </script>
 </body>
+
 </html>
