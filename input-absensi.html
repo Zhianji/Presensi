@@ -212,7 +212,7 @@
             <!-- Sticky Bottom Action Bar Mobile -->
             <div class="fixed bottom-14 left-0 right-0 px-4 py-3 z-40 glass-panel border-t border-slate-700/80 backdrop-blur-xl md:hidden">
                 <div class="max-w-[1280px] mx-auto flex items-center gap-2.5">
-                    <button class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 border border-white/10" onclick="simpanAbsensi()">
+                    <button id="btn-simpan-mobile" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs py-3 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 border border-white/10" onclick="simpanAbsensi()">
                         <span class="material-symbols-outlined text-lg">save</span> Simpan Absensi
                     </button>
                     <button class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-4 py-3 rounded-xl shadow-sm hover:bg-rose-500/30 transition-all flex items-center justify-center gap-1 font-semibold text-xs active:scale-95" onclick="confirmResetAbsensi()">
@@ -975,7 +975,7 @@
         const tanggal = document.getElementById('input-tanggal-desktop').value || (document.getElementById('input-tanggal-mobile') ? document.getElementById('input-tanggal-mobile').value : '');
         
         let rows = document.querySelectorAll('#input-absensi-tbody tr[data-siswa-id]');
-        if(rows.length === 0) {
+        if (rows.length === 0) {
             rows = document.querySelectorAll('#student-list div[data-siswa-id]');
         }
 
@@ -989,9 +989,23 @@
         }
 
         const btnDesktop = document.getElementById('btn-simpan');
+        const btnMobile = document.getElementById('btn-simpan-mobile');
         const originalDesktopText = btnDesktop ? btnDesktop.innerHTML : '';
+        const originalMobileText = btnMobile ? btnMobile.innerHTML : '';
 
-        if(btnDesktop) { btnDesktop.disabled = true; btnDesktop.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Menyimpan...`; }
+        const setButtonsLoading = (isLoading, label) => {
+            const text = label || 'Menyimpan...';
+            if (btnDesktop) {
+                btnDesktop.disabled = isLoading;
+                btnDesktop.innerHTML = isLoading ? `<span class="material-symbols-outlined animate-spin text-sm">sync</span> ${text}` : originalDesktopText;
+            }
+            if (btnMobile) {
+                btnMobile.disabled = isLoading;
+                btnMobile.innerHTML = isLoading ? `<span class="material-symbols-outlined animate-spin text-sm">sync</span> ${text}` : originalMobileText;
+            }
+        };
+
+        setButtonsLoading(true);
 
         const items = [];
         rows.forEach(row => {
@@ -1008,10 +1022,12 @@
                 keterangan: ketInput ? ketInput.value : ''
             });
 
-            const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(siswaId));
-            if (idx !== -1) {
-                currentSiswaList[idx].status = statusVal;
-                currentSiswaList[idx].keterangan = ketInput ? ketInput.value : '';
+            if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
+                const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(siswaId));
+                if (idx !== -1) {
+                    currentSiswaList[idx].status = statusVal;
+                    currentSiswaList[idx].keterangan = ketInput ? ketInput.value : '';
+                }
             }
         });
 
@@ -1021,7 +1037,7 @@
             } else {
                 alert('Silakan pilih status presensi setidaknya untuk 1 siswa.');
             }
-            if(btnDesktop) { btnDesktop.disabled = false; btnDesktop.innerHTML = originalDesktopText; }
+            setButtonsLoading(false);
             return;
         }
 
@@ -1029,51 +1045,70 @@
         setCached(cacheKey, { ok: true, data: currentSiswaList });
 
         try {
-            let isBatchSaved = false;
-            try {
-                const batchRes = await apiPost('saveAbsensiBatch', {
-                    token: getToken(),
-                    items: items,
-                    mapel: mapel,
-                    tanggal: tanggal
-                }, 25000);
+            // Attempt 1: Batch Save (Singular Fast Spreadsheet Lock)
+            const batchRes = await apiPost('saveAbsensiBatch', {
+                token: getToken(),
+                items: items,
+                mapel: mapel,
+                tanggal: tanggal
+            }, 35000, 1);
 
-                if (batchRes && batchRes.ok) {
-                    invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
-                    if (typeof showToast === 'function') {
-                        showToast(`Presensi ${items.length} siswa berhasil disimpan ke spreadsheet!`, false);
-                    } else {
-                        alert(`Presensi ${items.length} siswa berhasil disimpan!`);
-                    }
-                    isBatchSaved = true;
+            if (batchRes && batchRes.ok) {
+                invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
+                if (typeof showToast === 'function') {
+                    showToast(`Presensi ${items.length} siswa berhasil disimpan ke spreadsheet!`, false);
+                } else {
+                    alert(`Presensi ${items.length} siswa berhasil disimpan!`);
                 }
-            } catch (e) {
-                console.warn('Batch save error, trying sequential chunked fallback:', e);
+                return;
             }
 
-            if (!isBatchSaved) {
-                let savedCount = 0;
-                const chunkSize = 5;
-                for (let i = 0; i < items.length; i += chunkSize) {
-                    const chunk = items.slice(i, i + chunkSize);
-                    const promises = chunk.map(item => 
-                        apiPost('setAbsensiStatus', {
-                            token: getToken(),
-                            siswa_id: item.siswa_id,
-                            mapel: mapel,
-                            tanggal: tanggal,
-                            status: item.status,
-                            keterangan: item.keterangan
-                        }, 10000)
-                    );
-                    const results = await Promise.allSettled(promises);
-                    savedCount += results.filter(r => r.status === 'fulfilled' && r.value && r.value.ok).length;
+            // If server returned explicit error (Auth/Session/Validation)
+            if (batchRes && batchRes.error) {
+                console.warn('saveAbsensiBatch error:', batchRes.error);
+                if (batchRes.error.toLowerCase().includes('sesi') || batchRes.error.toLowerCase().includes('token')) {
+                    if (typeof showToast === 'function') showToast('Sesi login telah berakhir. Silakan login kembali.', true);
+                    else alert('Sesi login telah berakhir. Silakan login kembali.');
+                    window.location.href = 'index.html';
+                    return;
                 }
+            }
 
+            // Attempt 2: Sequential Fallback (Safe for Google Apps Script Single-Thread Lock)
+            console.warn('Batch save did not complete cleanly, using sequential fallback...');
+            let savedCount = 0;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                setButtonsLoading(true, `Menyimpan (${i+1}/${items.length})...`);
+                
+                try {
+                    const res = await apiPost('setAbsensiStatus', {
+                        token: getToken(),
+                        siswa_id: item.siswa_id,
+                        mapel: mapel,
+                        tanggal: tanggal,
+                        status: item.status,
+                        keterangan: item.keterangan
+                    }, 15000, 0);
+                    if (res && res.ok) savedCount++;
+                } catch (err) {
+                    console.warn(`Gagal menyimpan siswa ${item.siswa_id}:`, err);
+                }
+            }
+
+            invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
+            if (savedCount > 0) {
                 if (typeof showToast === 'function') {
-                    showToast(`Absensi ${savedCount}/${items.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < items.length);
+                    showToast(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < items.length);
                 } else {
-                    alert(`Absensi ${savedCount}/${items.length} siswa berhasil disimpan!`);
+                    alert(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan!`);
+                }
+            } else {
+                const errMsg = (batchRes && batchRes.error) ? batchRes.error : 'Gagal terhubung ke Google Apps Script.';
+                if (typeof showToast === 'function') {
+                    showToast(`${errMsg} Presensi tersimpan di cache lokal.`, true);
+                } else {
+                    alert(`${errMsg} Presensi tersimpan di cache lokal.`);
                 }
             }
         } catch (e) {
@@ -1084,7 +1119,7 @@
                 alert(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
             }
         } finally {
-            if(btnDesktop) { btnDesktop.disabled = false; btnDesktop.innerHTML = originalDesktopText; }
+            setButtonsLoading(false);
         }
     }
     
