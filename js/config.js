@@ -123,6 +123,51 @@ async function apiPostCached(action, data, cacheKey, onFresh) {
   return await freshPromise;
 }
 
+// ==== SISWA CACHE HELPERS ====
+function getSiswaListFromCache() {
+  const cachedObj = getCached('cache_siswa_list');
+  if (cachedObj && cachedObj.ok && Array.isArray(cachedObj.data)) {
+    return cachedObj.data;
+  }
+  if (Array.isArray(cachedObj)) {
+    return cachedObj;
+  }
+  try {
+    const raw = localStorage.getItem('cache_siswa_list');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && parsed.data && Array.isArray(parsed.data)) return parsed.data;
+    if (parsed && parsed.data && parsed.data.data && Array.isArray(parsed.data.data)) return parsed.data.data;
+  } catch(e) {}
+  return null;
+}
+
+function setSiswaListCache(siswaArrayOrRes) {
+  let resObj;
+  if (Array.isArray(siswaArrayOrRes)) {
+    resObj = { ok: true, data: siswaArrayOrRes };
+  } else if (siswaArrayOrRes && siswaArrayOrRes.ok && Array.isArray(siswaArrayOrRes.data)) {
+    resObj = siswaArrayOrRes;
+  } else {
+    return;
+  }
+  setCached('cache_siswa_list', resObj);
+}
+
+function prefetchSiswaList() {
+  const role = getRole();
+  if (!role || role === 'siswa') return;
+  const token = getToken();
+  if (!token) return;
+  
+  const cached = getSiswaListFromCache();
+  if (!cached) {
+    apiPostCached('getSiswaList', { token }, 'cache_siswa_list').catch(() => {});
+  }
+}
+
+
 // ==== SESSION MANAGEMENT ====
 function saveSession(token, role, nama, email = '') {
   localStorage.setItem(TOKEN_KEY, token);
@@ -203,6 +248,7 @@ async function guardPage(requiredRole) {
       const { session, token: cachedToken, timestamp } = JSON.parse(rawSession);
       if (cachedToken === token && (Date.now() - timestamp < SESSION_CACHE_DURATION)) {
         setupCommonUI(session);
+        prefetchSiswaList();
         // Background revalidation jika session cache sudah berusia > 3 menit
         if (Date.now() - timestamp > 3 * 60 * 1000) {
           apiPost('checkSession', { token }).then(check => {

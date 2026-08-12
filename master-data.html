@@ -529,14 +529,12 @@
         const mobileList = document.getElementById('master-siswa-mobile-list');
 
         let hasRenderedInitial = false;
-        const cachedSiswa = localStorage.getItem('cache_siswa_list');
-        if (cachedSiswa) {
-            try {
-                allSiswaList = JSON.parse(cachedSiswa);
-                initKelasDropdowns(allSiswaList);
-                filterSiswaTable();
-                hasRenderedInitial = true;
-            } catch (e) {}
+        const cachedSiswa = getSiswaListFromCache();
+        if (Array.isArray(cachedSiswa) && cachedSiswa.length > 0) {
+            allSiswaList = cachedSiswa;
+            initKelasDropdowns(allSiswaList);
+            filterSiswaTable();
+            hasRenderedInitial = true;
         }
 
         if (!hasRenderedInitial) {
@@ -546,10 +544,15 @@
         }
 
         try {
-            const res = await apiPost('getSiswaList', { token: getToken() });
-            if (res && res.ok && res.data) {
+            const res = await apiPostCached('getSiswaList', { token: getToken() }, 'cache_siswa_list', (freshRes) => {
+                if (freshRes && freshRes.ok && Array.isArray(freshRes.data)) {
+                    allSiswaList = freshRes.data;
+                    initKelasDropdowns(freshRes.data);
+                    filterSiswaTable();
+                }
+            });
+            if (res && res.ok && Array.isArray(res.data)) {
                 allSiswaList = res.data;
-                localStorage.setItem('cache_siswa_list', JSON.stringify(res.data));
                 initKelasDropdowns(res.data);
                 filterSiswaTable();
             }

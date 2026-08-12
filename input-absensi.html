@@ -515,8 +515,8 @@
         if (inputM) inputM.value = todayStr;
         
         setupFilterSync();
-        await initKelasOptions();
-        await loadStatusHarian();
+        initKelasOptions();
+        loadStatusHarian();
     });
 
     function setupFilterSync() {
@@ -548,22 +548,29 @@
         const kelasSelectM = document.getElementById('select-kelas-mobile');
         
         let classList = [];
-        const cachedSiswa = localStorage.getItem('cache_siswa_list');
-        if (cachedSiswa) {
-            try {
-                const siswaArr = JSON.parse(cachedSiswa);
-                classList = [...new Set(siswaArr.map(s => s.kelas).filter(Boolean))].sort();
-            } catch(e) {}
+        let allSiswa = getSiswaListFromCache();
+        if (Array.isArray(allSiswa) && allSiswa.length > 0) {
+            classList = [...new Set(allSiswa.map(s => s.kelas).filter(Boolean))].sort();
         }
         
-        if (!classList.length) {
-            try {
-                const res = await apiPost('getSiswaList', { token: getToken() });
-                if (res.ok && res.data) {
-                    classList = [...new Set(res.data.map(s => s.kelas).filter(Boolean))].sort();
+        // Selalu trigger update master data siswa di background jika cache belum ada atau perlu penyegaran
+        apiPostCached('getSiswaList', { token: getToken() }, 'cache_siswa_list').then(res => {
+            if (res && res.ok && Array.isArray(res.data)) {
+                const freshClasses = [...new Set(res.data.map(s => s.kelas).filter(Boolean))].sort();
+                if (freshClasses.length > 0) {
+                    let freshOptionsHtml = `<option value="">Semua Kelas</option>`;
+                    freshClasses.forEach(c => { freshOptionsHtml += `<option value="${c}">${c}</option>`; });
+                    const curValD = kelasSelectD ? kelasSelectD.value : '';
+                    const curValM = kelasSelectM ? kelasSelectM.value : '';
+                    if(kelasSelectD) { kelasSelectD.innerHTML = freshOptionsHtml; kelasSelectD.value = curValD; }
+                    if(kelasSelectM) { kelasSelectM.innerHTML = freshOptionsHtml; kelasSelectM.value = curValM; }
                 }
-            } catch(e) {}
-        }
+                // Jika tabel saat ini kosong/belum ada siswa, muat ulang status harian dengan data siswa yang baru didapat
+                if (!currentSiswaList || currentSiswaList.length === 0) {
+                    loadStatusHarian();
+                }
+            }
+        }).catch(() => {});
         
         if (!classList.length) {
             classList = ["X-E1", "X-E2", "X-E3", "X-E4", "X-E5", "X-E6"];
@@ -581,6 +588,8 @@
     async function loadStatusHarian(isManualClick = false) {
         const btnD = document.getElementById('btn-terapkan');
         const btnM = document.getElementById('btn-terapkan-mobile');
+        const tbody = document.getElementById('input-absensi-tbody');
+        const mobileList = document.getElementById('student-list');
         
         if (btnD) {
             btnD.disabled = true;
@@ -601,37 +610,68 @@
         const tanggal = tEl && tEl.value ? tEl.value : new Date().toISOString().split('T')[0];
 
         const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
-        const cached = localStorage.getItem(cacheKey);
-
-        const tbody = document.getElementById('input-absensi-tbody');
-        const mobileList = document.getElementById('student-list');
-        
         let hasRenderedInitial = false;
 
-        if (cached) {
-            try {
-                currentSiswaList = JSON.parse(cached);
-                renderSiswaTable(currentSiswaList);
-                const countText = `Menampilkan ${currentSiswaList.length} Siswa`;
+        // 1. Cek cache status harian spesifik kelas + mapel + tanggal
+        const cachedDaily = getCached(cacheKey);
+        if (cachedDaily && cachedDaily.ok && Array.isArray(cachedDaily.data) && cachedDaily.data.length > 0) {
+            currentSiswaList = cachedDaily.data;
+            renderSiswaTable(currentSiswaList);
+            const countText = `Menampilkan ${currentSiswaList.length} Siswa`;
+            const elDesktopText = document.getElementById('total-siswa-text');
+            if(elDesktopText) elDesktopText.textContent = countText;
+            
+            const elInfo = document.getElementById('info-text');
+            if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+            hasRenderedInitial = true;
+        }
+
+        // 2. Jika belum ada cache status harian, cek master data siswa dari cache
+        if (!hasRenderedInitial) {
+            let initialRoster = [];
+            const allSiswa = getSiswaListFromCache();
+            if (Array.isArray(allSiswa) && allSiswa.length > 0) {
+                initialRoster = allSiswa
+                    .filter(s => !kelas || s.kelas === kelas)
+                    .map(s => ({
+                        id: s.id || s.siswa_id,
+                        siswa_id: s.id || s.siswa_id,
+                        nama: s.nama,
+                        kelas: s.kelas,
+                        status: 'Belum',
+                        keterangan: ''
+                    }));
+            }
+
+            if (initialRoster.length > 0) {
+                currentSiswaList = initialRoster;
+                renderSiswaTable(initialRoster);
+                const countText = `Menampilkan ${initialRoster.length} Siswa`;
                 const elDesktopText = document.getElementById('total-siswa-text');
                 if(elDesktopText) elDesktopText.textContent = countText;
-                
+
                 const elInfo = document.getElementById('info-text');
                 if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
                 hasRenderedInitial = true;
-            } catch (e) {
-                console.error('Failed to parse cached status harian:', e);
+            } else {
+                // Jangan bersihkan tabel dengan pesan kosong; tampilkan loading indicator sampai fetch server selesai!
+                if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data siswa dari server...</td></tr>`;
+                if (mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-slate-400 text-xs"><span class="material-symbols-outlined animate-spin text-sm align-middle mr-1">sync</span> Memuat data siswa...</div>`;
             }
         }
 
-        if (!hasRenderedInitial) {
-            let initialRoster = [];
-            const cachedSiswaList = localStorage.getItem('cache_siswa_list');
-            if (cachedSiswaList) {
-                try {
-                    const allSiswa = JSON.parse(cachedSiswaList);
+        // Helper untuk memproses dan menampilkan data dari server
+        const applyResponseData = (res) => {
+            if (!res) return false;
+            
+            if (res.ok) {
+                let list = Array.isArray(res.data) ? res.data : [];
+                
+                // Fallback jika roster dari getStatusHarian kosong, tetapi master data siswa ada
+                if (list.length === 0) {
+                    const allSiswa = getSiswaListFromCache();
                     if (Array.isArray(allSiswa) && allSiswa.length > 0) {
-                        initialRoster = allSiswa
+                        list = allSiswa
                             .filter(s => !kelas || s.kelas === kelas)
                             .map(s => ({
                                 id: s.id || s.siswa_id,
@@ -642,41 +682,65 @@
                                 keterangan: ''
                             }));
                     }
-                } catch(e) {}
-            }
+                }
 
-            if (initialRoster.length === 0) {
-                initialRoster = [];
-            }
-
-            currentSiswaList = initialRoster;
-            renderSiswaTable(initialRoster);
-            const countText = `Menampilkan ${initialRoster.length} Siswa`;
-            const elDesktopText = document.getElementById('total-siswa-text');
-            if(elDesktopText) elDesktopText.textContent = countText;
-
-            const elInfo = document.getElementById('info-text');
-            if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
-        }
-
-        try {
-            const res = await apiPost('getStatusHarian', { token: getToken(), kelas, mapel, tanggal });
-            if (res && res.ok && res.data) {
-                currentSiswaList = res.data;
-                localStorage.setItem(cacheKey, JSON.stringify(res.data));
-                renderSiswaTable(res.data);
-                const countText = `Menampilkan ${res.data.length} Siswa`;
+                currentSiswaList = list;
+                renderSiswaTable(list);
+                const countText = `Menampilkan ${list.length} Siswa`;
                 const elDesktopText = document.getElementById('total-siswa-text');
-                if(elDesktopText) elDesktopText.textContent = countText;
+                if (elDesktopText) elDesktopText.textContent = countText;
                 
                 const elInfo = document.getElementById('info-text');
-                if(elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                if (elInfo) elInfo.innerHTML = `Menampilkan data presensi untuk kelas <strong>${kelas || 'Semua Kelas'}</strong> (${mapel}) tanggal <strong>${tanggal}</strong>.`;
+                
                 if (isManualClick && typeof showToast === 'function') {
                     showToast(`Data presensi ${kelas || 'Semua Kelas'} berhasil dimuat.`);
                 }
+                return true;
+            } else {
+                const errMsg = res.error || 'Gagal memuat data siswa dari server.';
+                if (!hasRenderedInitial || !currentSiswaList || currentSiswaList.length === 0) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-rose-400">
+                        <div class="flex flex-col items-center gap-2">
+                            <span>⚠️ ${errMsg}</span>
+                            <button onclick="loadStatusHarian(true)" class="mt-1 px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg font-medium text-xs hover:bg-rose-500/30 transition-colors">Coba Lagi</button>
+                        </div>
+                    </td></tr>`;
+                    if (mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-rose-400 text-xs">
+                        ⚠️ ${errMsg}<br>
+                        <button onclick="loadStatusHarian(true)" class="mt-2 px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg font-medium text-xs">Coba Lagi</button>
+                    </div>`;
+                }
+                if (isManualClick && typeof showToast === 'function') {
+                    showToast(errMsg, 'error');
+                }
+                return false;
+            }
+        };
+
+        // 3. Sync data segar dari server di background via apiPostCached
+        try {
+            const res = await apiPostCached('getStatusHarian', { token: getToken(), kelas, mapel, tanggal }, cacheKey, (freshRes) => {
+                applyResponseData(freshRes);
+            });
+
+            if (res) {
+                applyResponseData(res);
             }
         } catch (e) {
             console.warn("Background fetch getStatusHarian network error:", e);
+            if (!hasRenderedInitial || !currentSiswaList || currentSiswaList.length === 0) {
+                if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-rose-400">
+                    <div class="flex flex-col items-center gap-2">
+                        <span>⚠️ Gagal terhubung ke server. Periksa koneksi internet Anda.</span>
+                        <button onclick="loadStatusHarian(true)" class="mt-1 px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg font-medium text-xs hover:bg-rose-500/30 transition-colors">Coba Lagi</button>
+                    </div>
+                </td></tr>`;
+                if (mobileList) mobileList.innerHTML = `<div class="text-center p-4 text-rose-400 text-xs">
+                    ⚠️ Gagal terhubung ke server.<br>
+                    <button onclick="loadStatusHarian(true)" class="mt-2 px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg font-medium text-xs">Coba Lagi</button>
+                </div>`;
+            }
         } finally {
             if (btnD) {
                 btnD.disabled = false;
@@ -915,7 +979,7 @@
         }
 
         const cacheKey = `cache_status_harian_${kelas}_${mapel}_${tanggal}`;
-        localStorage.setItem(cacheKey, JSON.stringify(currentSiswaList));
+        setCached(cacheKey, { ok: true, data: currentSiswaList });
 
         try {
             let isBatchSaved = false;

@@ -824,12 +824,17 @@ function getStatusHarian(kelas, mapel, tanggal) {
   else if (cleanMapel.startsWith('KKA')) cleanMapel = 'KKA';
 
   const tanggalNorm = normalizeTanggal(tanggal);
+  const targetKelas = kelas ? String(kelas).trim().toLowerCase() : '';
 
   const siswaRows = getSheet(SHEET_SISWA).getDataRange().getValues();
   const roster = [];
   for (let i = 1; i < siswaRows.length; i++) {
-    const [id, , nama, rowKelas] = siswaRows[i];
-    if (!kelas || kelas === rowKelas) roster.push({ id: id, nama: nama, kelas: rowKelas });
+    const [id, nis, nama, rowKelas, wali, statusAktif] = siswaRows[i];
+    if (String(statusAktif || '').trim().toLowerCase() === 'nonaktif') continue;
+    const currentKelas = rowKelas ? String(rowKelas).trim().toLowerCase() : '';
+    if (!targetKelas || currentKelas === targetKelas) {
+      roster.push({ id: id, nis: nis, nama: nama, kelas: rowKelas });
+    }
   }
 
   const absensiRows = getSheet(SHEET_ABSENSI).getDataRange().getValues();
@@ -845,6 +850,7 @@ function getStatusHarian(kelas, mapel, tanggal) {
   const data = roster
     .map((s) => ({
       siswa_id: s.id,
+      nis: s.nis,
       nama: s.nama,
       kelas: s.kelas,
       status: statusById[s.id] ? statusById[s.id].status : null,
