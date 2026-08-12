@@ -1,5 +1,5 @@
 // ==== KONFIGURASI APLIKASI ====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxn8nxwiU5qpKJOdrHh2iicnpmYZP_VlXs8i5JCZxbtWQ28mK91YaCMpOtf89hwkBLUHA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZNUHqdpQ373lFbVSgIh4CzLz5dzUnLECpx5W1EhONc0bK2_nXSGl966ubKGqvzlfjsA/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
 const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
@@ -160,7 +160,7 @@ function prefetchSiswaList() {
   if (!role || role === 'siswa') return;
   const token = getToken();
   if (!token) return;
-  
+
   const cached = getSiswaListFromCache();
   if (!cached) {
     apiPostCached('getSiswaList', { token }, 'cache_siswa_list').catch(() => {});
@@ -913,4 +913,3 @@ function compressLogoImage(file, maxDimension = 300, quality = 0.85) {
     reader.readAsDataURL(file);
   });
 }
-
