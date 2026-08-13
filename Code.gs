@@ -642,6 +642,13 @@ function setAbsensiStatus(session, siswaId, mapel, tanggal, status, keterangan) 
   try {
     const sheet = getSheet(SHEET_ABSENSI);
     const existing = findAbsensiRow(sheet, siswaId, mapel, tanggalNorm);
+    if (status === 'Belum') {
+      if (existing) {
+        sheet.deleteRow(existing.row);
+      }
+      logAction(session.user_id, session.nama, 'Set Absensi', `Batal presensi ${siswaData.nama}`);
+      return { ok: true, message: 'Status presensi dibatalkan' };
+    }
     if (existing) {
       sheet.getRange(existing.row, 8, 1, 2).setValues([[status, keterangan || '']]);
     } else {
@@ -775,30 +782,47 @@ function saveAbsensiBatch(session, items, mapel, tanggal) {
     }
 
     let updatedCount = 0;
+    const rowsToDelete = [];
 
     items.forEach(item => {
       const siswaId = String(item.siswa_id || item.id || '').trim();
       if (!siswaId) return;
 
-      const status = item.status || 'Hadir';
+      const status = item.status;
       const keterangan = item.keterangan || '';
       const siswaData = siswaMap[siswaId] || { nama: item.nama || 'Siswa', kelas: item.kelas || '' };
       const key = `${siswaId}_${cleanM}_${tanggalNorm}`;
 
+      const isValidStatus = status && status !== 'Belum' && STATUS_LIST.indexOf(status) !== -1;
+
       if (existingMap.hasOwnProperty(key)) {
         const rIndex = existingMap[key];
-        data[rIndex][7] = status;      // Kolom H (index 7) = status
-        data[rIndex][8] = keterangan;  // Kolom I (index 8) = keterangan
-      } else {
+        if (isValidStatus) {
+          data[rIndex][7] = status;      // Kolom H (index 7) = status
+          data[rIndex][8] = keterangan;  // Kolom I (index 8) = keterangan
+          updatedCount++;
+        } else {
+          // Status dibatalkan ('Belum'), tandai baris untuk dihapus
+          rowsToDelete.push(rIndex);
+        }
+      } else if (isValidStatus) {
         const newId = Utilities.getUuid();
         data.push([newId, siswaId, siswaData.nama, siswaData.kelas, cleanM, tanggalNorm, '', status, keterangan]);
         existingMap[key] = data.length - 1;
+        updatedCount++;
       }
-      updatedCount++;
     });
+
+    if (rowsToDelete.length > 0) {
+      rowsToDelete.sort((a, b) => b - a);
+      rowsToDelete.forEach(rIdx => {
+        data.splice(rIdx, 1);
+      });
+    }
 
     // Write updated array back to sheet in 1 single bulk call
     if (data.length > 0) {
+      sheet.clearContents();
       sheet.getRange(1, 1, data.length, 9).setValues(data);
     }
 

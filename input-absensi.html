@@ -1016,11 +1016,21 @@
             const sId = String(siswaId).replace(/[^a-zA-Z0-9_-]/g, '_');
             const ketInput = document.getElementById(`ket-${sId}`) || document.getElementById(`ket-${siswaId}`);
 
-            items.push({
-                siswa_id: siswaId,
-                status: statusVal,
-                keterangan: ketInput ? ketInput.value : ''
-            });
+            let shouldPush = (statusVal && statusVal !== 'Belum');
+            if (!shouldPush && typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
+                const prevS = currentSiswaList.find(s => String(s.siswa_id || s.id) === String(siswaId));
+                if (prevS && prevS.status && prevS.status !== 'Belum') {
+                    shouldPush = true;
+                }
+            }
+
+            if (shouldPush) {
+                items.push({
+                    siswa_id: siswaId,
+                    status: statusVal,
+                    keterangan: ketInput ? ketInput.value : ''
+                });
+            }
 
             if (typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
                 const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(siswaId));
@@ -1031,7 +1041,9 @@
             }
         });
 
-        if (items.length === 0) {
+        const markedItemsCount = items.filter(i => i.status && i.status !== 'Belum').length;
+
+        if (markedItemsCount === 0 && items.length === 0) {
             if (typeof showToast === 'function') {
                 showToast('Silakan pilih status presensi setidaknya untuk 1 siswa.', true);
             } else {
@@ -1055,10 +1067,11 @@
 
             if (batchRes && batchRes.ok) {
                 invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
+                const savedCount = (typeof batchRes.count === 'number') ? batchRes.count : markedItemsCount;
                 if (typeof showToast === 'function') {
-                    showToast(`Presensi ${items.length} siswa berhasil disimpan ke spreadsheet!`, false);
+                    showToast(`Presensi ${savedCount} siswa berhasil disimpan ke spreadsheet!`, false);
                 } else {
-                    alert(`Presensi ${items.length} siswa berhasil disimpan!`);
+                    alert(`Presensi ${savedCount} siswa berhasil disimpan!`);
                 }
                 return;
             }
@@ -1077,9 +1090,10 @@
             // Attempt 2: Sequential Fallback (Safe for Google Apps Script Single-Thread Lock)
             console.warn('Batch save did not complete cleanly, using sequential fallback...');
             let savedCount = 0;
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                setButtonsLoading(true, `Menyimpan (${i+1}/${items.length})...`);
+            const validItems = items.filter(i => i.status && i.status !== 'Belum');
+            for (let i = 0; i < validItems.length; i++) {
+                const item = validItems[i];
+                setButtonsLoading(true, `Menyimpan (${i+1}/${validItems.length})...`);
                 
                 try {
                     const res = await apiPost('setAbsensiStatus', {
@@ -1099,9 +1113,9 @@
             invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
             if (savedCount > 0) {
                 if (typeof showToast === 'function') {
-                    showToast(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < items.length);
+                    showToast(`Presensi ${savedCount}/${validItems.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < validItems.length);
                 } else {
-                    alert(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan!`);
+                    alert(`Presensi ${savedCount}/${validItems.length} siswa berhasil disimpan!`);
                 }
             } else {
                 const errMsg = (batchRes && batchRes.error) ? batchRes.error : 'Gagal terhubung ke Google Apps Script.';
@@ -1114,9 +1128,9 @@
         } catch (e) {
             console.warn('Simpan absensi error:', e);
             if (typeof showToast === 'function') {
-                showToast(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`, false);
+                showToast(`Presensi ${markedItemsCount} siswa tersimpan di cache (Mode Offline).`, false);
             } else {
-                alert(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
+                alert(`Presensi ${markedItemsCount} siswa tersimpan di cache (Mode Offline).`);
             }
         } finally {
             setButtonsLoading(false);
