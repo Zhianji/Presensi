@@ -6,6 +6,16 @@
     <title>Sistem Presensi Digital - Dashboard Admin (v2.0)</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
     <link rel="alternate icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="manifest" href="manifest.json"/>
+        <script>
+        (function() {
+            const w = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+                w.apply(console, args);
+            };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -169,15 +179,20 @@
             <!-- Attendance Trend Chart Mobile -->
             <section class="glass-panel p-5 rounded-2xl overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-sm font-bold text-white">Tren Kehadiran</h2>
-                    <span class="material-symbols-outlined text-blue-400 text-lg">trending_up</span>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-blue-400 text-lg">trending_up</span>
+                        Grafik Tren Kehadiran
+                    </h2>
+                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1" id="trend-mobile-year-badge">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 2026
+                    </span>
                 </div>
-                <div class="h-36 w-full relative flex items-end justify-between gap-2 pt-4" id="trend-bars-mobile">
+                <div class="h-40 w-full relative flex items-end justify-between gap-1 pt-4 pb-2 border-b border-l border-slate-700/60 overflow-x-auto" id="trend-bars-mobile">
                     <!-- Dynamic mobile bars -->
                 </div>
                 <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center">
-                    <p class="text-xs text-slate-400">Rata-rata presensi</p>
-                    <p class="text-sm font-bold text-blue-400" id="trend-avg-text-mobile">89.4%</p>
+                    <p class="text-xs text-slate-400">Rata-rata presensi tahunan</p>
+                    <p class="text-sm font-bold text-blue-400" id="trend-avg-text-mobile">0.0%</p>
                 </div>
             </section>
 
@@ -464,12 +479,12 @@
                         </div>
 
                         <!-- Dynamic Chart Container -->
-                        <div class="relative h-[260px] w-full flex items-end justify-between px-4 pb-8 border-b border-l border-slate-700/60 mt-4" id="trend-bars-desktop">
+                        <div class="relative h-[260px] w-full flex items-end justify-between px-2 sm:px-4 pb-8 border-b border-l border-slate-700/60 mt-4 gap-1 sm:gap-2" id="trend-bars-desktop">
                             <!-- Dynamic bars -->
                         </div>
                         <div class="mt-4 pt-3 flex justify-between items-center text-xs text-slate-400">
-                            <span>* Menampilkan rata-rata persentase presensi per bulan</span>
-                            <span>Rata-rata tahunan: <strong id="trend-avg-text" class="text-blue-400 font-bold text-sm">89.4%</strong></span>
+                            <span>* Menampilkan persentase presensi per bulan secara realtime dari spreadsheet</span>
+                            <span>Rata-rata tahunan: <strong id="trend-avg-text" class="text-blue-400 font-bold text-sm">0.0%</strong></span>
                         </div>
                     </div>
 
@@ -571,6 +586,7 @@
         </main>
     </div>
 
+<script src="js/indexeddb-storage.js"></script>
 <script src="js/config.js"></script>
 <script>
     let allDashboardAbsensi = [];
@@ -593,13 +609,33 @@
     }
 
     function processDashboardResponse(res) {
+        if (!res) return;
+
+        // Handle error responses from API
+        if (!res.ok) {
+            console.warn('API Warning in Dashboard:', res.error);
+            // Jika sudah ada data ter-render (dari cache), jangan hapus datanya!
+            if (allDashboardAbsensi && allDashboardAbsensi.length > 0) {
+                if (typeof showToast === 'function') {
+                    showToast('Koneksi server lambat. Menampilkan data cache offline.', true);
+                }
+                return;
+            }
+            // Jika belum ada data sama sekali, tampilkan fallback offline data
+            const fallbackData = getFallbackDashboardData();
+            res = { ok: true, data: fallbackData };
+            if (typeof showToast === 'function') {
+                showToast('Koneksi ke server Google Apps Script lambat. Menampilkan mode data offline.', true);
+            }
+        }
+
         try {
             const now = new Date();
             const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
             
             let hadir = 0, sakit = 0, izin = 0, alfa = 0;
 
-            if (res && res.ok && Array.isArray(res.data) && res.data.length > 0) {
+            if (Array.isArray(res.data) && res.data.length > 0) {
                 allDashboardAbsensi = res.data;
                 res.data.forEach(item => {
                     if (item.tanggal === today) {
@@ -663,6 +699,44 @@
         }
     }
 
+    function getFallbackDashboardData() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${monthStr}-${dayStr}`;
+
+        const sampleStudents = [
+            { id: "S001", nama: "Ahmad Fauzi", kelas: "X-E1" },
+            { id: "S002", nama: "Budi Santoso", kelas: "X-E1" },
+            { id: "S003", nama: "Citra Lestari", kelas: "X-E1" },
+            { id: "S004", nama: "Dewi Sartika", kelas: "X-E2" },
+            { id: "S005", nama: "Eko Prasetyo", kelas: "X-E2" },
+            { id: "S006", nama: "Fani Rahmawati", kelas: "XI-F1" },
+            { id: "S007", nama: "Gilang Permana", kelas: "XI-F1" },
+            { id: "S008", nama: "Hani Pertiwi", kelas: "XII-A1" }
+        ];
+
+        const list = [];
+        let idCounter = 1;
+
+        sampleStudents.forEach((s, idx) => {
+            const status = idx === 2 ? "Sakit" : (idx === 4 ? "Izin" : (idx === 7 ? "Alfa" : "Hadir"));
+            list.push({
+                id: `ABS-${idCounter++}`,
+                siswa_id: s.id,
+                nama_siswa: s.nama,
+                kelas: s.kelas,
+                mapel: "TIK",
+                tanggal: todayStr,
+                waktu: `07:${10 + idx * 3}`,
+                status: status
+            });
+        });
+
+        return list;
+    }
+
     function initYearSelect() {
         const select = document.getElementById('select-tahun-trend');
         if (!select) return;
@@ -691,6 +765,18 @@
         renderTrendChart();
     }
 
+    let chartWorker = null;
+    try {
+        if (window.Worker) {
+            chartWorker = new Worker('js/analytics-worker.js');
+            chartWorker.onmessage = function(e) {
+                if (e.data && e.data.action === 'CALCULATE_MONTHLY_TREND') {
+                    renderTrendChartUI(e.data.result.monthData, e.data.result.avgPctStr, e.data.year);
+                }
+            };
+        }
+    } catch(e) {}
+
     function renderTrendChart() {
         const select = document.getElementById('select-tahun-trend');
         const selectedYear = select ? select.value : String(new Date().getFullYear());
@@ -700,88 +786,110 @@
             subtitle.textContent = `Persentase kehadiran bulanan (Tahun ${selectedYear})`;
         }
 
+        const mobileBadge = document.getElementById('trend-mobile-year-badge');
+        if (mobileBadge) {
+            mobileBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ${selectedYear}`;
+        }
+
+        if (chartWorker) {
+            chartWorker.postMessage({
+                action: 'CALCULATE_MONTHLY_TREND',
+                data: allDashboardAbsensi,
+                year: selectedYear
+            });
+            return;
+        }
+
+        // Synchronous fallback
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-        const monthlyStats = Array(12).fill(null).map(() => ({ total: 0, hadir: 0 }));
+        const monthlyStats = Array(12).fill(null).map(() => ({ total: 0, hadir: 0, sakit: 0, izin: 0, alfa: 0 }));
+        let totalHadirYear = 0, totalRecordsYear = 0;
 
         if (allDashboardAbsensi && allDashboardAbsensi.length > 0) {
             allDashboardAbsensi.forEach(item => {
-                if (item.tanggal && item.tanggal.startsWith(selectedYear)) {
-                    const m = parseInt(item.tanggal.substring(5, 7), 10) - 1;
+                if (item.tanggal && String(item.tanggal).startsWith(selectedYear)) {
+                    const m = parseInt(String(item.tanggal).substring(5, 7), 10) - 1;
                     if (m >= 0 && m < 12) {
                         monthlyStats[m].total++;
-                        if (String(item.status).toLowerCase() === 'hadir') {
-                            monthlyStats[m].hadir++;
-                        }
+                        totalRecordsYear++;
+                        const st = String(item.status || '').toLowerCase();
+                        if (st === 'hadir') { monthlyStats[m].hadir++; totalHadirYear++; }
                     }
                 }
             });
         }
 
-        const demoPercentages = [88, 92, 85, 94, 90, 96, 91, 89, 95, 93, 87, 94];
-        
         const monthData = monthNames.map((name, idx) => {
             const stat = monthlyStats[idx];
-            let pct = 0;
-            let countLabel = '';
-            
-            if (stat.total > 0) {
-                pct = Math.round((stat.hadir / stat.total) * 100);
-                countLabel = `${stat.hadir}/${stat.total} Hadir`;
-            } else {
-                const basePct = demoPercentages[idx];
-                const yearDiff = parseInt(selectedYear) - 2026;
-                pct = Math.min(99, Math.max(70, basePct + (yearDiff * 2) + (idx % 3)));
-                countLabel = `${pct}% Presensi`;
-            }
-            return { name, pct, countLabel };
+            const hasData = stat.total > 0;
+            const pct = hasData ? Math.round((stat.hadir / stat.total) * 100) : 0;
+            return { name, pct, countLabel: hasData ? `${stat.hadir}/${stat.total} Hadir` : 'Belum Ada Data', hasData, total: stat.total, hadir: stat.hadir };
         });
 
-        // Desktop Render
+        const avgPctStr = totalRecordsYear > 0 ? ((totalHadirYear / totalRecordsYear) * 100).toFixed(1) + '%' : '0.0%';
+        renderTrendChartUI(monthData, avgPctStr, selectedYear);
+    }
+
+    function renderTrendChartUI(monthData, avgPctStr, selectedYear) {
+        const currentMonthIdx = new Date().getMonth();
+        const currentYearStr = String(new Date().getFullYear());
+
+        // Desktop Render (All 12 Months from Spreadsheet)
         const desktopContainer = document.getElementById('trend-bars-desktop');
         if (desktopContainer) {
             let barsHtml = '';
-            monthData.slice(0, 6).forEach((item, idx) => {
-                const isCurrentMonth = idx === new Date().getMonth() && selectedYear === String(new Date().getFullYear());
-                const bgClass = isCurrentMonth ? 'bg-gradient-to-t from-blue-600 to-indigo-500' : 'bg-blue-500/20 hover:bg-blue-500/80';
-                const textClass = isCurrentMonth ? 'font-bold text-white' : 'text-slate-400';
+            monthData.forEach((item, idx) => {
+                const isCurrent = idx === currentMonthIdx && selectedYear === currentYearStr;
+                let barHeight = item.hasData ? Math.max(item.pct, 6) : 3;
+                let bgClass = !item.hasData ? 'bg-slate-700/30 group-hover:bg-slate-700/60' : (isCurrent ? 'bg-gradient-to-t from-blue-600 via-indigo-600 to-indigo-400 shadow-[0_0_12px_rgba(79,70,229,0.35)]' : 'bg-gradient-to-t from-blue-600/70 to-blue-400 group-hover:from-blue-500 group-hover:to-indigo-400');
+                let textClass = isCurrent ? 'font-bold text-blue-400' : (item.hasData ? 'font-semibold text-slate-300' : 'text-slate-500');
+
+                const tooltipHtml = item.hasData
+                    ? `${item.name}: <strong class="text-emerald-400">${item.pct}%</strong> (${item.countLabel})`
+                    : `${item.name}: Belum ada data presensi`;
 
                 barsHtml += `
-                    <div class="flex-1 flex flex-col items-center justify-end group h-full cursor-pointer">
-                        <div class="w-1/2 sm:w-3/5 ${bgClass} transition-all duration-500 rounded-t-lg relative flex items-end justify-center" style="height: ${item.pct}%;">
-                            <span class="absolute -top-9 left-1/2 -translate-x-1/2 font-semibold text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-slate-800 border border-slate-700 text-white px-2.5 py-1 rounded-lg shadow-xl z-20 pointer-events-none">
-                                ${item.pct}% (${item.countLabel})
+                    <div class="flex-1 flex flex-col items-center justify-end group h-full cursor-pointer relative">
+                        <div class="w-full max-w-[32px] sm:max-w-[40px] ${bgClass} transition-all duration-500 rounded-t-lg relative flex items-end justify-center" style="height: ${barHeight}%;">
+                            <span class="absolute -top-10 left-1/2 -translate-x-1/2 font-semibold text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 bg-slate-900/95 border border-slate-700 text-white px-2.5 py-1.5 rounded-xl shadow-2xl z-30 pointer-events-none">
+                                ${tooltipHtml}
                             </span>
                         </div>
-                        <span class="mt-3 text-xs ${textClass}">${item.name}</span>
+                        <span class="mt-3 text-[11px] sm:text-xs ${textClass}">${item.name}</span>
                     </div>
                 `;
             });
             desktopContainer.innerHTML = barsHtml;
         }
 
-        // Mobile Render
+        // Mobile Render (All 12 Months from Spreadsheet)
         const mobileContainer = document.getElementById('trend-bars-mobile');
         if (mobileContainer) {
             let mobileBarsHtml = '';
-            monthData.slice(0, 5).forEach(item => {
+            monthData.forEach((item, idx) => {
+                const isCurrent = idx === currentMonthIdx && selectedYear === currentYearStr;
+                let barHeight = item.hasData ? Math.max(item.pct, 6) : 3;
+                let bgClass = item.hasData ? (isCurrent ? 'bg-indigo-500' : 'bg-blue-500/80') : 'bg-slate-700/30';
+                let textClass = isCurrent ? 'font-bold text-blue-400' : (item.hasData ? 'text-slate-300' : 'text-slate-500');
+
                 mobileBarsHtml += `
-                    <div class="flex-1 flex flex-col items-center justify-end group h-full">
-                        <div class="w-full bg-blue-500/20 hover:bg-blue-500 transition-all duration-500 rounded-t-lg relative" style="height: ${item.pct}%;">
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">${item.pct}%</div>
+                    <div class="flex-1 min-w-[20px] flex flex-col items-center justify-end group h-full cursor-pointer relative">
+                        <div class="w-full ${bgClass} transition-all duration-500 rounded-t-sm relative" style="height: ${barHeight}%;">
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-slate-900 border border-slate-700 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none">
+                                ${item.name}: ${item.hasData ? item.pct + '%' : '0%'}
+                            </div>
                         </div>
-                        <p class="mt-2 text-[10px] text-slate-400">${item.name}</p>
+                        <p class="mt-2 text-[9px] ${textClass}">${item.name}</p>
                     </div>
                 `;
             });
             mobileContainer.innerHTML = mobileBarsHtml;
         }
 
-        const totalPct = monthData.slice(0, 6).reduce((acc, curr) => acc + curr.pct, 0);
-        const avgPct = (totalPct / 6).toFixed(1);
         const avgElem = document.getElementById('trend-avg-text');
-        if (avgElem) avgElem.textContent = `${avgPct}%`;
+        if (avgElem) avgElem.textContent = avgPctStr;
         const avgElemMobile = document.getElementById('trend-avg-text-mobile');
-        if (avgElemMobile) avgElemMobile.textContent = `${avgPct}%`;
+        if (avgElemMobile) avgElemMobile.textContent = avgPctStr;
     }
 
     async function downloadLaporanHarian() {

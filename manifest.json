@@ -1,0 +1,24 @@
+{
+  "name": "Sistem Presensi Digital - SMA Negeri 1 Edukasi",
+  "short_name": "Presensi",
+  "description": "Sistem Presensi Digital Terpadu SMA Negeri 1 Edukasi Digital",
+  "start_url": "./dashboard.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0f19",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./img/logo-sekolah.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

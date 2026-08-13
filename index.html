@@ -6,6 +6,16 @@
     <title>Portal Login - Sistem Presensi Digital</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
     <link rel="alternate icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="manifest" href="manifest.json"/>
+        <script>
+        (function() {
+            const w = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+                w.apply(console, args);
+            };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -66,6 +76,18 @@
 
     <!-- Main Content Area -->
     <main class="w-full max-w-5xl mx-auto px-3.5 sm:px-4 py-4 sm:py-8 relative z-10 my-auto">
+
+        <!-- Global Alert Box for Session Expiration or Errors -->
+        <div id="global-error-box" class="hidden max-w-md mx-auto mb-6 p-4 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-3 shadow-lg shadow-rose-950/20 relative z-30">
+            <span class="material-symbols-outlined text-rose-400 shrink-0 text-base">error</span>
+            <div class="flex-grow leading-relaxed">
+                <span class="font-bold text-white block mb-0.5">Sesi Terputus</span>
+                <span id="global-error-msg">Session tidak valid atau kadaluarsa, silakan login ulang.</span>
+            </div>
+            <button onclick="document.getElementById('global-error-box').classList.add('hidden')" class="text-slate-400 hover:text-white transition-colors cursor-pointer shrink-0">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
 
         <!-- STEP 1: ROLE SELECTION PORTAL -->
         <div id="step-role-selection" class="step-transition opacity-100 scale-100">
@@ -264,11 +286,26 @@
 
     <!-- Scripts -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="js/indexeddb-storage.js"></script>
     <script src="js/config.js"></script>
     <script>
         let currentSelectedRole = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Check for query param error (e.g., session expired)
+            const urlParams = new URLSearchParams(window.location.search);
+            const errParam = urlParams.get('err');
+            if (errParam) {
+                const globalErrorBox = document.getElementById('global-error-box');
+                const globalErrorMsg = document.getElementById('global-error-msg');
+                if (globalErrorBox && globalErrorMsg) {
+                    globalErrorMsg.textContent = errParam;
+                    globalErrorBox.classList.remove('hidden');
+                }
+                // Clean the query parameters from URL so refreshes don't show it again
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             // Check active session
             const token = getToken();
             if (token) {

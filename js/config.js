@@ -1,5 +1,5 @@
 // ==== KONFIGURASI APLIKASI ====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZNUHqdpQ373lFbVSgIh4CzLz5dzUnLECpx5W1EhONc0bK2_nXSGl966ubKGqvzlfjsA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1bvsl8a2-Ti9v4aLUM3CjLzVC2P2odl1pAGlbjXBEF3OIhkEE4HwLG9HXt1bQIyEKdg/exec';
 
 // Google OAuth Client ID (Isi jika menggunakan Google Identity Services di domain terdaftar)
 const GOOGLE_CLIENT_ID = '222705604056-fjhbfphdg2ncua1gohaboliar2drr59m.apps.googleusercontent.com';
@@ -16,7 +16,7 @@ async function apiGet(action, params = {}) {
   return res.json();
 }
 
-async function apiPost(action, data = {}, timeoutMs = 20000, maxRetries = 0) {
+async function apiPost(action, data = {}, timeoutMs = 45000, maxRetries = 1) {
   let finalUrl = APPS_SCRIPT_URL.trim();
   if (!finalUrl.endsWith('/exec') && !finalUrl.endsWith('/dev')) {
     finalUrl += finalUrl.endsWith('/') ? 'exec' : '/exec';
@@ -24,7 +24,7 @@ async function apiPost(action, data = {}, timeoutMs = 20000, maxRetries = 0) {
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const controller = new AbortController();
-    const currentTimeout = attempt > 0 ? 30000 : timeoutMs;
+    const currentTimeout = attempt > 0 ? 45000 : timeoutMs;
     const timer = setTimeout(() => controller.abort(), currentTimeout);
     try {
       const res = await fetch(finalUrl, {
@@ -36,7 +36,26 @@ async function apiPost(action, data = {}, timeoutMs = 20000, maxRetries = 0) {
       clearTimeout(timer);
       const text = await res.text();
       try {
-        return JSON.parse(text);
+        const json = JSON.parse(text);
+        if (json && json.ok === false && json.error && (
+            json.error.toLowerCase().includes('session tidak valid') ||
+            json.error.toLowerCase().includes('sesi login telah berakhir') ||
+            json.error.toLowerCase().includes('kadaluarsa') ||
+            json.error.toLowerCase().includes('login ulang')
+        )) {
+          clearSession();
+          const loc = window.location;
+          const isLoginPage = loc.pathname.endsWith('index.html') || loc.pathname === '/' || loc.pathname.endsWith('/');
+          if (!isLoginPage) {
+            loc.href = 'index.html?err=' + encodeURIComponent(json.error);
+          } else {
+            const urlParams = new URLSearchParams(loc.search);
+            if (!urlParams.has('err')) {
+              loc.href = 'index.html?err=' + encodeURIComponent(json.error);
+            }
+          }
+        }
+        return json;
       } catch (e) {
         console.warn("Apps Script non-JSON response:", text);
         return { ok: false, error: "Respon server bukan format JSON yang valid.", raw: text };
@@ -73,23 +92,41 @@ const CACHE_DURATIONS = {
 function getCached(key) {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const { data, timestamp } = JSON.parse(raw);
-    const duration = CACHE_DURATIONS[key] || 5 * 60 * 1000;
-    if (Date.now() - timestamp > duration) {
+    if (raw) {
+      const { data, timestamp } = JSON.parse(raw);
+      const duration = CACHE_DURATIONS[key] || 5 * 60 * 1000;
+      if (Date.now() - timestamp <= duration) {
+        return data;
+      }
       localStorage.removeItem(key);
-      return null;
     }
-    return data;
-  } catch (err) {
-    return null;
-  }
+  } catch (err) {}
+
+  return null;
 }
 
 function setCached(key, data) {
   try {
     localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch (err) {}
+  } catch (err) {
+    console.warn('[Storage] LocalStorage quota exceeded, relying on IndexedDB store.');
+  }
+
+  // Dual-write to IndexedDB for high-scale storage
+  if (typeof saveToIDB === 'function') {
+    saveToIDB(key, data).catch(() => {});
+  }
+}
+
+// ==== SERVICE WORKER REGISTRATION (PWA) ====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      console.log('[PWA] Service Worker registered successfully:', reg.scope);
+    }).catch((err) => {
+      console.warn('[PWA] Service Worker registration failed:', err);
+    });
+  });
 }
 
 function clearAllCache() {
@@ -108,7 +145,7 @@ function invalidateCache(keys) {
 
 async function apiPostCached(action, data, cacheKey, onFresh) {
   const cached = cacheKey ? getCached(cacheKey) : null;
-  const freshPromise = apiPost(action, data).then(res => {
+  const freshPromise = apiPost(action, data, 45000, 1).then(res => {
     if (res && res.ok && cacheKey) setCached(cacheKey, res);
     if (onFresh) onFresh(res);
     return res;
@@ -156,15 +193,212 @@ function setSiswaListCache(siswaArrayOrRes) {
 }
 
 function prefetchSiswaList() {
-  const role = getRole();
-  if (!role || role === 'siswa') return;
-  const token = getToken();
-  if (!token) return;
+  startProgressivePrefetch();
+}
 
-  const cached = getSiswaListFromCache();
-  if (!cached) {
-    apiPostCached('getSiswaList', { token }, 'cache_siswa_list').catch(() => {});
+// ==== PROGRESSIVE BACKGROUND PREFETCHING SYSTEM ====
+let isPrefetchingActive = false;
+let lastPrefetchTime = 0;
+
+async function startProgressivePrefetch() {
+  const role = getRole();
+  const token = getToken();
+  if (!role || !token || role === 'siswa') return;
+
+  if (isPrefetchingActive || (Date.now() - lastPrefetchTime < 3 * 60 * 1000)) return;
+  isPrefetchingActive = true;
+
+  console.log('[Prefetch] Memulai pengunduhan data bertahap di latar belakang...');
+
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  try {
+    // Step 1: Data Master Siswa
+    if (!getCached('cache_siswa_list')) {
+      await apiPostCached('getSiswaList', { token }, 'cache_siswa_list').catch(() => {});
+    }
+    await delay(600);
+
+    // Step 2: Data Laporan Presensi
+    if (!getCached('cache_laporan_data')) {
+      await apiPostCached('getLaporan', { token }, 'cache_laporan_data').catch(() => {});
+    }
+    await delay(800);
+
+    // Step 3: Data Pengaturan Sistem
+    if (!getCached('cache_pengaturan')) {
+      await apiPostCached('getPengaturan', { token }, 'cache_pengaturan').catch(() => {});
+    }
+    await delay(800);
+
+    // Step 4 & 5: Data Pengelola & Log Aktivitas (khusus Admin & Kepsek)
+    if (['admin', 'kepsek'].includes(role)) {
+      if (!getCached('cache_guru_list')) {
+        await apiPostCached('getGuruList', { token }, 'cache_guru_list').catch(() => {});
+      }
+      await delay(800);
+
+      if (!getCached('cache_log_aktivitas')) {
+        await apiPostCached('getLogAktivitas', { token }, 'cache_log_aktivitas').catch(() => {});
+      }
+    }
+
+    lastPrefetchTime = Date.now();
+    console.log('[Prefetch] Seluruh data utama berhasil disinkronkan ke LocalStorage.');
+  } catch (err) {
+    console.warn('[Prefetch] Peringatan prefetch:', err.message);
+  } finally {
+    isPrefetchingActive = false;
   }
+}
+
+// ==== OFFLINE TRANSACTION QUEUE ENGINE ====
+const QUEUE_STORAGE_KEY = 'offline_mutation_queue';
+let isProcessingQueue = false;
+
+function getOfflineQueue() {
+  try {
+    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveOfflineQueue(queue) {
+  try {
+    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
+    updateQueueBadgeUI();
+  } catch (e) {}
+}
+
+function getQueueCount() {
+  return getOfflineQueue().length;
+}
+
+function updateQueueBadgeUI() {
+  const count = getQueueCount();
+  const badges = document.querySelectorAll('.offline-queue-badge');
+  badges.forEach(badge => {
+    if (count > 0) {
+      badge.classList.remove('hidden');
+      badge.textContent = `${count} antrean offline`;
+    } else {
+      badge.classList.add('hidden');
+    }
+  });
+}
+
+/**
+ * Memasukkan operasi mutasi data ke antrean lokal dan langsung memperbarui UI (Optimistic UI)
+ */
+async function enqueueMutation(action, payload, optimisticUpdateFn) {
+  if (typeof optimisticUpdateFn === 'function') {
+    try {
+      optimisticUpdateFn();
+    } catch (e) {
+      console.error('[QueueEngine] Optimistic update UI error:', e);
+    }
+  }
+
+  const queue = getOfflineQueue();
+  const item = {
+    id: 'MUT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    action,
+    payload,
+    timestamp: Date.now(),
+    attempts: 0
+  };
+  queue.push(item);
+  saveOfflineQueue(queue);
+
+  if (typeof showToast === 'function') {
+    showToast(`Data tersimpan secara lokal. (${queue.length} antrean disinkronkan)`);
+  }
+
+  processOfflineQueue();
+  return { ok: true, isQueued: true, queueId: item.id };
+}
+
+async function processOfflineQueue() {
+  if (isProcessingQueue) return;
+  const queue = getOfflineQueue();
+  if (queue.length === 0) return;
+
+  isProcessingQueue = true;
+  console.log(`[QueueEngine] Memproses ${queue.length} antrean transaksi offline...`);
+
+  let remainingQueue = [...queue];
+
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i];
+    item.attempts = (item.attempts || 0) + 1;
+
+    try {
+      const res = await apiPost(item.action, item.payload, 30000, 1);
+      
+      if (res && res.ok) {
+        console.log(`[QueueEngine] Antrean ${item.id} (${item.action}) BERHASIL disinkronkan.`);
+        remainingQueue = remainingQueue.filter(q => q.id !== item.id);
+        saveOfflineQueue(remainingQueue);
+
+        if (item.action.includes('Absensi') || item.action.includes('Status')) {
+          invalidateCache(['cache_laporan_data', 'cache_riwayat_siswa']);
+        } else if (item.action.includes('Siswa')) {
+          invalidateCache(['cache_siswa_list']);
+        } else if (item.action.includes('Pengaturan')) {
+          invalidateCache(['cache_pengaturan']);
+        }
+      } else {
+        console.warn(`[QueueEngine] Antrean ${item.id} (${item.action}) ditolak server:`, res ? res.error : 'Unknown');
+        if (item.attempts >= 3) {
+          remainingQueue = remainingQueue.filter(q => q.id !== item.id);
+          saveOfflineQueue(remainingQueue);
+        }
+        break;
+      }
+    } catch (err) {
+      console.warn(`[QueueEngine] Gagal mengirim antrean ${item.id}:`, err.message);
+      break;
+    }
+  }
+
+  isProcessingQueue = false;
+  updateQueueBadgeUI();
+}
+
+window.addEventListener('online', () => {
+  console.log('[QueueEngine] Koneksi terhubung kembali! Memulai sinkronisasi antrean...');
+  processOfflineQueue();
+});
+
+setInterval(() => {
+  if (getQueueCount() > 0 && !isProcessingQueue) {
+    processOfflineQueue();
+  }
+}, 45000);
+
+// ==== LOCALSTORAGE PERSISTENT HELPERS ====
+function getLaporanFromCache() {
+  const cachedObj = getCached('cache_laporan_data');
+  if (cachedObj && cachedObj.ok && Array.isArray(cachedObj.data)) return cachedObj.data;
+  if (Array.isArray(cachedObj)) return cachedObj;
+  return null;
+}
+
+function setLaporanCache(laporanArray) {
+  if (!Array.isArray(laporanArray)) return;
+  setCached('cache_laporan_data', { ok: true, data: laporanArray });
+}
+
+function getPengaturanFromCache() {
+  const cachedObj = getCached('cache_pengaturan');
+  if (cachedObj && cachedObj.ok) return cachedObj.data || cachedObj;
+  return null;
+}
+
+function setPengaturanCache(settingsObj) {
+  setCached('cache_pengaturan', { ok: true, data: settingsObj });
 }
 
 
@@ -237,7 +471,7 @@ async function guardPage(requiredRole) {
 
   if (!roleMatch) {
     clearSession();
-    window.location.href = 'index.html';
+    window.location.href = 'index.html?err=' + encodeURIComponent('Akses ditolak untuk peran ini. Silakan login kembali dengan peran yang sesuai.');
     return null;
   }
 
@@ -249,6 +483,8 @@ async function guardPage(requiredRole) {
       if (cachedToken === token && (Date.now() - timestamp < SESSION_CACHE_DURATION)) {
         setupCommonUI(session);
         prefetchSiswaList();
+        startProgressivePrefetch();
+        updateQueueBadgeUI();
         // Background revalidation jika session cache sudah berusia > 3 menit
         if (Date.now() - timestamp > 3 * 60 * 1000) {
           apiPost('checkSession', { token }).then(check => {
@@ -282,22 +518,26 @@ async function guardPage(requiredRole) {
       if (isTimeoutOrConnError || (token && (token.startsWith('fallback_token_') || token.startsWith('local_token_')))) {
         console.warn("Using offline session fallback due to backend timeout/connection issue.");
         const fallbackSession = { ok: true, role: currentRole, nama: currentNama, email: currentEmail };
+        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({ session: fallbackSession, token, timestamp: Date.now() }));
         setupCommonUI(fallbackSession);
         return fallbackSession;
       }
       clearSession();
-      window.location.href = 'index.html';
+      const errMsg = check && check.error ? check.error : 'Session tidak valid atau kadaluarsa, silakan login ulang';
+      window.location.href = 'index.html?err=' + encodeURIComponent(errMsg);
       return null;
     }
 
     if (!freshRoleMatch) {
       clearSession();
-      window.location.href = 'index.html';
+      window.location.href = 'index.html?err=' + encodeURIComponent('Akses ditolak untuk peran ini. Silakan login kembali dengan peran yang sesuai.');
       return null;
     }
 
     sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify({ session: check, token, timestamp: Date.now() }));
     setupCommonUI(check);
+    startProgressivePrefetch();
+    updateQueueBadgeUI();
     return check;
   } catch (e) {
     console.error('Session verification error:', e);
@@ -307,7 +547,7 @@ async function guardPage(requiredRole) {
       return fallbackSession;
     } else {
       clearSession();
-      window.location.href = 'index.html';
+      window.location.href = 'index.html?err=' + encodeURIComponent('Gagal memverifikasi sesi. Silakan coba login kembali.');
       return null;
     }
   }

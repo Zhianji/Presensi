@@ -6,6 +6,16 @@
     <title>Input Absensi - Sistem Presensi Digital (v2.0)</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
     <link rel="alternate icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="manifest" href="manifest.json"/>
+        <script>
+        (function() {
+            const w = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+                w.apply(console, args);
+            };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -497,6 +507,7 @@
         </main>
     </div>
 
+<script src="js/indexeddb-storage.js"></script>
 <script src="js/config.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
@@ -1010,21 +1021,16 @@
         const items = [];
         rows.forEach(row => {
             const siswaId = row.getAttribute('data-siswa-id');
-            const checkedRadio = row.querySelector('input[type="radio"]:checked');
-            const statusVal = checkedRadio ? checkedRadio.value : 'Belum';
-
             const sId = String(siswaId).replace(/[^a-zA-Z0-9_-]/g, '_');
+
+            const dtRadio = row.querySelector(`input[name="status-${sId}"]:checked`) || document.querySelector(`input[name="status-${sId}"]:checked`);
+            const mobRadio = row.querySelector(`input[name="status-mob-${sId}"]:checked`) || document.querySelector(`input[name="status-mob-${sId}"]:checked`);
+            const checkedRadio = dtRadio || mobRadio || row.querySelector('input[type="radio"]:checked');
+
+            const statusVal = checkedRadio ? checkedRadio.value : 'Belum';
             const ketInput = document.getElementById(`ket-${sId}`) || document.getElementById(`ket-${siswaId}`);
 
-            let shouldPush = (statusVal && statusVal !== 'Belum');
-            if (!shouldPush && typeof currentSiswaList !== 'undefined' && Array.isArray(currentSiswaList)) {
-                const prevS = currentSiswaList.find(s => String(s.siswa_id || s.id) === String(siswaId));
-                if (prevS && prevS.status && prevS.status !== 'Belum') {
-                    shouldPush = true;
-                }
-            }
-
-            if (shouldPush) {
+            if (statusVal && statusVal !== 'Belum' && ['Hadir', 'Sakit', 'Izin', 'Alfa'].includes(statusVal)) {
                 items.push({
                     siswa_id: siswaId,
                     status: statusVal,
@@ -1041,9 +1047,7 @@
             }
         });
 
-        const markedItemsCount = items.filter(i => i.status && i.status !== 'Belum').length;
-
-        if (markedItemsCount === 0 && items.length === 0) {
+        if (items.length === 0) {
             if (typeof showToast === 'function') {
                 showToast('Silakan pilih status presensi setidaknya untuk 1 siswa.', true);
             } else {
@@ -1067,7 +1071,7 @@
 
             if (batchRes && batchRes.ok) {
                 invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
-                const savedCount = (typeof batchRes.count === 'number') ? batchRes.count : markedItemsCount;
+                const savedCount = (typeof batchRes.count === 'number') ? batchRes.count : items.length;
                 if (typeof showToast === 'function') {
                     showToast(`Presensi ${savedCount} siswa berhasil disimpan ke spreadsheet!`, false);
                 } else {
@@ -1090,10 +1094,9 @@
             // Attempt 2: Sequential Fallback (Safe for Google Apps Script Single-Thread Lock)
             console.warn('Batch save did not complete cleanly, using sequential fallback...');
             let savedCount = 0;
-            const validItems = items.filter(i => i.status && i.status !== 'Belum');
-            for (let i = 0; i < validItems.length; i++) {
-                const item = validItems[i];
-                setButtonsLoading(true, `Menyimpan (${i+1}/${validItems.length})...`);
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                setButtonsLoading(true, `Menyimpan (${i+1}/${items.length})...`);
                 
                 try {
                     const res = await apiPost('setAbsensiStatus', {
@@ -1113,9 +1116,9 @@
             invalidateCache(['cache_laporan_data', 'cache_overview_v2']);
             if (savedCount > 0) {
                 if (typeof showToast === 'function') {
-                    showToast(`Presensi ${savedCount}/${validItems.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < validItems.length);
+                    showToast(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan ke spreadsheet!`, savedCount < items.length);
                 } else {
-                    alert(`Presensi ${savedCount}/${validItems.length} siswa berhasil disimpan!`);
+                    alert(`Presensi ${savedCount}/${items.length} siswa berhasil disimpan!`);
                 }
             } else {
                 const errMsg = (batchRes && batchRes.error) ? batchRes.error : 'Gagal terhubung ke Google Apps Script.';
@@ -1128,9 +1131,9 @@
         } catch (e) {
             console.warn('Simpan absensi error:', e);
             if (typeof showToast === 'function') {
-                showToast(`Presensi ${markedItemsCount} siswa tersimpan di cache (Mode Offline).`, false);
+                showToast(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`, false);
             } else {
-                alert(`Presensi ${markedItemsCount} siswa tersimpan di cache (Mode Offline).`);
+                alert(`Presensi ${items.length} siswa tersimpan di cache (Mode Offline).`);
             }
         } finally {
             setButtonsLoading(false);

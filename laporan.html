@@ -7,10 +7,20 @@
     <title>Rekap & Laporan - Sistem Presensi Digital (v2.0)</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.json" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
+        <script>
+        (function() {
+            const w = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+                w.apply(console, args);
+            };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="js/tailwind-config.js"></script>
     <script src="js/logo-sekolah.js"></script>
@@ -849,6 +859,7 @@
         </table>
     </div>
 
+    <script src="js/indexeddb-storage.js"></script>
     <script src="js/config.js"></script>
     <script>
         let allLaporanData = [];
@@ -975,12 +986,29 @@
         }
 
         function processLaporanResponse(res) {
+            if (!res) return;
+
+            // Handle error response
+            if (!res.ok && !Array.isArray(res)) {
+                console.error("API Error in Laporan:", res.error);
+                if (allLaporanData && allLaporanData.length > 0) {
+                    if (typeof showToast === 'function') {
+                        showToast('Gagal menyinkronkan data terbaru. Menampilkan data offline.', true);
+                    }
+                    return;
+                }
+                allLaporanData = [];
+                populateClassDropdowns(allLaporanData);
+                applyFilters();
+                return;
+            }
+
             try {
-                if (res && res.ok && Array.isArray(res.data)) {
+                if (res.ok && Array.isArray(res.data)) {
                     allLaporanData = res.data;
-                } else if (res && res.ok && res.laporan && Array.isArray(res.laporan.data)) {
+                } else if (res.ok && res.laporan && Array.isArray(res.laporan.data)) {
                     allLaporanData = res.laporan.data;
-                } else if (res && Array.isArray(res)) {
+                } else if (Array.isArray(res)) {
                     allLaporanData = res;
                 } else {
                     console.warn("Data laporan dari spreadsheet kosong atau tidak valid.");
