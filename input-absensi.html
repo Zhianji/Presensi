@@ -886,13 +886,13 @@
                             <p class="font-semibold text-white text-xs">${s.nama}</p>
                             <p class="text-[10px] text-slate-400">${s.kelas}</p>
                         </div>
-                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${status === 'Hadir' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (status === 'Sakit' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : (status === 'Izin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : (status === 'Alfa' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700')))}">${status || 'Belum'}</span>
+                        <span class="mobile-status-badge text-[10px] font-bold px-2.5 py-1 rounded-full ${status === 'Hadir' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (status === 'Sakit' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : (status === 'Izin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : (status === 'Alfa' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700')))}">${status || 'Belum'}</span>
                     </div>
                     <div class="flex items-center justify-between gap-1.5 pt-1">
-                        <button type="button" onclick="toggleStatusMobile('${rawSId}', 'Hadir')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Hadir' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 border border-emerald-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Hadir</button>
-                        <button type="button" onclick="toggleStatusMobile('${rawSId}', 'Sakit')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Sakit' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Sakit</button>
-                        <button type="button" onclick="toggleStatusMobile('${rawSId}', 'Izin')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Izin' ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30 border border-amber-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Izin</button>
-                        <button type="button" onclick="toggleStatusMobile('${rawSId}', 'Alfa')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Alfa' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 border border-rose-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Alfa</button>
+                        <button type="button" data-status-btn="Hadir" onclick="toggleStatusMobile('${rawSId}', 'Hadir')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Hadir' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 border border-emerald-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Hadir</button>
+                        <button type="button" data-status-btn="Sakit" onclick="toggleStatusMobile('${rawSId}', 'Sakit')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Sakit' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Sakit</button>
+                        <button type="button" data-status-btn="Izin" onclick="toggleStatusMobile('${rawSId}', 'Izin')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Izin' ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30 border border-amber-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Izin</button>
+                        <button type="button" data-status-btn="Alfa" onclick="toggleStatusMobile('${rawSId}', 'Alfa')" class="flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ${status === 'Alfa' ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 border border-rose-400/40' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'}">Alfa</button>
                     </div>
                 </div>
             `;
@@ -905,14 +905,64 @@
         if (typeof currentSiswaList === 'undefined' || !Array.isArray(currentSiswaList)) return;
         
         const idx = currentSiswaList.findIndex(s => String(s.siswa_id || s.id) === String(rawSId));
-        if (idx !== -1) {
-            if (currentSiswaList[idx].status === statusVal) {
-                currentSiswaList[idx].status = 'Belum';
-            } else {
-                currentSiswaList[idx].status = statusVal;
+        if (idx === -1) return;
+        
+        const currentStatus = currentSiswaList[idx].status || 'Belum';
+        const newStatus = (currentStatus === statusVal) ? 'Belum' : statusVal;
+        
+        // 1. Update status di data array
+        currentSiswaList[idx].status = newStatus;
+        
+        // 2. Lakukan update DOM secara lokal tanpa menggambar ulang seluruh list
+        const card = document.querySelector(`#student-list div[data-siswa-id="${rawSId}"]`);
+        if (card) {
+            // Update status badge text & class
+            const badge = card.querySelector('.mobile-status-badge');
+            if (badge) {
+                badge.textContent = newStatus === 'Belum' ? 'Belum' : newStatus;
+                badge.className = `mobile-status-badge text-[10px] font-bold px-2.5 py-1 rounded-full ` + 
+                    (newStatus === 'Hadir' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 
+                     (newStatus === 'Sakit' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 
+                      (newStatus === 'Izin' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
+                       (newStatus === 'Alfa' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 
+                        'bg-slate-800 text-slate-400 border border-slate-700'))));
             }
+            
+            // Update status button active/inactive states
+            const buttons = {
+                'Hadir': card.querySelector('button[data-status-btn="Hadir"]'),
+                'Sakit': card.querySelector('button[data-status-btn="Sakit"]'),
+                'Izin': card.querySelector('button[data-status-btn="Izin"]'),
+                'Alfa': card.querySelector('button[data-status-btn="Alfa"]')
+            };
+            
+            const classes = {
+                'Hadir': { active: 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 border border-emerald-400/40', inactive: 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60' },
+                'Sakit': { active: 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-400/40', inactive: 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60' },
+                'Izin': { active: 'bg-amber-600 text-white shadow-lg shadow-amber-600/30 border border-amber-400/40', inactive: 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60' },
+                'Alfa': { active: 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 border border-rose-400/40', inactive: 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60' }
+            };
+            
+            Object.keys(buttons).forEach(st => {
+                const btn = buttons[st];
+                if (btn) {
+                    const isSelected = (newStatus === st);
+                    btn.className = `flex-1 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer ` + 
+                        (isSelected ? classes[st].active : classes[st].inactive);
+                }
+            });
         }
-        renderSiswaTable(currentSiswaList);
+        
+        // 3. Sinkronisasikan ke tampilan desktop agar status radio di desktop tercentang 
+        // sehingga jika user menyimpan dari tombol desktop (atau data tersinkronisasi), nilainya tetap konsisten.
+        const sId = String(rawSId).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const dtRadio = document.querySelector(`input[name="status-${sId}"][value="${newStatus}"]`);
+        if (dtRadio) {
+            dtRadio.checked = true;
+        } else if (newStatus === 'Belum') {
+            const dtRadios = document.querySelectorAll(`input[name="status-${sId}"]`);
+            dtRadios.forEach(r => r.checked = false);
+        }
     }
 
     function handleStatusClick(e, sId, statusVal) {
