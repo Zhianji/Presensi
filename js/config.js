@@ -123,9 +123,38 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       console.log('[PWA] Service Worker registered successfully:', reg.scope);
+      
+      // Auto check and trigger update immediately on load
+      reg.update();
+
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        if (installingWorker) {
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                console.log('[PWA] New update available. Activating...');
+                if (typeof showToast === 'function') {
+                  showToast('Pembaruan sistem terdeteksi! Memuat ulang...', false);
+                }
+              }
+            }
+          };
+        }
+      };
     }).catch((err) => {
       console.warn('[PWA] Service Worker registration failed:', err);
     });
+  });
+
+  // Force page reload once the new service worker takes control
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      console.log('[PWA] New Service Worker active, reloading page...');
+      window.location.reload();
+    }
   });
 }
 

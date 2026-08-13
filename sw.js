@@ -1,5 +1,5 @@
 // ==== SERVICE WORKER: PRESENSI DIGITAL PWA ====
-const CACHE_NAME = 'presensi-pwa-v2.0';
+const CACHE_NAME = 'presensi-pwa-v2.2';
 
 const ASSETS_TO_CACHE = [
   './',
