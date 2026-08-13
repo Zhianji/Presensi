@@ -58,7 +58,7 @@ async function apiPost(action, data = {}, timeoutMs = 45000, maxRetries = 1) {
         return json;
       } catch (e) {
         console.warn("Apps Script non-JSON response:", text);
-        return { ok: false, error: "Respon server bukan format JSON yang valid.", raw: text };
+        return { ok: false, error: "Respon server bukan format JSON yang valid.", raw: text, isNonJson: true };
       }
     } catch (err) {
       clearTimeout(timer);
@@ -540,9 +540,13 @@ async function guardPage(requiredRole) {
 
     if (!check || !check.ok) {
       const isTimeoutOrConnError = check && check.error && (
+        check.isNonJson ||
         check.error.includes('timeout') ||
         check.error.includes('terhubung') ||
-        check.error.includes('Failed to fetch')
+        check.error.includes('Failed to fetch') ||
+        check.error.includes('JSON') ||
+        check.error.includes('format') ||
+        check.error.includes('bukan format')
       );
       if (isTimeoutOrConnError || (token && (token.startsWith('fallback_token_') || token.startsWith('local_token_')))) {
         console.warn("Using offline session fallback due to backend timeout/connection issue.");
@@ -589,12 +593,16 @@ async function mockGoogleLogin(email, name = '', picture = '', expectedRole = ''
     return res;
   }
 
-  // Check if failure is due to network timeout or connection error to Google Apps Script
+  // Check if failure is due to network timeout, non-JSON response, or connection error to Google Apps Script
   const isNetworkOrTimeout = res && res.error && (
+    res.isNonJson ||
     res.error.includes('timeout') ||
     res.error.includes('terhubung') ||
     res.error.includes('Failed to fetch') ||
-    res.error.includes('NetworkError')
+    res.error.includes('NetworkError') ||
+    res.error.includes('JSON') ||
+    res.error.includes('format') ||
+    res.error.includes('bukan format')
   );
 
   if (isNetworkOrTimeout) {
